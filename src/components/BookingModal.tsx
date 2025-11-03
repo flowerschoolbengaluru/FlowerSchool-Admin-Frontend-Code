@@ -224,7 +224,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                 };
 
                 try {
-                    // Create Razorpay order
+                    // Create Razorpay order with course details for email notification
                     const orderResponse = await createRazorpayOrder({
                         amount: parseFloat(event.amount?.toString() || '0'),
                         currency: 'INR',
@@ -233,7 +233,8 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                             event_title: event.title,
                             event_date: event.event_date,
                             student_name: enrollmentData.full_name
-                        }
+                        },
+                        courseDetails: enrollmentData // Add course details for email
                     });
 
                     if (!orderResponse.success) {

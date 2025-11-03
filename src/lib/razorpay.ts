@@ -21,6 +21,7 @@ export interface RazorpayOrderData {
   currency?: string;
   receipt?: string;
   notes?: Record<string, string>;
+  courseDetails?: any; // Course enrollment details for email notifications
 }
 
 export interface RazorpayPaymentOptions {
