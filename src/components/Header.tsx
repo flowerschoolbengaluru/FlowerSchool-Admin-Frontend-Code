@@ -25,24 +25,24 @@ const Header = ({ onAdminClick, onNavigate }: HeaderProps) => {
 
   return (
     <header className="sticky top-0 z-50 bg-pink-50/95 backdrop-blur supports-[backdrop-filter]:bg-pink-50/60 border-b border-pink-200">
-      <div className="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+      <div className="container mx-auto px-3 sm:px-4 md:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 sm:h-16">
           {/* Logo - Responsive sizing */}
-          <Link to="/" className="flex items-center cursor-pointer">
+          <Link to="/" className="flex items-center cursor-pointer flex-shrink-0">
             <img
               src={flowerSchoolLogo}
               alt="The Flower School"
-              className="h-8 sm:h-10 md:h-12 w-auto mr-2 sm:mr-3"
+              className="h-8 sm:h-9 md:h-10 lg:h-12 w-auto mr-2 sm:mr-3"
             />
             <div className="flex flex-col">
-              <h1 className="text-sm sm:text-lg md:text-xl font-sans font-bold text-pink-700 leading-tight">
+              <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-sans font-bold text-pink-700 leading-tight whitespace-nowrap">
                 The Flower School
               </h1>
-              <p className="text-xs text-muted-foreground hidden xs:block font-sans">Bengaluru</p>
+              <p className="text-xs text-muted-foreground font-sans hidden xs:block">Bengaluru</p>
             </div>
           </Link>
 
-          {/* Desktop Navigation - Hidden on tablet and below */}
+          {/* Desktop Navigation - Hidden on mobile and tablet */}
           <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
             {navItems.map((item) => (
               <Link
@@ -60,12 +60,12 @@ const Header = ({ onAdminClick, onNavigate }: HeaderProps) => {
           </nav>
 
           {/* Tablet Navigation - Visible only on medium screens */}
-          <nav className="hidden md:flex lg:hidden items-center space-x-4">
+          <nav className="hidden md:flex lg:hidden items-center space-x-3">
             {navItems.slice(0, 3).map((item) => (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`text-sm text-foreground hover:text-pink-600 transition font-medium ${
+                className={`text-xs sm:text-sm text-foreground hover:text-pink-600 transition font-medium whitespace-nowrap font-sans ${
                   location.pathname === item.path
                     ? "text-pink-600 border-b-2 border-pink-600"
                     : ""
@@ -77,53 +77,60 @@ const Header = ({ onAdminClick, onNavigate }: HeaderProps) => {
           </nav>
 
           {/* Desktop Actions - Hidden on mobile */}
-          <div className="hidden md:flex items-center space-x-2 lg:space-x-4">
+          <div className="hidden md:flex items-center space-x-2 lg:space-x-4 flex-shrink-0">
             <AuthButtons />
           </div>
 
-          {/* Mobile Menu - Visible on tablet and below */}
-          <div className="md:hidden lg:hidden">
+          {/* Mobile Menu Button - Visible on mobile and tablet */}
+          <div className="flex md:hidden lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="p-2">
-                  <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-1.5 sm:p-2 h-9 w-9 sm:h-10 sm:w-10"
+                >
+                  <Menu className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-[280px] sm:w-[320px] md:w-[400px] bg-pink-50 p-4"
+                className="w-[85vw] max-w-[320px] sm:max-w-[350px] bg-pink-50 p-4 sm:p-6 overflow-y-auto"
               >
-                <div className="flex flex-col space-y-3 sm:space-y-4 mt-6 sm:mt-8">
+                <div className="flex flex-col h-full">
                   {/* Mobile Logo */}
-                  <div className="flex items-center pb-4 border-b border-pink-200">
+                  <div className="flex items-center pb-4 border-b border-pink-200 mb-4">
                     <img
                       src={flowerSchoolLogo}
                       alt="The Flower School"
-                      className="h-8 w-auto mr-2"
+                      className="h-8 sm:h-10 w-auto mr-3"
                     />
                     <div>
-                      <h2 className="text-lg font-playfair font-bold text-pink-700">
+                      <h2 className="text-lg sm:text-xl font-sans font-bold text-pink-700">
                         The Flower School
                       </h2>
-                      <p className="text-xs text-muted-foreground">Bengaluru</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground font-sans">Bengaluru</p>
                     </div>
                   </div>
 
                   {/* Mobile Navigation Links */}
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      onClick={() => setIsOpen(false)}
-                      className={`text-base sm:text-lg font-medium text-foreground hover:text-pink-600 transition-colors py-2 px-1 font-sans ${
-                        location.pathname === item.path
-                          ? "text-pink-600 font-semibold bg-pink-100 rounded-md"
-                          : ""
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                  <nav className="flex-1 space-y-2 sm:space-y-3">
+                    {navItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        onClick={() => setIsOpen(false)}
+                        className={`block text-base sm:text-lg font-medium text-foreground hover:text-pink-600 transition-colors py-2.5 px-3 sm:py-3 sm:px-4 rounded-lg font-sans ${
+                          location.pathname === item.path
+                            ? "text-pink-600 font-semibold bg-pink-100 border border-pink-200"
+                            : "hover:bg-pink-50"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </nav>
                   
                   {/* Mobile Auth Section */}
                   <div className="pt-4 mt-4 border-t border-pink-200">
@@ -137,51 +144,58 @@ const Header = ({ onAdminClick, onNavigate }: HeaderProps) => {
           </div>
 
           {/* Tablet Menu Button - Visible only on medium screens when nav is condensed */}
-          <div className="hidden md:block lg:hidden">
+          <div className="hidden md:flex lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="sm">
-                  <Menu className="h-5 w-5" />
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="p-2 h-9 w-9"
+                >
+                  <Menu className="h-4 w-4" />
+                  <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
               <SheetContent
                 side="right"
-                className="w-[350px] bg-pink-50"
+                className="w-[380px] max-w-[90vw] bg-pink-50 p-6"
               >
-                <div className="flex flex-col space-y-4 mt-8">
+                <div className="flex flex-col h-full">
                   {/* Tablet Logo */}
-                  <div className="flex items-center pb-4 border-b border-pink-200">
+                  <div className="flex items-center pb-4 border-b border-pink-200 mb-6">
                     <img
                       src={flowerSchoolLogo}
                       alt="The Flower School"
                       className="h-10 w-auto mr-3"
                     />
                     <div>
-                      <h2 className="text-lg font-sans font-bold text-pink-700">
+                      <h2 className="text-xl font-sans font-bold text-pink-700">
                         The Flower School
                       </h2>
-                      <p className="text-xs text-muted-foreground font-sans">Bengaluru</p>
+                      <p className="text-sm text-muted-foreground font-sans">Bengaluru</p>
                     </div>
                   </div>
 
                   {/* All Navigation Links */}
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      onClick={() => setIsOpen(false)}
-                      className={`text-lg font-medium text-foreground hover:text-pink-600 transition-colors py-2 font-sans ${
-                        location.pathname === item.path
-                          ? "text-pink-600 font-semibold bg-pink-100 rounded-md px-3"
-                          : ""
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
+                  <nav className="flex-1 space-y-3">
+                    {navItems.map((item) => (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        onClick={() => setIsOpen(false)}
+                        className={`block text-lg font-medium text-foreground hover:text-pink-600 transition-colors py-3 px-4 rounded-lg font-sans ${
+                          location.pathname === item.path
+                            ? "text-pink-600 font-semibold bg-pink-100 border border-pink-200"
+                            : "hover:bg-pink-50"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </nav>
                   
                   {/* Tablet Auth Section */}
-                  <div className="pt-4 border-t border-pink-200">
+                  <div className="pt-6 border-t border-pink-200">
                     <AuthButtons onMenuClose={() => setIsOpen(false)} />
                   </div>
                 </div>

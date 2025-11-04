@@ -6,6 +6,7 @@ export interface Event {
   event_date: string; // ISO date string or date format
   event_time?: string; // Time string
   duration?: string; // Duration interval
+  sessions?: number; // Number of sessions
   instructor?: string;
   spots_left?: number;
   image?: string; // Base64 or URL
@@ -23,6 +24,7 @@ export interface EventFormData {
   event_date: string;
   event_time?: string;
   duration?: string;
+  sessions?: number;
   instructor?: string;
   spots_left?: number;
   image?: string;

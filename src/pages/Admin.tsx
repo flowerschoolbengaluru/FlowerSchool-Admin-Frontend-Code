@@ -53,6 +53,9 @@ interface Product {
   name: string;
   description: string;
   price: number;
+  originalPrice?: number;
+  discountPercentage?: number;
+  discountAmount?: number;
   category: string | string[];
   image: string;
   imagefirst?: string;
@@ -62,6 +65,7 @@ interface Product {
   stockquantity: number;
   instock: boolean;
   featured: boolean;
+  discounts_offers?: boolean;
   createdat?: string;
 }
 
@@ -143,6 +147,7 @@ interface PayLaterRecord {
   phone_number: string;
   payment_method: string;
   questions_or_comments?: string;
+  courses_or_workshops?: string;
   created_at: string;
 }
 
@@ -201,6 +206,22 @@ const Admin = () => {
   const [bestSellerValue, setBestSellerValue] = useState<'true' | 'false'>('false');
   const [editBestSellerValue, setEditBestSellerValue] = useState<'true' | 'false'>('false');
   const [editIsCustomValue, setEditIsCustomValue] = useState<'true' | 'false'>('false');
+  const [showDiscountFields, setShowDiscountFields] = useState(false);
+  const [editShowDiscountFields, setEditShowDiscountFields] = useState(false);
+  
+  // Pricing state variables
+  const [sellingPrice, setSellingPrice] = useState('');
+  const [originalPrice, setOriginalPrice] = useState('');
+  const [discountPercentage, setDiscountPercentage] = useState('');
+  // Preview (computed) selling price shown to customers when a discount is entered
+  const [previewSellingPrice, setPreviewSellingPrice] = useState('');
+  
+  // Edit pricing state variables
+  const [editSellingPrice, setEditSellingPrice] = useState('');
+  const [editOriginalPrice, setEditOriginalPrice] = useState('');
+  const [editDiscountPercentage, setEditDiscountPercentage] = useState('');
+  // Edit-mode preview selling price (computed)
+  const [editPreviewSellingPrice, setEditPreviewSellingPrice] = useState('');
 
   // Helper function to determine instock status
   const getInstockStatus = (product: any): boolean => {
@@ -2470,16 +2491,36 @@ case "products":
                 const isCustomBool = customRaw === 'true';
                 const bestSellerRaw = formData.get('isBestSeller')?.toString() || 'false';
                 const isBestSellerBool = bestSellerRaw === 'true';
-                const productData = {
+                  const originalPriceNum = originalPrice ? parseFloat(originalPrice) : null;
+                  const discountPercentNum = discountPercentage ? parseInt(discountPercentage) : null;
+
+                  // If discounts are enabled we want to send the computed selling price (sellingPrice state)
+                  // as `price`, and send `originalPrice`, `discountPercentage` and `discountAmount` (amount value).
+                  const computedDiscountAmount = (() => {
+                    if (showDiscountFields && originalPriceNum !== null && discountPercentNum !== null && originalPriceNum > 0 && discountPercentNum > 0) {
+                      // discount amount = originalPrice * percent / 100
+                      return parseFloat((originalPriceNum * discountPercentNum / 100).toFixed(2));
+                    }
+                    return null;
+                  })();
+
+                  const productData = {
                   name: formData.get('name')?.toString() || '',
                   description: formData.get('description')?.toString() || '',
-                  price: parseFloat(formData.get('price')?.toString() || '0'),
+                  // price: final selling price. If discounts are enabled use the sellingPrice state (auto-calculated),
+                  // otherwise use the raw price field value entered by the admin.
+                  price: showDiscountFields ? parseFloat(sellingPrice || '0') : parseFloat(formData.get('price')?.toString() || '0'),
+                  originalPrice: showDiscountFields && originalPriceNum !== null ? originalPriceNum : null,
+                  discountPercentage: showDiscountFields && discountPercentNum !== null ? discountPercentNum : null,
+                  // discountAmount should be the numeric amount (e.g. 50.00), not the final price
+                  discountAmount: computedDiscountAmount,
                   // send categories as an array
                   category: categoriesToSend,
                   stockquantity: Math.max(0, parseInt(formData.get('stockQuantity')?.toString() || '0')),
                   instock: formData.get('instock') === 'true',
                   featured: formData.get('featured') === 'on',
                   colour: formData.get('colour')?.toString() || '',
+                  discounts_offers: showDiscountFields, // Use checkbox state
                   // New custom fields
                   customLabel: formData.get('customLabel')?.toString() || '',
                   // Keep raw values too so backend can inspect original fields
@@ -2491,6 +2532,8 @@ case "products":
                   isBestSeller: isBestSellerBool,
                   isbestseller: isBestSellerBool,
                 };
+
+                console.log('Product data being sent:', productData);
 
                 // Create product first
                 const response = await api.post('/api/admin/products', productData);
@@ -2733,10 +2776,160 @@ case "products":
                   <Input id="name" name="name" required className="text-sm sm:text-base" />
                 </div>
                 <div>
-                  <Label htmlFor="price" className="font-sans text-sm sm:text-base">Price</Label>
-                  <Input id="price" name="price" type="number" step="0.01" min="0" required className="text-sm sm:text-base" />
+                  <Label htmlFor="price" className="font-sans text-sm sm:text-base">
+                    {showDiscountFields ? "Selling Price (Auto-calculated) (₹)" : "Selling Price (₹)"}
+                  </Label>
+                  <Input 
+                    id="price" 
+                    name="price" 
+                    type="number" 
+                    step="0.01" 
+                    min="0" 
+                    required 
+                    className="text-sm sm:text-base" 
+                    placeholder="649"
+                    value={sellingPrice}
+                    onChange={(e) => setSellingPrice(e.target.value)}
+                  />
+                  <p className="text-xs text-gray-600 mt-1">
+                    {showDiscountFields 
+                      ? "This is calculated automatically based on original price and discount" 
+                      : "This is the final price customers will pay"
+                    }
+                  </p>
                 </div>
               </div>
+
+              {/* Discount Offers Checkbox */}
+              <div className="flex items-center space-x-2">
+                  <Checkbox 
+                  id="discounts_offers" 
+                  name="discounts_offers"
+                  checked={showDiscountFields}
+                  onCheckedChange={(checked) => {
+                    setShowDiscountFields(checked as boolean);
+                    const priceInput = document.getElementById('price') as HTMLInputElement;
+                    
+                    if (checked) {
+                      // When enabling discount, move current selling price to original price
+                      if (sellingPrice && parseFloat(sellingPrice) > 0) {
+                        setOriginalPrice(sellingPrice);
+                      }
+
+                      // If a discount % was already entered, compute the new selling price immediately
+                      const orig = sellingPrice && parseFloat(sellingPrice) > 0 ? parseFloat(sellingPrice) : (originalPrice ? parseFloat(originalPrice) : null);
+                      const pct = discountPercentage ? parseFloat(discountPercentage) : null;
+                      if (orig !== null && pct !== null && pct > 0) {
+                        const newSelling = orig - (orig * pct / 100);
+                        // show computed value in the preview only; do not overwrite the stored selling price input
+                        setPreviewSellingPrice(newSelling.toFixed(2));
+                      }
+                      
+                      // Make price field readonly when discount is enabled
+                      if (priceInput) {
+                        priceInput.readOnly = true;
+                        priceInput.style.backgroundColor = '#f0f9ff';
+                        priceInput.style.cursor = 'not-allowed';
+                      }
+                    } else {
+                      // Clear discount fields when unchecked
+                      setOriginalPrice('');
+                      setDiscountPercentage('');
+                      setPreviewSellingPrice('');
+                      
+                      // Make price field editable again
+                      if (priceInput) {
+                        priceInput.readOnly = false;
+                        priceInput.style.backgroundColor = '';
+                        priceInput.style.cursor = '';
+                      }
+                    }
+                  }}
+                />
+                <Label htmlFor="discounts_offers" className="font-sans text-sm sm:text-base">
+                  Enable Discount/Offers
+                </Label>
+              </div>
+
+              {/* Conditional Discount Field - Only show when discount checkbox is checked */}
+              {showDiscountFields && (
+                <div className="p-4 border border-orange-200 rounded-lg bg-orange-50">
+                  <div className="mb-3">
+                    <h4 className="font-medium text-sm text-orange-800 mb-1">Discount Configuration</h4>
+                    <p className="text-xs text-orange-600">Enter a discount percentage to calculate the final selling price. The final price preview updates automatically.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3">
+                    <div>
+                      <Label htmlFor="discountPercentage" className="font-sans text-sm sm:text-base">Discount % <span className="text-red-500">*</span></Label>
+                      <Input 
+                        id="discountPercentage" 
+                        name="discountPercentage" 
+                        type="number" 
+                        min="1" 
+                        max="99" 
+                        className="text-sm sm:text-base" 
+                        placeholder="10"
+                        value={discountPercentage}
+                        required={showDiscountFields}
+                        onChange={(e) => {
+                            const discountPercent = parseFloat(e.target.value) || 0;
+                            setDiscountPercentage(e.target.value);
+
+                            const originalPriceNum = parseFloat(originalPrice) || 0;
+
+                            if (discountPercent > 0 && originalPriceNum > 0) {
+                              // Calculate new selling price after discount and update preview only
+                              const newSellingPrice = originalPriceNum - (originalPriceNum * discountPercent / 100);
+                              setPreviewSellingPrice(newSellingPrice.toFixed(2));
+                            } else if (discountPercent === 0 && originalPriceNum > 0) {
+                              // If discount is 0, preview equals original price
+                              setPreviewSellingPrice(originalPrice.toString());
+                            } else {
+                              setPreviewSellingPrice('');
+                            }
+                        }}
+                      />
+                    </div>
+                  </div>
+                  
+                  {/* Amazon-style Display Preview */}
+                  <div className="mt-4 p-4 bg-white border border-green-200 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-green-800">🛍️ Amazon-style Display Preview</span>
+                      <span className="text-xs text-green-600">How customers will see it</span>
+                    </div>
+                    <div className="bg-gray-50 border rounded p-3">
+                      <div className="text-gray-600">
+                        {discountPercentage && originalPrice && (previewSellingPrice || sellingPrice) ? (
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl font-bold text-red-600">₹{Math.round(parseFloat(previewSellingPrice || sellingPrice))}</span>
+                            <span className="text-lg text-gray-500 line-through">₹{Math.round(parseFloat(originalPrice))}</span>
+                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-bold">{discountPercentage}% OFF</span>
+                          </div>
+                        ) : (
+                          'Enter discount percentage to see preview'
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Similar to Amazon product pricing display</p>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-3 text-sm">
+                    <div className="font-medium text-blue-800 mb-1">💡 How it works:</div>
+                    <div className="text-blue-700">
+                      1. Your selling price (₹{originalPrice || '700'}) moved to "Original Price"<br/>
+                      2. Enter discount percentage ({discountPercentage || '10'}%)<br/>
+                      3. New selling price calculated automatically (₹{sellingPrice || '630'})<br/>
+                      4. Display shows: <strong>
+                        <span className="font-bold">₹{Math.round(parseFloat(sellingPrice || '630'))}</span>{' '}
+                        <span className="text-gray-500 line-through">₹{Math.round(parseFloat(originalPrice || '700'))}</span>{' '}
+                        {discountPercentage || '10'}% OFF
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Categories Section */}
               <div>
@@ -3047,6 +3240,13 @@ case "products":
                           });
                           
                           setExistingImages(existingImagesData);
+                          setEditShowDiscountFields(product.discounts_offers || false);
+                          
+                          // Initialize pricing state for edit form
+                          setEditSellingPrice(product.price?.toString() || '');
+                          setEditOriginalPrice(product.originalPrice?.toString() || '');
+                          setEditDiscountPercentage(product.discountPercentage?.toString() || '');
+                          
                           setIsEditModalOpen(true);
                         }}
                       >
@@ -3093,9 +3293,55 @@ case "products":
                       <h3 className="font-medium line-clamp-2 font-sans text-sm sm:text-base flex-1 min-w-0">
                         {product.name || 'Unnamed Product'}
                       </h3>
-                      <p className="font-bold text-base font-sans sm:text-lg flex-shrink-0 ml-2">
-                        ₹{product.price || 0}
-                      </p>
+                      <div className="flex-shrink-0 ml-2 text-right">
+                        {product.originalPrice && product.discountPercentage && product.discounts_offers ? (
+                          // Amazon-style pricing display with discount
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 flex-wrap justify-end">
+                              <span className="font-bold text-base text-red-600 font-sans sm:text-lg">
+                                ₹{product.price || 0}
+                              </span>
+                              <span className="text-xs text-gray-500 line-through">
+                                ₹{product.originalPrice}
+                              </span>
+                              <span className="bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-xs font-bold">
+                                {product.discountPercentage}% OFF
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          // Regular pricing without discount
+                          <div>
+                            {/* <p className="font-bold text-base font-sans sm:text-lg">
+                              ₹{product.price || 0}
+                            </p> */}
+                            {/* Debug info - remove after testing */}
+                            <div className="text-xs flex items-center gap-3 text-gray-600">
+                              {/* Original price (small, struck-through) */}
+                              {product.originalprice ? (
+                                <span className="text-gray-500 line-through text-sm">₹{product.originalprice}</span>
+                              ) : (
+                                <span className="text-gray-400 text-sm">No orig</span>
+                              )}
+
+                              {/* Current / selling price (prominent) */}
+                              <span className="font-sans font-semibold text-base text-gray-900">₹{product.price || 0}</span>
+
+                              {/* Discount badge (green) or fallback */}
+                              {product.discount_percentage ? (
+                                <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-semibold">{product.discount_percentage}% OFF</span>
+                              ) : (
+                                <span className="text-gray-400 text-xs">No %</span>
+                              )}
+
+                              {/* Offers flag fallback */}
+                              {!product.discounts_offers && (
+                                <span className="text-gray-400 text-xs">✗Offers</span>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     
                     {/* Improved Category Display */}
@@ -3138,6 +3384,14 @@ case "products":
 
                     <DescriptionWithToggle description={product.description} maxLines={2} />
                     
+                    {product.discounts_offers && (
+                      <div className="mt-2">
+                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border border-yellow-200">
+                          🏷️ Special Offer Available
+                        </Badge>
+                      </div>
+                    )}
+                    
                     <div className="flex items-center justify-between text-xs text-muted-foreground">
                       <span>Stock: {product.stockquantity || 0}</span>
                       <span>ID: {product.id ? product.id.slice(0, 6) : 'N/A'}</span>
@@ -3155,6 +3409,7 @@ case "products":
             )}
           </div>
         </CardContent>
+        
       </Card>
     </div>
   );
@@ -5324,13 +5579,13 @@ case "products":
                       <div>
                         <Label className="text-sm font-medium text-muted-foreground">Created At</Label>
                         <p className="text-sm">
-                          {String(new Date(selectedStatusFeedback.created_at).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          }))}
+                          {(() => {
+                            try {
+                              return format(new Date(selectedStatusFeedback.created_at), "PPpp");
+                            } catch (e) {
+                              return String(new Date(selectedStatusFeedback.created_at).toLocaleString());
+                            }
+                          })()}
                         </p>
                       </div>
                     )}
@@ -7781,6 +8036,32 @@ case "products":
                   <Label className="sm:text-right font-medium">Description</Label>
                   <div className="sm:col-span-3 text-sm lg:text-base break-words">{selectedProduct.description}</div>
                 </div>
+                {selectedProduct.discounts_offers && (
+                  <div className="grid grid-cols-1 sm:grid-cols-4 items-start gap-2 lg:gap-4">
+                    <Label className="sm:text-right font-medium">Discounts/Offers</Label>
+                    <div className="sm:col-span-3">
+                      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border border-yellow-200">
+                        🏷️ Special Offer Available
+                      </Badge>
+                      {selectedProduct.originalPrice && selectedProduct.discountPercentage && (
+                        <div className="mt-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">Sale Price:</span>
+                            <span className="text-green-600 font-bold">₹{selectedProduct.price}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">Original Price:</span>
+                            <span className="text-gray-500 line-through">₹{selectedProduct.originalPrice}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">Discount:</span>
+                            <span className="text-red-500 font-medium">{selectedProduct.discountPercentage}% OFF</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </>
             )}
           </div>
@@ -7846,15 +8127,29 @@ case "products":
                 ? editProductCategories
                 : (formData.getAll('category').map(c => c?.toString() || '').filter(Boolean));
 
+              const editOriginalPriceNum = editOriginalPrice ? parseFloat(editOriginalPrice) : null;
+              const editDiscountPercentNum = editDiscountPercentage ? parseInt(editDiscountPercentage) : null;
+              const computedEditDiscountAmount = (() => {
+                if (editShowDiscountFields && editOriginalPriceNum !== null && editDiscountPercentNum !== null && editOriginalPriceNum > 0 && editDiscountPercentNum > 0) {
+                  return parseFloat((editOriginalPriceNum * editDiscountPercentNum / 100).toFixed(2));
+                }
+                return null;
+              })();
+
               const updatedData = {
                 name: formData.get('name') as string,
-                price: parseFloat(formData.get('price') as string),
+                // price should be the final selling price; when edit discounts are enabled use the editSellingPrice state
+                price: editShowDiscountFields ? parseFloat(editSellingPrice || '0') : parseFloat(formData.get('price') as string),
+                originalPrice: editShowDiscountFields && editOriginalPriceNum !== null ? editOriginalPriceNum : null,
+                discountPercentage: editShowDiscountFields && editDiscountPercentNum !== null ? editDiscountPercentNum : null,
+                discountAmount: computedEditDiscountAmount,
                 // send categories as an array (matches create product)
                 category: categoriesToSend,
                 stockquantity: parseInt(formData.get('stockquantity') as string),
                 description: formData.get('description') as string,
                 instock: (formData.get('instock') as string) === 'true',
                 colour: formData.get('colour') as string,
+                discounts_offers: editShowDiscountFields, // Use checkbox state
                 // include custom fields
                 customLabel: formData.get('customLabel') as string,
                 isCustom: (formData.get('isCustom') as string) === 'true',
@@ -8135,13 +8430,48 @@ case "products":
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="price" className="sm:text-right font-medium">Price</Label>
+                  <Label htmlFor="price" className="sm:text-right font-medium">
+                    {editShowDiscountFields ? "New Selling Price (₹)" : "Selling Price (₹)"}
+                  </Label>
                   <Input
                     id="price"
                     name="price"
                     type="number"
                     step="0.01"
-                    defaultValue={selectedProduct.price}
+                    value={editSellingPrice}
+                    onChange={(e) => setEditSellingPrice(e.target.value)}
+                    className="sm:col-span-3"
+                    readOnly={editShowDiscountFields}
+                    style={editShowDiscountFields ? { backgroundColor: '#f0f9ff', cursor: 'not-allowed' } : {}}
+                  />
+                  {editShowDiscountFields && (
+                    <div className="sm:col-span-4 text-xs text-blue-600 mt-1">
+                      This will be calculated automatically from original price and discount
+                    </div>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
+                  <Label htmlFor="originalPrice" className="sm:text-right font-medium">Original Price <span className="text-muted-foreground">(Optional)</span></Label>
+                  <Input
+                    id="originalPrice"
+                    name="originalPrice"
+                    type="number"
+                    step="0.01"
+                    defaultValue={selectedProduct.originalPrice || ''}
+                    placeholder="Enter original price before discount"
+                    className="sm:col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
+                  <Label htmlFor="discountPercentage" className="sm:text-right font-medium">Discount % <span className="text-muted-foreground">(Optional)</span></Label>
+                  <Input
+                    id="discountPercentage"
+                    name="discountPercentage"
+                    type="number"
+                    min="0"
+                    max="100"
+                    defaultValue={selectedProduct.discountPercentage || ''}
+                    placeholder="Enter discount percentage (0-100)"
                     className="sm:col-span-3"
                   />
                 </div>
@@ -8315,6 +8645,116 @@ case "products":
                     className="sm:col-span-3"
                   />
                 </div>
+                {/* Discount Offers Checkbox */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
+                  <Label htmlFor="edit_discounts_offers" className="sm:text-right font-medium">Enable Discount/Offers</Label>
+                  <div className="sm:col-span-3 flex items-center space-x-2">
+                    <Checkbox 
+                      id="edit_discounts_offers" 
+                      name="discounts_offers"
+                      checked={editShowDiscountFields}
+                      onCheckedChange={(checked) => {
+                        setEditShowDiscountFields(checked as boolean);
+                        if (checked) {
+                          // When enabling discount, move current selling price to original price
+                          if (editSellingPrice && parseFloat(editSellingPrice) > 0) {
+                            setEditOriginalPrice(editSellingPrice);
+                          }
+
+                          // If an edit discount % already exists, compute new selling price immediately
+                          const orig = editSellingPrice && parseFloat(editSellingPrice) > 0 ? parseFloat(editSellingPrice) : (editOriginalPrice ? parseFloat(editOriginalPrice) : null);
+                          const pct = editDiscountPercentage ? parseFloat(editDiscountPercentage) : null;
+                          if (orig !== null && pct !== null && pct > 0) {
+                            const newSelling = orig - (orig * pct / 100);
+                            // update preview only
+                            setEditPreviewSellingPrice(newSelling.toFixed(2));
+                          }
+                        } else {
+                          // Clear discount fields when unchecked
+                          setEditOriginalPrice('');
+                          setEditDiscountPercentage('');
+                          setEditPreviewSellingPrice('');
+                        }
+                      }}
+                    />
+                    <span className="text-sm">Check to enable discount pricing</span>
+                  </div>
+                </div>
+
+                {/* Conditional Discount Field - Only show when discount checkbox is checked */}
+                {editShowDiscountFields && (
+                  <div className="p-4 border border-orange-200 rounded-lg bg-orange-50">
+                    <div className="mb-3">
+                      <h4 className="font-medium text-sm text-orange-800 mb-1">Edit Discount Configuration</h4>
+                      <p className="text-xs text-orange-600">Enter a discount percentage to calculate the final selling price. The preview below shows how customers will see it.</p>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3">
+                      <div>
+                        <Label htmlFor="edit_discountPercentage" className="font-sans text-sm sm:text-base">Discount % <span className="text-red-500">*</span></Label>
+                        <Input 
+                          id="edit_discountPercentage" 
+                          name="discountPercentage" 
+                          type="number" 
+                          min="1" 
+                          max="99" 
+                          className="text-sm sm:text-base" 
+                          placeholder="10"
+                          value={editDiscountPercentage}
+                          required={editShowDiscountFields}
+                          onChange={(e) => {
+                            const discountPercent = parseFloat(e.target.value) || 0;
+                            setEditDiscountPercentage(e.target.value);
+
+                            const originalPriceNum = parseFloat(editOriginalPrice) || 0;
+
+                            if (discountPercent > 0 && originalPriceNum > 0) {
+                              // Calculate new selling price after discount and update preview only
+                              const newSellingPrice = originalPriceNum - (originalPriceNum * discountPercent / 100);
+                              setEditPreviewSellingPrice(newSellingPrice.toFixed(2));
+                            } else if (discountPercent === 0 && originalPriceNum > 0) {
+                              setEditPreviewSellingPrice(editOriginalPrice);
+                            } else {
+                              setEditPreviewSellingPrice('');
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Amazon-style Display Preview for Edit */}
+                    <div className="mt-4 p-4 bg-white border border-green-200 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-green-800">🛍️ Amazon-style Display Preview</span>
+                        <span className="text-xs text-green-600">How customers will see it</span>
+                      </div>
+                      <div className="bg-gray-50 border rounded p-3">
+                        <div className="text-gray-600">
+                          {editDiscountPercentage && editOriginalPrice && (editPreviewSellingPrice || editSellingPrice) ? (
+                            <div className="flex items-center gap-3">
+                              <span className="text-2xl font-bold text-red-600">₹{Math.round(parseFloat(editPreviewSellingPrice || editSellingPrice))}</span>
+                              <span className="text-lg text-gray-500 line-through">₹{Math.round(parseFloat(editOriginalPrice))}</span>
+                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-bold">{editDiscountPercentage}% OFF</span>
+                            </div>
+                          ) : (
+                            'Enter discount percentage to see preview'
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Similar to Amazon product pricing display</p>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-3 text-sm">
+                      <div className="font-medium text-blue-800 mb-1">💡 How it works:</div>
+                      <div className="text-blue-700">
+                        1. Your selling price (₹{editOriginalPrice || '700'}) moved to "Original Price"<br/>
+                        2. Enter discount percentage ({editDiscountPercentage || '10'}%)<br/>
+                        3. New selling price preview (does not overwrite your saved selling price): ₹{editPreviewSellingPrice || editSellingPrice || '630'}<br/>
+                        4. Display shows: <strong>₹{Math.round(parseFloat(editPreviewSellingPrice || editSellingPrice || '630'))} ₹{Math.round(parseFloat(editOriginalPrice || '700'))} {editDiscountPercentage || '10'}% OFF</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
               
                 <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
                   <Label htmlFor="edit_isCustom" className="sm:text-right font-medium">Is Custom</Label>

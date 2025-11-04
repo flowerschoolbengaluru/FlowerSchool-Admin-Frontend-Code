@@ -20,6 +20,9 @@ interface FlowerClass {
   title: string;
   description: string;
   price: string;
+  originalPrice?: string;
+  discountPercentage?: number;
+  discountAmount?: number;
   duration: string;
   sessions: number;
   features: Feature[];
@@ -59,25 +62,25 @@ const Classes = () => {
     {
       title: "Expert Instructors",
       description: "Learn from certified master florists with years of professional experience",
-      icon: <GraduationCap className="h-8 w-8" />,
+      icon: <GraduationCap className="h-6 w-6 sm:h-8 sm:w-8" />,
       gradient: "from-pink-500 to-rose-500"
     },
     {
       title: "Hands-On Training",
       description: "Practice with real flowers and professional equipment in our modern studios",
-      icon: <Target className="h-8 w-8" />,
+      icon: <Target className="h-6 w-6 sm:h-8 sm:w-8" />,
       gradient: "from-purple-500 to-pink-500"
     },
     {
       title: "Industry Recognition",
       description: "Receive certificates that are valued by employers and floral industry professionals",
-      icon: <Award className="h-8 w-8" />,
+      icon: <Award className="h-6 w-6 sm:h-8 sm:w-8" />,
       gradient: "from-rose-500 to-pink-500"
     },
     {
       title: "Passionate Community",
       description: "Join a supportive network of flower enthusiasts and professional florists",
-      icon: <Heart className="h-8 w-8" />,
+      icon: <Heart className="h-6 w-6 sm:h-8 sm:w-8" />,
       gradient: "from-pink-500 to-purple-500"
     }
   ];
@@ -292,17 +295,17 @@ const Classes = () => {
 
         <main>
           {/* Hero Section */}
-          <section className="mt-6 bg-white">
-            <div className="container mx-auto text-center px-4">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
+          <section className="mt-4 sm:mt-6 bg-white">
+            <div className="container mx-auto text-center px-3 sm:px-4">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-pink-500 to-rose-500 bg-clip-text text-transparent">
                 Our Courses
               </h1>
-              <p className="text-xl text-gray-800 mb-4 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-gray-800 mb-3 sm:mb-4 max-w-3xl mx-auto leading-relaxed">
                 Transform your passion for flowers into professional skills with our
                 expert-led courses. Whether you're a beginner or a seasoned floral designer,
                 we provide hands-on training to elevate your creativity and career.
               </p>
-              <p className="text-lg text-gray-800 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-sm sm:text-base md:text-lg text-gray-800 max-w-3xl mx-auto leading-relaxed">
                 Learn advanced techniques in floral arrangement, event decoration,
                 bouquet styling, and more — all guided by experienced mentors dedicated
                 to helping you grow in the world of floral artistry.
@@ -311,34 +314,34 @@ const Classes = () => {
           </section>
 
           
-          <section className="py-8 bg-white">
-            <div className="container mx-auto px-4">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 max-w-2xl mx-auto">
+          <section className="py-6 sm:py-8 bg-white">
+            <div className="container mx-auto px-3 sm:px-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-2xl mx-auto">
                 {/* Diploma Courses Box */}
                 <div
-                  className="flex items-center gap-4 bg-white border-2 border-pink-200 rounded-xl p-4 w-full sm:w-auto hover:border-pink-400 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                  className="flex items-center gap-3 sm:gap-4 bg-white border-2 border-pink-200 rounded-xl p-3 sm:p-4 w-full sm:w-auto hover:border-pink-400 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                   onClick={() => handleCourseTypeClick("Diploma Course")}
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
-                    <GraduationCap className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <div className="text-left">
-                    <div className="text-base font-semibold text-gray-900">Diploma Courses</div>
-                    <div className="text-sm text-gray-600">Professional certification programs</div>
+                  <div className="text-left min-w-0 flex-1">
+                    <div className="text-sm sm:text-base font-semibold text-gray-900 truncate">Diploma Courses</div>
+                    <div className="text-xs sm:text-sm text-gray-600 truncate">Professional certification programs</div>
                   </div>
                 </div>
 
                 {/* Workshops Box */}
                 <div
-                  className="flex items-center gap-4 bg-white border-2 border-purple-200 rounded-xl p-4 w-full sm:w-auto hover:border-purple-400 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                  className="flex items-center gap-3 sm:gap-4 bg-white border-2 border-purple-200 rounded-xl p-3 sm:p-4 w-full sm:w-auto hover:border-purple-400 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                   onClick={() => handleCourseTypeClick("Workshops")}
                 >
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300">
-                    <BookOpen className="w-6 h-6" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                    <BookOpen className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
-                  <div className="text-left">
-                    <div className="text-base font-semibold text-gray-900">Workshops</div>
-                    <div className="text-sm text-gray-600">Short intensive sessions</div>
+                  <div className="text-left min-w-0 flex-1">
+                    <div className="text-sm sm:text-base font-semibold text-gray-900 truncate">Workshops</div>
+                    <div className="text-xs sm:text-sm text-gray-600 truncate">Short intensive sessions</div>
                   </div>
                 </div>
               </div>
@@ -346,40 +349,40 @@ const Classes = () => {
           </section>
 
           {/* Interactive Main Showcase Grid */}
-          <section className="py-16 bg-white">
-            <div className="container mx-auto">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+          <section className="py-8 sm:py-12 md:py-16 bg-white">
+            <div className="container mx-auto px-3 sm:px-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16">
                 {/* Left side - Graduation image with enhanced interaction */}
                 <div className="relative group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500">
+                  <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl hover:shadow-2xl sm:hover:shadow-3xl transition-all duration-500">
                     <div className="absolute inset-0 bg-gradient-to-bl from-rose-500/20 to-pink-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     <img
                       src={schoolGraduationImage}
                       alt="Flower school graduation ceremony"
-                      className="w-full h-96 object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                      className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover transform group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-700 ease-out"
                     />
 
                     {/* Floating elements */}
-                    <div className="absolute top-4 left-4 w-4 h-4 bg-rose-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
-                    <div className="absolute top-8 right-8 w-3 h-3 bg-pink-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-ping" />
+                    <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-3 h-3 sm:w-4 sm:h-4 bg-rose-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
+                    <div className="absolute top-4 right-4 sm:top-8 sm:right-8 w-2 h-2 sm:w-3 sm:h-3 bg-pink-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-ping" />
                   </div>
                 </div>
 
                 {/* Right side - Classroom image with enhanced interaction */}
                 <div className="relative group cursor-pointer">
-                  <div className="relative overflow-hidden rounded-3xl shadow-2xl hover:shadow-3xl transition-all duration-500">
+                  <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl shadow-xl sm:shadow-2xl hover:shadow-2xl sm:hover:shadow-3xl transition-all duration-500">
                     <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-purple-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                     <img
                       src={schoolClassroomImage}
                       alt="Flower school classroom with students learning"
-                      className="w-full h-96 object-cover transform group-hover:scale-110 transition-transform duration-700 ease-out"
+                      className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover transform group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-700 ease-out"
                     />
 
                     {/* Floating elements */}
-                    <div className="absolute bottom-4 right-4 w-4 h-4 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
-                    <div className="absolute bottom-8 left-8 w-3 h-3 bg-pink-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-ping" />
+                    <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-3 h-3 sm:w-4 sm:h-4 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
+                    <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 w-2 h-2 sm:w-3 sm:h-3 bg-pink-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-ping" />
                   </div>
                 </div>
               </div>
@@ -387,28 +390,29 @@ const Classes = () => {
           </section>
 
           {/* Filter Section */}
-          <section className="py-8 bg-white">
-            <div className="container mx-auto">
+          <section className="py-6 sm:py-8 bg-white">
+            <div className="container mx-auto px-3 sm:px-4">
               {/* Course Count */}
-              <div className="text-center mb-8">
-                <p className="text-lg text-muted-foreground">
-                  <BookOpen className="h-5 w-5 inline mr-2 text-pink-500" />
+              <div className="text-center mb-6 sm:mb-8">
+                <p className="text-sm sm:text-base md:text-lg text-muted-foreground">
+                  <BookOpen className="h-4 w-4 sm:h-5 sm:w-5 inline mr-2 text-pink-500" />
                   {classes.length} Course{classes.length !== 1 ? 's' : ''} Available
                 </p>
               </div>
 
               {/* Level Filter */}
-              <div className="flex justify-center gap-2 mb-8 flex-wrap">
+              <div className="flex justify-center gap-1 sm:gap-2 mb-6 sm:mb-8 flex-wrap">
                 {["Diploma Course", "Workshops"].map((level) => (
                   <Button
                     key={level}
                     variant={selectedLevel === level ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedLevel(level)}
-                    className={selectedLevel === level
-                      ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
-                      : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
-                    }
+                    className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 ${
+                      selectedLevel === level
+                        ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
+                        : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
+                    }`}
                   >
                     {level}
                     <span className="ml-1 text-xs">
@@ -421,36 +425,36 @@ const Classes = () => {
           </section>
 
           {/* Classes Available Section */}
-          <section className="py-10 bg-white" ref={coursesSectionRef}>
-            <div className="container mx-auto">
+          <section className="py-8 sm:py-10 bg-white" ref={coursesSectionRef}>
+            <div className="container mx-auto px-3 sm:px-4">
               {filtered.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-pink-100 flex items-center justify-center">
-                    <BookOpen className="h-8 w-8 text-pink-500" />
+                <div className="text-center py-12 sm:py-16">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 mx-auto mb-4 sm:mb-6 rounded-full bg-pink-100 flex items-center justify-center">
+                    <BookOpen className="h-6 w-6 sm:h-8 sm:w-8 text-pink-500" />
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">No courses found</h3>
-                  <p className="text-muted-foreground">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-semibold mb-2">No courses found</h3>
+                  <p className="text-muted-foreground text-sm sm:text-base">
                     {selectedLevel !== "All"
                       ? `No ${selectedLevel.toLowerCase()} level courses available.`
                       : `No courses are currently available.`}
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                   {filtered.map((cls, index) => (
                     <Card
                       key={cls.id}
                       className="overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-pink-100 h-full flex flex-col"
                     >
                       {/* Course Image - Natural Size with Flexible Container */}
-                      <div className="relative flex-shrink-0 bg-gray-50 min-h-[180px] flex items-center justify-center overflow-hidden">
+                      <div className="relative flex-shrink-0 bg-gray-50 min-h-[140px] sm:min-h-[160px] md:min-h-[180px] flex items-center justify-center overflow-hidden">
                         {imageErrors.has(cls.id) ? (
-                          <div className="w-full h-full bg-gradient-to-br from-pink-100 via-purple-50 to-orange-100 flex items-center justify-center p-4">
+                          <div className="w-full h-full bg-gradient-to-br from-pink-100 via-purple-50 to-orange-100 flex items-center justify-center p-3 sm:p-4">
                             <div className="text-center">
-                              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-white/80 flex items-center justify-center shadow-lg">
-                                <ImageIcon className="h-8 w-8 text-pink-500" />
+                              <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto mb-2 sm:mb-3 rounded-full bg-white/80 flex items-center justify-center shadow-lg">
+                                <ImageIcon className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-pink-500" />
                               </div>
-                              <p className="text-sm font-medium text-pink-600">{cls.title}</p>
+                              <p className="text-xs sm:text-sm font-medium text-pink-600 truncate px-2">{cls.title}</p>
                               <p className="text-xs text-muted-foreground mt-1">Course Image</p>
                             </div>
                           </div>
@@ -459,18 +463,18 @@ const Classes = () => {
                             <img
                               src={formatImageSrc(cls.image)}
                               alt={cls.title}
-                              className="w-full h-auto max-h-[280px] object-contain"
+                              className="w-full h-auto max-h-[200px] sm:max-h-[240px] md:max-h-[280px] object-contain"
                               onError={() => handleImageError(cls.id)}
                               onLoad={() => handleImageLoad(cls.id)}
                               loading="lazy"
                             />
                             {cls.popular && (
-                              <Badge className="absolute top-3 right-3 bg-orange-500 hover:bg-orange-600 text-white text-xs">
+                              <Badge className="absolute top-2 right-2 sm:top-3 sm:right-3 bg-orange-500 hover:bg-orange-600 text-white text-xs">
                                 🔥 Popular
                               </Badge>
                             )}
                             {cls.category && (
-                              <Badge variant="secondary" className="absolute top-3 left-3 bg-pink-100 text-pink-700 border-pink-200 text-xs">
+                              <Badge variant="secondary" className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-pink-100 text-pink-700 border-pink-200 text-xs">
                                 {cls.category}
                               </Badge>
                             )}
@@ -479,23 +483,23 @@ const Classes = () => {
                       </div>
 
                       {/* Card Content - Improved Alignment */}
-                      <CardContent className="flex-grow flex flex-col p-4 space-y-4">
+                      <CardContent className="flex-grow flex flex-col p-3 sm:p-4 space-y-3 sm:space-y-4">
                         {/* Title and Rating */}
                         <div className="flex items-start justify-between gap-2">
-                          <CardTitle className="text-lg font-semibold text-gray-900 leading-tight flex-1">
-                            {cls.title}
+                          <CardTitle className="text-base sm:text-lg font-semibold text-gray-900 leading-tight flex-1 min-w-0">
+                            <span className="line-clamp-2">{cls.title}</span>
                           </CardTitle>
                           <div className="flex items-center gap-1 flex-shrink-0">
-                            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                            <span className="text-sm font-medium text-gray-700">
+                            <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-yellow-400" />
+                            <span className="text-xs sm:text-sm font-medium text-gray-700">
                               {cls.rating?.toFixed(1) || "4.5"}
                             </span>
                           </div>
                         </div>
 
                         {/* Description */}
-                        <div className="space-y-2">
-                          <div className={`text-sm text-gray-600 leading-relaxed ${
+                        <div className="space-y-1 sm:space-y-2">
+                          <div className={`text-xs sm:text-sm text-gray-600 leading-relaxed ${
                             isDescriptionExpanded(cls.id) ? '' : 'line-clamp-2'
                           }`}>
                             {cls.description}
@@ -504,7 +508,7 @@ const Classes = () => {
                             <Button
                               variant="ghost"
                               size="sm"
-                              className="h-6 px-2 text-xs text-pink-600 hover:text-pink-700 hover:bg-pink-50 -ml-2"
+                              className="h-5 sm:h-6 px-1 sm:px-2 text-xs text-pink-600 hover:text-pink-700 hover:bg-pink-50 -ml-1 sm:-ml-2"
                               onClick={() => toggleDescription(cls.id)}
                             >
                               {isDescriptionExpanded(cls.id) ? (
@@ -521,26 +525,25 @@ const Classes = () => {
                         </div>
 
                         {/* Course Details */}
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Calendar className="h-4 w-4 text-pink-500 flex-shrink-0" />
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />
                             <span className="truncate">Next: {cls.nextbatch}</span>
                           </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-    <Clock className="h-4 w-4 text-pink-500 flex-shrink-0" />
-    <span>Duration (per session): {cls.duration}</span>
-  </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <Clock className="h-4 w-4 text-pink-500 flex-shrink-0" />
-                            <span>{cls.duration} session{cls.sessions > 1 ? 's' : ''}</span>
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                            <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />
+                            <span>Duration: {cls.duration}</span>
                           </div>
-                         
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+                            <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />
+                            <span>{cls.sessions} session{cls.sessions > 1 ? 's' : ''}</span>
+                          </div>
                         </div>
 
                         {/* Features */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                           <h4
-                            className={`text-sm font-medium cursor-pointer select-none ${expandedFeatures.has(cls.id) ? 'text-pink-600' : 'text-gray-900'}`}
+                            className={`text-xs sm:text-sm font-medium cursor-pointer select-none ${expandedFeatures.has(cls.id) ? 'text-pink-600' : 'text-gray-900'}`}
                             onClick={() => {
                               setExpandedFeatures(prev => {
                                 const newSet = new Set(prev);
@@ -555,10 +558,10 @@ const Classes = () => {
                             What you'll learn:
                           </h4>
 
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1 sm:gap-2">
                             {cls.features && cls.features.length > 0 ? (
                               (expandedFeatures.has(cls.id) ? cls.features : cls.features.slice(0, 2)).map((f, fi) => (
-                                <Badge key={fi} variant="outline" className="text-xs bg-gray-50 border-gray-200 text-gray-600 px-2 py-1">
+                                <Badge key={fi} variant="outline" className="text-xs bg-gray-50 border-gray-200 text-gray-600 px-1.5 sm:px-2 py-0.5 sm:py-1">
                                   {f.topic}
                                 </Badge>
                               ))
@@ -571,7 +574,7 @@ const Classes = () => {
                                 variant="outline"
                                 role="button"
                                 aria-expanded={expandedFeatures.has(cls.id)}
-                                className="text-xs bg-gray-50 border-gray-200 text-gray-600 px-2 py-1 cursor-pointer hover:bg-pink-50"
+                                className="text-xs bg-gray-50 border-gray-200 text-gray-600 px-1.5 sm:px-2 py-0.5 sm:py-1 cursor-pointer hover:bg-pink-50"
                                 onClick={() => {
                                   setExpandedFeatures(prev => {
                                     const newSet = new Set(prev);
@@ -588,14 +591,28 @@ const Classes = () => {
                         </div>
 
                         {/* Price and CTA */}
-                        <div className="mt-auto pt-4 border-t border-pink-100">
-                          <div className="flex items-center justify-between mb-3">
-                            
+                        <div className="mt-auto pt-3 sm:pt-4 border-t border-pink-100">
+                          <div className="flex items-center justify-between mb-2 sm:mb-3">
+                            <div className="flex items-center gap-1 sm:gap-2">
+                              <span className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900">
+                                ₹{cls.price}
+                              </span>
+                              {cls.originalPrice && (
+                                <span className="text-xs sm:text-sm text-gray-500 line-through">
+                                  ₹{cls.originalPrice}
+                                </span>
+                              )}
+                            </div>
+                            {cls.capacity && (
+                              <div className="text-xs text-gray-500">
+                                {cls.enrolled || 0}/{cls.capacity} enrolled
+                              </div>
+                            )}
                           </div>
 
                           <div className="grid grid-cols-1 gap-2">
                             <Button
-                              className="w-full font-medium bg-orange-600 hover:bg-orange-700 text-white h-10"
+                              className="w-full font-medium bg-orange-600 hover:bg-orange-700 text-white h-9 sm:h-10 text-sm sm:text-base"
                               disabled={(cls.enrolled || 0) >= (cls.capacity || 20)}
                               onClick={() => {
                                 setSelectedCourse(convertToEvent(cls));
@@ -603,7 +620,7 @@ const Classes = () => {
                               }}
                             >
                               {(cls.enrolled || 0) < (cls.capacity || 20) ? "Enroll Now" : "Join Waitlist"}
-                              <ArrowRight className="h-4 w-4 ml-2" />
+                              <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1 sm:ml-2" />
                             </Button>
                           </div>
                         </div>
@@ -616,24 +633,24 @@ const Classes = () => {
           </section>
 
           {/* Animated Achievements Grid */}
-          <section className="py-14 bg-white">
-            <div className="container mx-auto">
+          <section className="py-8 sm:py-12 md:py-14 bg-white">
+            <div className="container mx-auto px-3 sm:px-4">
               {/* Section Header */}
-              <div className="text-center mb-12">
-                <div className="inline-flex items-center gap-2 mb-4 px-4 py-2 rounded-full bg-pink-100 border border-pink-200">
-                  <div className="w-2 h-2 bg-pink-500 rounded-full animate-pulse"></div>
-                  <span className="text-sm font-semibold text-pink-700 uppercase tracking-wide">Why Choose Us</span>
+              <div className="text-center mb-8 sm:mb-10 md:mb-12">
+                <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-pink-100 border border-pink-200">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs sm:text-sm font-semibold text-pink-700 uppercase tracking-wide">Why Choose Us</span>
                 </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
                    <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">What Makes Our School Special</span>
                 </h2>
-                <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
                   We're committed to providing the best floral education experience with industry-leading standards and passionate mentorship.
                 </p>
               </div>
 
               {/* Achievements Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                 {achievements.map((achievement, index) => (
                   <div
                     key={achievement.title}
@@ -642,21 +659,21 @@ const Classes = () => {
                     style={{ transitionDelay: `${index * 150}ms` }}
                   >
                     <Card className="h-full border border-pink-100 hover:border-pink-300 hover:shadow-xl transition-all duration-300 group bg-white/80 backdrop-blur-sm">
-                      <CardContent className="p-6 text-center">
+                      <CardContent className="p-4 sm:p-5 md:p-6 text-center">
                         {/* Gradient Icon Container */}
-                        <div className={`w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${achievement.gradient} flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                        <div className={`w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-4 sm:mb-5 md:mb-6 rounded-xl sm:rounded-2xl bg-gradient-to-br ${achievement.gradient} flex items-center justify-center group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                           <div className="text-white">
                             {achievement.icon}
                           </div>
                         </div>
 
                         {/* Title */}
-                        <h3 className="text-xl font-bold mb-4 text-gray-900 group-hover:text-pink-600 transition-colors duration-300">
+                        <h3 className="text-base sm:text-lg md:text-xl font-bold mb-3 sm:mb-4 text-gray-900 group-hover:text-pink-600 transition-colors duration-300">
                           {achievement.title}
                         </h3>
 
                         {/* Description */}
-                        <p className="text-gray-600 leading-relaxed">
+                        <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                           {achievement.description}
                         </p>
                       </CardContent>

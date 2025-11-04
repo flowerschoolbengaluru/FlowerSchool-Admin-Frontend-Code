@@ -11,6 +11,7 @@ import { X, Mail, Check, Phone, User, MapPin, Home } from "lucide-react";
 // Import the logos
 import FlowerSchoolLogo from "@/assets/Flower_School_Logo_1757484169081 copy.png";
 import EcommerceBouquetLogo from "@/assets/Flower_School_Logo_1757484169081.png";
+import BouquetBarLogo from "@/assets/E_Commerce_Bouquet_Bar_Logo_1757433847861.png";
 import EventVenue from "./EventVenue";
 import EventImage from "@/assets/EventImage.jpg";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -79,29 +80,29 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 50 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="w-full max-w-md"
+            className="w-full max-w-md mx-2"
           >
             <Card className="relative overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-white to-pink-50/30">
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-pink-200/20 rounded-full -translate-y-16 translate-x-16"></div>
               <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full -translate-x-12 translate-y-12"></div>
 
-              <CardHeader className="text-center relative z-10 pb-4">
+              <CardHeader className="text-center relative z-10 pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
                 <button
                   onClick={handleClose}
-                  className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
                 >
                   <X className="h-4 w-4 text-gray-500" />
                 </button>
 
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                  <img src={EcommerceBouquetLogo} alt="Flower School Logo" className="w-12 h-12 object-contain" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-sm">
+                  <img src={EcommerceBouquetLogo} alt="Flower School Logo" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
                 </div>
 
-                <CardTitle className="text-2xl font-bold text-gray-900">
+                <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">
                   {isSubmitted ? "Welcome to Flower School! 🌸" : "Get Flower Updates!"}
                 </CardTitle>
-                <p className="text-gray-600 mt-2">
+                <p className="text-gray-600 mt-2 text-sm sm:text-base">
                   {isSubmitted
                     ? "Thank you for subscribing! We'll contact you soon with floral updates."
                     : "Subscribe to get exclusive flower tips, class updates, and special offers."
@@ -109,9 +110,9 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                 </p>
               </CardHeader>
 
-              <CardContent className="relative z-10 px-6 pb-6">
+              <CardContent className="relative z-10 px-4 sm:px-6 pb-4 sm:pb-6">
                 {!isSubmitted ? (
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
@@ -119,7 +120,7 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                         placeholder="Enter your full name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="pl-10 pr-4 py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl"
+                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
                         required
                         disabled={isSubmitting}
                       />
@@ -132,7 +133,7 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                         placeholder="Enter your phone number"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="pl-10 pr-4 py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl"
+                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
                         required
                         disabled={isSubmitting}
                       />
@@ -145,7 +146,7 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                         placeholder="Enter your email address"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 pr-4 py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl"
+                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
                         required
                         disabled={isSubmitting}
                       />
@@ -158,7 +159,7 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                         placeholder="Enter your city"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="pl-10 pr-4 py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl"
+                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
                         required
                         disabled={isSubmitting}
                       />
@@ -171,7 +172,7 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                         placeholder="Enter your address"
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
-                        className="pl-10 pr-4 py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl"
+                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
                         required
                         disabled={isSubmitting}
                       />
@@ -180,7 +181,7 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                     <Button
                       type="submit"
                       disabled={isSubmitting || !email.trim() || !name.trim() || !phone.trim() || !city.trim() || !address.trim()}
-                      className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105"
+                      className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-2 sm:py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
                     >
                       {isSubmitting ? (
                         <div className="flex items-center gap-2">
@@ -200,15 +201,15 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
                   <motion.div
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-4"
+                    className="text-center py-3 sm:py-4"
                   >
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Check className="h-8 w-8 text-green-600" />
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                      <Check className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
                     </div>
-                    <p className="text-green-600 font-semibold">
+                    <p className="text-green-600 font-semibold text-sm sm:text-base">
                       Successfully subscribed!
                     </p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
                       Closing in 3 seconds...
                     </p>
                   </motion.div>
@@ -289,12 +290,12 @@ const Hero = ({ onNavigate }: HeroProps) => {
 
   const handleEventVenueClick = () => {
     setShowEventVenue(true);
-        window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   };
 
   const handleBackToHome = () => {
     setShowEventVenue(false);
-        window.scrollTo(0, 0);
+    window.scrollTo(0, 0);
   };
 
   const handleSubscribe = (data: { email: string; name: string; phone: string; city: string; address: string }) => {
@@ -330,7 +331,7 @@ const Hero = ({ onNavigate }: HeroProps) => {
           </div>
         )}
 
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-8 relative z-10">
           <div className="flex flex-col items-center justify-center max-w-7xl mx-auto">
 
             {/* Hero Header */}
@@ -338,9 +339,9 @@ const Hero = ({ onNavigate }: HeroProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6 }}
-              className="mb-12 md:mb-16 px-2 text-center"
+              className="mb-8 md:mb-16 px-2 text-center"
             >
-              <h1 className="text-1xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-10">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 md:mb-10">
                 <span className="bg-gradient-to-r from-pink-500 via-pink-600 to-pink-700 bg-clip-text text-transparent">
                   Welcome to The 
                 </span>
@@ -355,10 +356,10 @@ const Hero = ({ onNavigate }: HeroProps) => {
                 initial={{ opacity: 0 }}
                 animate={isInView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-700 mt-6"
+                className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-gray-700 mt-4 md:mt-6 min-h-[1.5em]"
               >
                 {displayText}
-                <span className="animate-pulse ml-1 ">|</span>
+                <span className="animate-pulse ml-1">|</span>
               </motion.div>
             </motion.div>
 
@@ -367,10 +368,10 @@ const Hero = ({ onNavigate }: HeroProps) => {
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="mb-16 md:mb-20 max-w-3xl mx-4 text-center"
+              className="mb-12 md:mb-20 max-w-3xl mx-3 sm:mx-4 text-center"
             >
               <div className="">
-                <blockquote className="text-lg md:text-xl text-gray-700 font-medium leading-relaxed italic">
+                <blockquote className="text-base sm:text-lg md:text-xl text-gray-700 font-medium leading-relaxed italic">
                   "Cultivating creativity with nature's finest blooms. Our mission is to teach floral design
                   with deep respect for both artistry and environment."
                 </blockquote>
@@ -378,68 +379,68 @@ const Hero = ({ onNavigate }: HeroProps) => {
             </motion.div>
 
             {/* Services Grid */}
-            <div className="w-full max-w-7xl space-y-16 md:space-y-20">
+            <div className="w-full max-w-7xl space-y-12 md:space-y-20 px-2 sm:px-4">
               
               {/* Flower School and Bouquet Bar - Equal Size Grid */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 0.8 }}
-                className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12"
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12"
               >
                 {/* Flower School Card */}
                 <div className="relative h-full">
-                  <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-1 shadow-2xl h-full">
-                    <div className="bg-white rounded-xl overflow-hidden relative flex flex-col items-center justify-between p-8 h-full">
+                  <div className="bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl p-1 shadow-xl md:shadow-2xl h-full">
+                    <div className="bg-white rounded-xl overflow-hidden relative flex flex-col items-center justify-between p-4 sm:p-6 md:p-8 h-full">
                       <img
                         src={FlowerSchoolLogo}
                         alt="Flower School Logo"
-                        className="w-full h-40 md:h-48 object-contain mb-6"
+                        className="w-full h-32 sm:h-36 md:h-40 lg:h-48 object-contain mb-4 md:mb-6"
                       />
 
                       <div className="text-center flex-1 flex flex-col justify-between w-full">
                         <div>
-                          <div className="inline-flex items-center gap-3 mb-4 justify-center">
-                            <div className="w-3 h-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"></div>
-                            <span className="text-sm font-semibold text-block uppercase tracking-wide">Education</span>
+                          <div className="inline-flex items-center gap-2 sm:gap-3 mb-3 md:mb-4 justify-center">
+                            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full"></div>
+                            <span className="text-xs sm:text-sm font-semibold text-block uppercase tracking-wide">Education</span>
                           </div>
 
-                          <h3 className="text-2xl md:text-3xl font-bold text-pink-600 mb-6">
+                          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-pink-600 mb-4 md:mb-6">
                             Floral Design Courses
                           </h3>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 md:mb-6">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Expert Instructors</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Expert Instructors</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Creative Environment</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Creative Environment</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Certification Programs</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Certification Programs</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-pink-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Hands-on Learning</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Hands-on Learning</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex justify-center mt-4">
+                        <div className="flex justify-center mt-3 md:mt-4">
                           <Button
                             size="lg"
-                            className="bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:from-pink-600 hover:to-rose-600 shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-8 py-3 font-semibold"
+                            className="bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-xl hover:from-pink-600 hover:to-rose-600 shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-6 sm:px-8 py-2 sm:py-3 font-semibold text-sm sm:text-base w-full sm:w-auto"
                             onClick={() => navigate("/classes")}
                           >
                             Explore Courses
@@ -452,57 +453,57 @@ const Hero = ({ onNavigate }: HeroProps) => {
 
                 {/* Exquisite Bouquets Card */}
                 <div className="relative h-full">
-                  <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-1 shadow-2xl h-full">
-                    <div className="bg-white rounded-xl overflow-hidden relative flex flex-col items-center justify-between p-8 h-full">
+                  <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-1 shadow-xl md:shadow-2xl h-full">
+                    <div className="bg-white rounded-xl overflow-hidden relative flex flex-col items-center justify-between p-4 sm:p-6 md:p-8 h-full">
                       <img
-                        src={EcommerceBouquetLogo}
+                        src={BouquetBarLogo}
                         alt="Bouquet Bar Logo"
-                        className="w-full h-40 md:h-48 object-contain mb-6"
+                        className="w-full h-32 sm:h-36 md:h-40 lg:h-48 object-contain mb-4 md:mb-6"
                       />
 
                       <div className="text-center flex-1 flex flex-col justify-between w-full">
                         <div>
-                          <div className="inline-flex items-center gap-3 mb-4 justify-center">
-                            <div className="w-3 h-3 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full"></div>
-                            <span className="text-sm font-semibold uppercase tracking-wide">Floral Shop</span>
+                          <div className="inline-flex items-center gap-2 sm:gap-3 mb-3 md:mb-4 justify-center">
+                            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full"></div>
+                            <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide">Floral Shop</span>
                           </div>
 
-                          <h3 className="text-2xl md:text-3xl font-bold text-rose-600 mb-6">
+                          <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-rose-600 mb-4 md:mb-6">
                             Exquisite Bouquets
                           </h3>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-rose-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 md:mb-6">
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Custom Arrangements</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Custom Arrangements</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-rose-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Same-day Delivery</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Same-day Delivery</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-rose-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Event Decor</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Event Decor</span>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <div className="w-6 h-6 bg-rose-100 rounded-lg flex items-center justify-center">
-                                <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <div className="w-5 h-5 sm:w-6 sm:h-6 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                               </div>
-                              <span className="text-gray-700 text-sm">Premium Quality</span>
+                              <span className="text-gray-700 text-xs sm:text-sm">Premium Quality</span>
                             </div>
                           </div>
                         </div>
 
-                        <div className="flex justify-center mt-4">
+                        <div className="flex justify-center mt-3 md:mt-4">
                           <Button
                             size="lg"
-                            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl hover:from-rose-600 hover:to-pink-600 shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-8 py-3 font-semibold"
+                            className="bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl hover:from-rose-600 hover:to-pink-600 shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 px-6 sm:px-8 py-2 sm:py-3 font-semibold text-sm sm:text-base w-full sm:w-auto"
                             onClick={() => window.open("https://app.flowerschoolbengaluru.com/shop", "_blank")}
                           >
                             Shop Bouquets
@@ -519,50 +520,50 @@ const Hero = ({ onNavigate }: HeroProps) => {
                 initial={{ opacity: 0, y: 30 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.6, delay: 1.2 }}
-                className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center"
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-12 items-center"
               >
                 {/* Content */}
-                <div className="space-y-6">
-                  <div className="inline-flex items-center gap-3 mb-4">
-                    <div className="w-3 h-3 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full"></div>
-                    <span className="text-sm font-semibold text-block uppercase tracking-wide">Venue Rental</span>
+                <div className="space-y-4 md:space-y-6 order-2 lg:order-1">
+                  <div className="inline-flex items-center gap-2 sm:gap-3 mb-3 md:mb-4">
+                    <div className="w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full"></div>
+                    <span className="text-xs sm:text-sm font-semibold text-block uppercase tracking-wide">Venue Rental</span>
                   </div>
                   
-                  <h3 className="text-3xl md:text-4xl font-bold text-rose-600">
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-rose-600">
                     Event Venue
                   </h3>
               
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
-                        <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 py-3 md:py-4">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                       </div>
-                      <span className="text-gray-700 font-medium">1400 sq. ft. Space</span>
+                      <span className="text-gray-700 font-medium text-sm sm:text-base">1400 sq. ft. Space</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
-                        <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                       </div>
-                      <span className="text-gray-700 font-medium">Beautiful Ambiance</span>
+                      <span className="text-gray-700 font-medium text-sm sm:text-base">Beautiful Ambiance</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
-                        <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                       </div>
-                      <span className="text-gray-700 font-medium">Flexible Layouts</span>
+                      <span className="text-gray-700 font-medium text-sm sm:text-base">Flexible Layouts</span>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
-                        <div className="w-2 h-2 bg-rose-500 rounded-full"></div>
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-rose-500 rounded-full"></div>
                       </div>
-                      <span className="text-gray-700 font-medium">Pantry Room</span>
+                      <span className="text-gray-700 font-medium text-sm sm:text-base">Pantry Room</span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-3 md:pt-4">
                     <Button
                       size="lg"
-                      className="bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl hover:from-rose-600 hover:to-pink-600 shadow-lg transform hover:-translate-y-1 transition-all duration-300 px-8 py-3 font-semibold"
+                      className="bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-xl hover:from-rose-600 hover:to-pink-600 shadow-lg transform hover:-translate-y-1 transition-all duration-300 px-6 sm:px-8 py-2 sm:py-3 font-semibold text-sm sm:text-base w-full sm:w-auto"
                       onClick={handleEventVenueClick}
                     >
                       View Venue
@@ -570,23 +571,23 @@ const Hero = ({ onNavigate }: HeroProps) => {
                     <Button
                       size="lg"
                       variant="outline"
-                      className="border-2 border-pink-300 text-pink-600 hover:bg-pink-50 hover:border-pink-400 rounded-xl transform hover:-translate-y-1 transition-all duration-300 px-8 py-3 font-semibold"
+                      className="border-2 border-pink-300 text-pink-600 hover:bg-pink-50 hover:border-pink-400 rounded-xl transform hover:-translate-y-1 transition-all duration-300 px-6 sm:px-8 py-2 sm:py-3 font-semibold text-sm sm:text-base w-full sm:w-auto"
                       onClick={() => setShowFrontCard(true)}
                     >
-                      <Mail className="h-5 w-5 mr-2" />
+                      <Mail className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Get Updates
                     </Button>
                   </div>
                 </div>
 
                 {/* Visual */}
-                <div className="relative">
-                  <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-1 shadow-2xl">
+                <div className="relative order-1 lg:order-2">
+                  <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl p-1 shadow-xl md:shadow-2xl">
                     <div className="bg-white rounded-xl overflow-hidden">
                       <img
                         src={EventImage}
                         alt="Event Venue Space"
-                        className="w-full h-64 md:h-80 object-cover"
+                        className="w-full h-48 sm:h-56 md:h-64 lg:h-80 object-cover"
                       />
                     </div>
                   </div>

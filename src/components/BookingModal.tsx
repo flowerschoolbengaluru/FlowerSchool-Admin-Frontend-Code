@@ -320,19 +320,17 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
         }
     };
 
-
-
     return (
         <>
             <Dialog open={isOpen} onOpenChange={handleClose}>
-                <DialogContent className="sm:max-w-[500px] md:max-w-[600px] w-[95%] sm:w-[90%] mx-auto max-h-[95vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="text-lg sm:text-xl font-bold">
+                <DialogContent className="max-w-[95vw] mx-2 sm:max-w-[500px] md:max-w-[600px] max-h-[90vh] sm:max-h-[95vh] overflow-y-auto rounded-lg sm:rounded-xl">
+                    <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
+                        <DialogTitle className="text-lg sm:text-xl font-bold text-center sm:text-left">
                             {event.event_type === 'Course' ? 'Enroll in Course' : 
                              event.event_type === 'Workshop' ? 'Register for Workshop' : 
                              'Book Event'}: {event.title}
                         </DialogTitle>
-                        <DialogDescription className="text-sm sm:text-base">
+                        <DialogDescription className="text-sm sm:text-base text-center sm:text-left">
                             {step === 1 
                                 ? `${event.event_date} ${event.event_time ? `at ${event.event_time}` : ''} - Fill out the form below to reserve your spot`
                                 : `${event.event_date} ${event.event_time ? `at ${event.event_time}` : ''} - Choose your preferred payment option`
@@ -341,7 +339,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                     </DialogHeader>
 
                     {errorMessage && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                        <div className="mx-4 sm:mx-6 bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded-md text-xs sm:text-sm">
                             {errorMessage}
                         </div>
                     )}
@@ -349,8 +347,8 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                     {step === 1 ? (
                         // Step 1: Registration Form
                         <>
-                            <div className="space-y-4 py-4">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-4 py-2 sm:py-4 px-4 sm:px-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="firstName" className="text-sm font-medium">First Name *</Label>
                                         <Input
@@ -359,7 +357,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                             value={formData.firstName}
                                             onChange={handleInputChange}
                                             placeholder="Enter your first name"
-                                            className={`h-10 sm:h-11 ${validationErrors.firstName ? 'border-red-500' : ''}`}
+                                            className={`h-10 sm:h-11 text-sm sm:text-base ${validationErrors.firstName ? 'border-red-500' : ''}`}
                                         />
                                         {validationErrors.firstName && (
                                             <p className="text-red-500 text-xs">{validationErrors.firstName}</p>
@@ -373,7 +371,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                             value={formData.lastName}
                                             onChange={handleInputChange}
                                             placeholder="Enter your last name"
-                                            className={`h-10 sm:h-11 ${validationErrors.lastName ? 'border-red-500' : ''}`}
+                                            className={`h-10 sm:h-11 text-sm sm:text-base ${validationErrors.lastName ? 'border-red-500' : ''}`}
                                         />
                                         {validationErrors.lastName && (
                                             <p className="text-red-500 text-xs">{validationErrors.lastName}</p>
@@ -390,7 +388,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                         value={formData.email}
                                         onChange={handleInputChange}
                                         placeholder="Enter your email address"
-                                        className={`h-10 sm:h-11 ${validationErrors.email ? 'border-red-500' : ''}`}
+                                        className={`h-10 sm:h-11 text-sm sm:text-base ${validationErrors.email ? 'border-red-500' : ''}`}
                                     />
                                     {validationErrors.email && (
                                         <p className="text-red-500 text-xs">{validationErrors.email}</p>
@@ -406,7 +404,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                         value={formData.phone}
                                         onChange={handleInputChange}
                                         placeholder="Enter 10-digit mobile number"
-                                        className={`h-10 sm:h-11 ${validationErrors.phone ? 'border-red-500' : ''}`}
+                                        className={`h-10 sm:h-11 text-sm sm:text-base ${validationErrors.phone ? 'border-red-500' : ''}`}
                                     />
                                     {validationErrors.phone && (
                                         <p className="text-red-500 text-xs">{validationErrors.phone}</p>
@@ -421,12 +419,18 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                         value={formData.specialRequirements}
                                         onChange={handleInputChange}
                                         placeholder="Any special requirements or dietary restrictions..."
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[80px] resize-vertical"
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[80px] resize-vertical text-sm sm:text-base"
                                     />
                                 </div>
                             </div>
-                            <DialogFooter>
-                                <Button variant="outline" onClick={handleClose} className="border-pink-600 text-pink-600 hover:bg-pink-50">Cancel</Button>
+                            <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-3 px-4 sm:px-6 pb-4 sm:pb-6">
+                                <Button 
+                                    variant="outline" 
+                                    onClick={handleClose} 
+                                    className="w-full sm:w-auto border-pink-600 text-pink-600 hover:bg-pink-50 h-10 sm:h-11 text-sm sm:text-base"
+                                >
+                                    Cancel
+                                </Button>
                                 <Button
                                     onClick={() => {
                                         if (validateForm()) {
@@ -434,34 +438,40 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                         }
                                     }}
                                     disabled={loading}
-                                    className="bg-pink-600 hover:bg-pink-700"
+                                    className="w-full sm:w-auto bg-pink-600 hover:bg-pink-700 h-10 sm:h-11 text-sm sm:text-base"
                                 >
-                                    {loading ? "Processing..." : 
-                                     event.event_type === 'Course' ? 'Enroll Now' : 
-                                     event.event_type === 'Workshop' ? 'Register Now' : 
-                                     'Book Now'}
+                                    {loading ? (
+                                        <span className="flex items-center justify-center">
+                                            <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                                            Processing...
+                                        </span>
+                                    ) : (
+                                        event.event_type === 'Course' ? 'Enroll Now' : 
+                                        event.event_type === 'Workshop' ? 'Register Now' : 
+                                        'Book Now'
+                                    )}
                                 </Button>
                             </DialogFooter>
                         </>
                     ) : step === 2 ? (
                         // Step 2: Payment Choice
                         <>
-                            <div className="space-y-6 py-4">
+                            <div className="space-y-4 sm:space-y-6 py-2 sm:py-4 px-4 sm:px-6">
                                 <div className="text-center space-y-2">
-                                    <h4 className="font-medium text-lg text-green-600">
+                                    <h4 className="font-medium text-base sm:text-lg text-green-600">
                                         ✅ {event.event_type === 'Course' ? 'Enrollment Registered!' : 
                                             event.event_type === 'Workshop' ? 'Registration Complete!' : 
                                             'Booking Registered!'}
                                     </h4>
-                                    <p className="text-sm text-muted-foreground">
+                                    <p className="text-xs sm:text-sm text-muted-foreground">
                                         Your spot has been reserved. Choose your payment option:
                                     </p>
                                 </div>
 
                                 {/* Course/Workshop Details */}
-                                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                                    <h5 className="font-medium mb-2">{event.event_type} Details</h5>
-                                    <div className="space-y-1 text-sm text-muted-foreground">
+                                <div className="bg-primary/5 border border-primary/20 rounded-lg p-3 sm:p-4">
+                                    <h5 className="font-medium text-sm sm:text-base mb-2">{event.event_type} Details</h5>
+                                    <div className="space-y-1 text-xs sm:text-sm text-muted-foreground">
                                         <p><span className="font-medium">Title:</span> {event.title}</p>
                                         <p><span className="font-medium">Date:</span> {event.event_date}</p>
                                         {event.event_time && <p><span className="font-medium">Time:</span> {event.event_time}</p>}
@@ -471,35 +481,37 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                 </div>
 
                                 {/* Payment Options */}
-                                <div className="space-y-4">
-                                    <h4 className="font-medium text-lg">Choose Payment Option</h4>
+                                <div className="space-y-3 sm:space-y-4">
+                                    <h4 className="font-medium text-base sm:text-lg text-center sm:text-left">Choose Payment Option</h4>
                                     
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 gap-3 sm:gap-4">
                                         <Button
                                             variant="outline"
-                                            className="h-20 border-2 border-orange-300 hover:border-orange-400 hover:bg-orange-50"
+                                            className="h-16 sm:h-20 border-2 border-orange-300 hover:border-orange-400 hover:bg-orange-50 py-2"
                                             onClick={() => {
                                                 setPaymentChoice('later');
                                                 handlePayment();
                                             }}
                                             disabled={loading}
                                         >
-                                            <div className="text-center">
-                                                <div className="font-medium text-orange-600">Pay Later</div>
-                                                <div className="text-xs text-muted-foreground mt-1">Reserve your spot now, pay at the venue</div>
+                                            <div className="text-center w-full">
+                                                <div className="font-medium text-orange-600 text-sm sm:text-base">Pay Later</div>
+                                                <div className="text-xs text-muted-foreground mt-1 px-2">
+                                                    Reserve your spot now, pay at the venue
+                                                </div>
                                             </div>
                                         </Button>
                                         <Button
-                                            className="h-20 bg-green-600 hover:bg-green-700"
+                                            className="h-16 sm:h-20 bg-green-600 hover:bg-green-700 py-2"
                                             onClick={() => {
                                                 setPaymentChoice('now');
                                                 handlePayment();
                                             }}
                                             disabled={loading}
                                         >
-                                            <div className="text-center text-white">
-                                                <div className="font-medium">Pay Now</div>
-                                                <div className="text-xs mt-1">Complete payment online</div>
+                                            <div className="text-center text-white w-full">
+                                                <div className="font-medium text-sm sm:text-base">Pay Now</div>
+                                                <div className="text-xs mt-1 px-2">Complete payment online securely</div>
                                             </div>
                                         </Button>
                                     </div>
@@ -512,34 +524,37 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
 
             {/* Success Modal */}
             <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-                <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                        <DialogTitle className="text-center text-green-600">
+                <DialogContent className="max-w-[90vw] sm:max-w-md mx-2 rounded-lg sm:rounded-xl">
+                    <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
+                        <DialogTitle className="text-center text-green-600 text-lg sm:text-xl">
                             🎉 Success!
                         </DialogTitle>
-                        <DialogDescription className="text-center">
+                        <DialogDescription className="text-center text-sm sm:text-base">
                             {paymentChoice === 'later' 
                                 ? 'Your enrollment has been registered successfully with pay later option.'
                                 : 'Your enrollment has been completed successfully.'
                             }
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="text-center space-y-4 py-4">
-                        <p className="text-lg font-medium">
+                    <div className="text-center space-y-3 sm:space-y-4 py-3 sm:py-4 px-4 sm:px-6">
+                        <p className="text-base sm:text-lg font-medium">
                             {paymentChoice === 'later' 
                                 ? 'Your spot has been reserved!'
                                 : 'Payment completed successfully!'
                             }
                         </p>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                             {paymentChoice === 'later' 
                                 ? 'You can pay at the venue. We\'ll send you a confirmation message shortly.'
                                 : 'Thank you for your payment. You\'ll receive a confirmation shortly.'
                             }
                         </p>
                     </div>
-                    <DialogFooter>
-                        <Button onClick={handleSuccessClose} className="w-full">
+                    <DialogFooter className="px-4 sm:px-6 pb-4 sm:pb-6">
+                        <Button 
+                            onClick={handleSuccessClose} 
+                            className="w-full h-10 sm:h-11 text-sm sm:text-base"
+                        >
                             Close
                         </Button>
                     </DialogFooter>
