@@ -86,8 +86,10 @@ export function SignInForm() {
         const userName = `${response.data.user.firstname} ${response.data.user.lastname}`;
 
         toast({
-          title: "Success!",
+          title: "Success! 🎉",
           description: `Welcome back, ${userName}! You've successfully signed in.`,
+          variant: "default",
+          className: "bg-green-50 border-green-200 text-green-900",
         });
 
         // Remove the saved email from localStorage after successful login
@@ -96,8 +98,8 @@ export function SignInForm() {
         // Determine redirect path
         const isAdminFlag = localStorage.getItem('isAdmin') === 'true';
 
-        // Small delay to ensure all data is stored
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Small delay to ensure all data is stored and toast is visible
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         navigate(isAdminFlag ? '/admin' : '/');
       } else {
@@ -120,8 +122,10 @@ export function SignInForm() {
 
         const userName = `${userResponse.data.firstname} ${userResponse.data.lastname}`;
         toast({
-          title: "Success!",
+          title: "Success! 🎉",
           description: `Welcome back, ${userName}! You've successfully signed in.`,
+          variant: "default",
+          className: "bg-green-50 border-green-200 text-green-900",
         });
 
         // Remove the saved email from localStorage after successful login
@@ -130,17 +134,35 @@ export function SignInForm() {
         // Determine redirect path
         const isAdminFlag = localStorage.getItem('isAdmin') === 'true';
 
-        // Small delay to ensure all data is stored
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // Small delay to ensure all data is stored and toast is visible
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         navigate(isAdminFlag ? '/admin' : '/');
       }
 
     } catch (error: any) {
-      // Always show an error toast for any error
+      // Enhanced error handling with specific messages for different error types
+      let errorTitle = "Sign In Failed";
       let errorMessage = "Failed to connect to server.";
-      // Prefer server error message if available
-      if (error.response?.data) {
+      
+      // Handle different types of errors
+      if (error.response?.status === 401) {
+        errorTitle = "Invalid Credentials";
+        errorMessage = "The email or password you entered is incorrect. Please try again.";
+      } else if (error.response?.status === 400) {
+        errorTitle = "Bad Request";
+        errorMessage = "Please check your input and try again.";
+      } else if (error.response?.status === 404) {
+        errorTitle = "Service Unavailable";
+        errorMessage = "Authentication endpoint not found. Please check backend configuration.";
+      } else if (error.response?.status === 500) {
+        errorTitle = "Server Error";
+        errorMessage = "Internal server error. Please try again later.";
+      } else if (error.code === 'ERR_NETWORK') {
+        errorTitle = "Connection Error";
+        errorMessage = "Cannot connect to server. Please check if the backend is running on http://localhost:5000 and try again.";
+      } else if (error.response?.data) {
+        // Prefer server error message if available
         if (typeof error.response.data === 'string') {
           errorMessage = error.response.data;
         } else if (error.response.data.message) {
@@ -148,21 +170,21 @@ export function SignInForm() {
         } else if (error.response.data.error) {
           errorMessage = error.response.data.error;
         }
-      } else if (error.response?.status === 401) {
-        errorMessage = "Invalid email or password.";
-      } else if (error.code === 'ERR_NETWORK') {
-        errorMessage = "Cannot connect to server. Please check if the backend is running on http://localhost:5000";
-      } else if (error.response?.status === 404) {
-        errorMessage = "Authentication endpoint not found. Please check backend configuration.";
       } else if (error.message) {
         errorMessage = error.message;
       }
+
+      // Show error toast with enhanced styling
       toast({
-        title: "Error",
+        title: errorTitle,
         description: errorMessage,
         variant: "destructive",
+        duration: 5000, // Show for 5 seconds for errors
       });
-      // Do not navigate on error
+      
+      // Clear password field on error for security
+      setPassword('');
+      
     } finally {
       setIsLoading(false);
     }
@@ -198,6 +220,7 @@ export function SignInForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={isLoading}
           />
         </div>
         <div className="space-y-2">
@@ -209,13 +232,13 @@ export function SignInForm() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={isLoading}
           />
         </div>
         <Button
           type="submit"
           className="w-full"
           disabled={isLoading}
-          onClick={() => console.log('Button clicked - about to submit form')}
         >
           {isLoading ? "Signing in..." : "Sign In"}
         </Button>
@@ -225,6 +248,7 @@ export function SignInForm() {
           variant="link"
           className="text-sm text-primary"
           onClick={() => window.open("https://app.flowerschoolbengaluru.com/forgot-password", "_blank")}
+          disabled={isLoading}
         >
           Forgot your password?
         </Button>
@@ -234,6 +258,7 @@ export function SignInForm() {
             variant="link"
             className="text-primary"
             onClick={() => window.open("https://app.flowerschoolbengaluru.com/signup", "_blank")}
+            disabled={isLoading}
           >
             Sign up
           </Button>

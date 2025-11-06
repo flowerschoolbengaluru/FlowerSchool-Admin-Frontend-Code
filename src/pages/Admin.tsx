@@ -65,6 +65,8 @@ interface Product {
   stockquantity: number;
   instock: boolean;
   featured: boolean;
+  iscustom?: boolean;
+  isbestseller?: boolean;
   discounts_offers?: boolean;
   createdat?: string;
 }
@@ -203,9 +205,8 @@ interface Impact {
 const Admin = () => {
   const { toast } = useToast();
  
-  const [bestSellerValue, setBestSellerValue] = useState<'true' | 'false'>('false');
-  const [editBestSellerValue, setEditBestSellerValue] = useState<'true' | 'false'>('false');
-  const [editIsCustomValue, setEditIsCustomValue] = useState<'true' | 'false'>('false');
+  // Best seller fields removed - no longer exist
+  // Custom fields removed - no longer exist
   const [showDiscountFields, setShowDiscountFields] = useState(false);
   const [editShowDiscountFields, setEditShowDiscountFields] = useState(false);
   
@@ -865,14 +866,7 @@ const Admin = () => {
       setEditProductCategories(Array.isArray(selectedProduct.category)
         ? (selectedProduct.category as string[])
         : getCategoryArray(selectedProduct.category));
-      // Initialize edit Best Seller state from selected product
-      const bs = (selectedProduct as any).isBestSeller ?? (selectedProduct as any).isbestseller;
-      setEditBestSellerValue(bs ? 'true' : 'false');
-      // Initialize edit Is Custom state from multiple possible shapes
-      const parseBool = (v: any): boolean => (v === true || v === 'true' || v === 1 || v === '1' || String(v).toLowerCase() === 'enable');
-      const ic = (selectedProduct as any);
-      const computedIsCustom = parseBool(ic?.isCustom) || parseBool(ic?.iscustom) || parseBool(ic?.custom) || parseBool(ic?.displayOption);
-      setEditIsCustomValue(computedIsCustom ? 'true' : 'false');
+      // Custom fields removed - no longer exist
     } else {
       setEditProductCategories([]);
     }
@@ -2486,25 +2480,20 @@ case "products":
                   : formData.getAll('category').map(c => c?.toString() || '').filter(Boolean);
 
                 // First create the product without images
-                // Get custom field value from the select
-                const customRaw = formData.get('custom')?.toString() || '';
-                const isCustomBool = customRaw === 'true';
-                const bestSellerRaw = formData.get('isBestSeller')?.toString() || 'false';
-                const isBestSellerBool = bestSellerRaw === 'true';
-                  const originalPriceNum = originalPrice ? parseFloat(originalPrice) : null;
-                  const discountPercentNum = discountPercentage ? parseInt(discountPercentage) : null;
+                const originalPriceNum = originalPrice ? parseFloat(originalPrice) : null;
+                const discountPercentNum = discountPercentage ? parseInt(discountPercentage) : null;
 
-                  // If discounts are enabled we want to send the computed selling price (sellingPrice state)
-                  // as `price`, and send `originalPrice`, `discountPercentage` and `discountAmount` (amount value).
-                  const computedDiscountAmount = (() => {
-                    if (showDiscountFields && originalPriceNum !== null && discountPercentNum !== null && originalPriceNum > 0 && discountPercentNum > 0) {
-                      // discount amount = originalPrice * percent / 100
-                      return parseFloat((originalPriceNum * discountPercentNum / 100).toFixed(2));
-                    }
-                    return null;
-                  })();
+                // If discounts are enabled we want to send the computed selling price (sellingPrice state)
+                // as `price`, and send `originalPrice`, `discountPercentage` and `discountAmount` (amount value).
+                const computedDiscountAmount = (() => {
+                  if (showDiscountFields && originalPriceNum !== null && discountPercentNum !== null && originalPriceNum > 0 && discountPercentNum > 0) {
+                    // discount amount = originalPrice * percent / 100
+                    return parseFloat((originalPriceNum * discountPercentNum / 100).toFixed(2));
+                  }
+                  return null;
+                })();
 
-                  const productData = {
+                const productData = {
                   name: formData.get('name')?.toString() || '',
                   description: formData.get('description')?.toString() || '',
                   // price: final selling price. If discounts are enabled use the sellingPrice state (auto-calculated),
@@ -2521,16 +2510,8 @@ case "products":
                   featured: formData.get('featured') === 'on',
                   colour: formData.get('colour')?.toString() || '',
                   discounts_offers: showDiscountFields, // Use checkbox state
-                  // New custom fields
-                  customLabel: formData.get('customLabel')?.toString() || '',
-                  // Keep raw values too so backend can inspect original fields
-                  // Ensure a proper boolean is sent for isCustom (canonicalize input)
-                  isCustom: isCustomBool,
-                  // include lowercase key as some backend/db code expects 'iscustom'
-                  iscustom: isCustomBool,
-                  // Best seller flags (both casings for compatibility)
-                  isBestSeller: isBestSellerBool,
-                  isbestseller: isBestSellerBool,
+                  iscustom: formData.get('iscustom') === 'on',
+                  isbestseller: formData.get('isbestseller') === 'on',
                 };
 
                 console.log('Product data being sent:', productData);
@@ -3105,34 +3086,16 @@ case "products":
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="custom" className="text-sm sm:text-base">Custom</Label>
-                  <Select name="custom" defaultValue="true">
-                    <SelectTrigger className="text-xs sm:text-sm">
-                      <SelectValue placeholder="Select custom status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true" className="text-xs sm:text-sm">Enable</SelectItem>
-                      <SelectItem value="false" className="text-xs sm:text-sm">Disable</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="iscustom" name="iscustom" />
+                  <Label htmlFor="iscustom" className="text-sm sm:text-base">Custom Product</Label>
                 </div>
-                <div>
-                  <Label htmlFor="isBestSeller" className="text-sm sm:text-base">Best Seller</Label>
-                  {/* Mirror shadcn Select value into a hidden input so it's included in FormData */}
-                  <input type="hidden" name="isBestSeller" value={bestSellerValue} />
-                  <Select
-                    defaultValue={bestSellerValue}
-                    onValueChange={(val) => setBestSellerValue((val as 'true' | 'false') || 'false')}
-                  >
-                    <SelectTrigger className="text-xs sm:text-sm">
-                      <SelectValue placeholder="Is this a best seller?" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true" className="text-xs sm:text-sm">Enable</SelectItem>
-                      <SelectItem value="false" className="text-xs sm:text-sm">Disable</SelectItem>
-                    </SelectContent>
-                  </Select>
+              </div>
+
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                <div className="flex items-center space-x-2">
+                  <Checkbox id="isbestseller" name="isbestseller" />
+                  <Label htmlFor="isbestseller" className="text-sm sm:text-base">Best Seller</Label>
                 </div>
               </div>
 
@@ -3226,7 +3189,9 @@ case "products":
                         className="h-6 w-6 sm:h-8 sm:w-8"
                         title="Edit Product"
                         onClick={() => {
+                          console.log('Edit button clicked for product:', product.id, product.name);
                           setSelectedProduct(product);
+                          console.log('selectedProduct set to:', product);
                           
                           // Initialize existing images tracking
                           const imageFields = ['image', 'imagefirst', 'imagesecond', 'imagethirder', 'imagefoure'];
@@ -3242,11 +3207,29 @@ case "products":
                           setExistingImages(existingImagesData);
                           setEditShowDiscountFields(product.discounts_offers || false);
                           
-                          // Initialize pricing state for edit form
+                          // Initialize pricing state for edit form - handle both camelCase and snake_case
                           setEditSellingPrice(product.price?.toString() || '');
-                          setEditOriginalPrice(product.originalPrice?.toString() || '');
-                          setEditDiscountPercentage(product.discountPercentage?.toString() || '');
+                          const originalPriceValue = (product.originalPrice || (product as any).originalprice)?.toString() || '';
+                          const discountPercentageValue = (product.discountPercentage || (product as any).discount_percentage)?.toString() || '';
                           
+                          console.log('Setting edit form values:');
+                          console.log('- editSellingPrice:', product.price?.toString() || '');
+                          console.log('- editOriginalPrice:', originalPriceValue);
+                          console.log('- editDiscountPercentage:', discountPercentageValue);
+                          console.log('- editShowDiscountFields:', product.discounts_offers || false);
+                          
+                          setEditOriginalPrice(originalPriceValue);
+                          setEditDiscountPercentage(discountPercentageValue);
+                          
+                          // Initialize category states for edit form
+                          setEditSelectedCategoryId('');
+                          setEditSelectedCategoryItem('');
+                          setEditTypedCategory('');
+                          
+                          // Clear any previous edit form states
+                          setEditImageFiles([]);
+                          
+                          console.log('Opening edit modal...');
                           setIsEditModalOpen(true);
                         }}
                       >
@@ -3279,11 +3262,16 @@ case "products":
                           Featured
                         </Badge>
                       )}
-                      {(product as any).isBestSeller || (product as any).isbestseller ? (
-                        <Badge variant="secondary" className="shadow-sm text-xs bg-amber-100 text-amber-800 border border-amber-200">
+                      {product.isbestseller && (
+                        <Badge className="bg-yellow-500 text-white shadow-sm text-xs">
                           Best Seller
                         </Badge>
-                      ) : null}
+                      )}
+                      {product.iscustom && (
+                        <Badge className="bg-purple-500 text-white shadow-sm text-xs">
+                          Custom
+                        </Badge>
+                      )}
                     </div>
                   </div>
 
@@ -3295,51 +3283,51 @@ case "products":
                       </h3>
                       <div className="flex-shrink-0 ml-2 text-right">
                         {product.originalPrice && product.discountPercentage && product.discounts_offers ? (
-                          // Amazon-style pricing display with discount
+                          // Discount pricing display: Original (strikethrough), Final, Badge
                           <div className="space-y-1">
                             <div className="flex items-center gap-2 flex-wrap justify-end">
-                              <span className="font-bold text-base text-red-600 font-sans sm:text-lg">
-                                ₹{product.price || 0}
-                              </span>
-                              <span className="text-xs text-gray-500 line-through">
+                              <span className="text-lg text-gray-500 line-through font-sans">
                                 ₹{product.originalPrice}
                               </span>
-                              <span className="bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-xs font-bold">
+                              <span className="font-bold text-lg text-red-600 font-sans">
+                                ₹{product.price || 0}
+                              </span>
+                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold">
                                 {product.discountPercentage}% OFF
                               </span>
                             </div>
                           </div>
                         ) : (
-                          // Regular pricing without discount
-                          <div>
-                            {/* <p className="font-bold text-base font-sans sm:text-lg">
-                              ₹{product.price || 0}
-                            </p> */}
-                            {/* Debug info - remove after testing */}
-                            <div className="text-xs flex items-center gap-3 text-gray-600">
-                              {/* Original price (small, struck-through) */}
-                              {product.originalprice ? (
-                                <span className="text-gray-500 line-through text-sm">₹{product.originalprice}</span>
+                          // Regular pricing display - Only show original price when discounts_offers is enabled
+                          <div className="flex items-center justify-between mb-3 md:mb-4">
+                            <div className="flex items-center gap-3 text-sm md:text-base text-gray-600">
+                              {product.discounts_offers ? (
+                                // Show discount information only when discounts_offers is true
+                                <>
+                                  {(product as any).originalprice ? (
+                                    <span className="text-gray-500 line-through text-sm">₹{(product as any).originalprice}</span>
+                                  ) : (
+                                    <span className="text-gray-400 text-sm">No orig</span>
+                                  )}
+
+                                  <span className="font-sans font-semibold text-lg md:text-xl text-gray-900">₹{product.price || 0}</span>
+
+                                  {(product as any).discount_percentage ? (
+                                    <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-semibold">{(product as any).discount_percentage}% OFF</span>
+                                  ) : (
+                                    <span className="text-gray-400 text-xs">No %</span>
+                                  )}
+                                </>
                               ) : (
-                                <span className="text-gray-400 text-sm">No orig</span>
+                                // When discounts_offers is false, only show the original price (which is the selling price)
+                                <span className="font-sans font-semibold text-lg md:text-xl text-gray-900">
+                                  ₹{(product as any).originalprice || product.price || 0}
+                                </span>
                               )}
 
-                              {/* Current / selling price (prominent) */}
-                              <span className="font-sans font-semibold text-base text-gray-900">₹{product.price || 0}</span>
 
-                              {/* Discount badge (green) or fallback */}
-                              {product.discount_percentage ? (
-                                <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded text-xs font-semibold">{product.discount_percentage}% OFF</span>
-                              ) : (
-                                <span className="text-gray-400 text-xs">No %</span>
-                              )}
-
-                              {/* Offers flag fallback */}
-                              {!product.discounts_offers && (
-                                <span className="text-gray-400 text-xs">✗Offers</span>
-                              )}
-                            </div>
-                          </div>
+                    </div>
+                  </div>
                         )}
                       </div>
                     </div>
@@ -5849,20 +5837,22 @@ case "products":
                     <div className="grid gap-3 py-2 sm:gap-4 sm:py-4">
                       <div className="grid grid-cols-1 gap-2 items-center sm:grid-cols-4 sm:gap-4">
                         <Label htmlFor="edit_office_day" className="text-sm sm:text-base sm:text-right">Day</Label>
-                        <Select name="office_day" defaultValue={selectedOfficeTiming.office_day} className="sm:col-span-3">
-                          <SelectTrigger className="text-xs sm:text-sm">
-                            <SelectValue placeholder="Select day" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Monday" className="text-xs sm:text-sm">Monday</SelectItem>
-                            <SelectItem value="Tuesday" className="text-xs sm:text-sm">Tuesday</SelectItem>
-                            <SelectItem value="Wednesday" className="text-xs sm:text-sm">Wednesday</SelectItem>
-                            <SelectItem value="Thursday" className="text-xs sm:text-sm">Thursday</SelectItem>
-                            <SelectItem value="Friday" className="text-xs sm:text-sm">Friday</SelectItem>
-                            <SelectItem value="Saturday" className="text-xs sm:text-sm">Saturday</SelectItem>
+                        <div className="sm:col-span-3">
+                          <Select name="office_day" defaultValue={selectedOfficeTiming.office_day}>
+                            <SelectTrigger className="text-xs sm:text-sm">
+                              <SelectValue placeholder="Select day" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Monday" className="text-xs sm:text-sm">Monday</SelectItem>
+                              <SelectItem value="Tuesday" className="text-xs sm:text-sm">Tuesday</SelectItem>
+                              <SelectItem value="Wednesday" className="text-xs sm:text-sm">Wednesday</SelectItem>
+                              <SelectItem value="Thursday" className="text-xs sm:text-sm">Thursday</SelectItem>
+                              <SelectItem value="Friday" className="text-xs sm:text-sm">Friday</SelectItem>
+                              <SelectItem value="Saturday" className="text-xs sm:text-sm">Saturday</SelectItem>
                             <SelectItem value="Sunday" className="text-xs sm:text-sm">Sunday</SelectItem>
                           </SelectContent>
                         </Select>
+                        </div>
                       </div>
                       <div className="grid grid-cols-1 gap-2 items-center sm:grid-cols-4 sm:gap-4">
                         <Label htmlFor="edit_open_time" className="text-sm sm:text-base sm:text-right">Open</Label>
@@ -8119,8 +8109,9 @@ case "products":
           <DialogHeader>
             <DialogTitle className="text-base lg:text-lg">Edit Product</DialogTitle>
           </DialogHeader>
-          {selectedProduct && (
+          {selectedProduct ? (
             <form onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
+              console.log('Edit form submitted for product:', selectedProduct.id);
               e.preventDefault();
               const formData = new FormData(e.currentTarget);
               const categoriesToSend = editProductCategories.length
@@ -8150,14 +8141,12 @@ case "products":
                 instock: (formData.get('instock') as string) === 'true',
                 colour: formData.get('colour') as string,
                 discounts_offers: editShowDiscountFields, // Use checkbox state
-                // include custom fields
-                customLabel: formData.get('customLabel') as string,
-                isCustom: (formData.get('isCustom') as string) === 'true',
-                // lowercase alias for backend compatibility
-                iscustom: (formData.get('isCustom') as string) === 'true',
-                // Best seller flags from hidden input (mirrored from Select)
-                isBestSeller: (formData.get('isBestSeller') as string) === 'true',
-                isbestseller: (formData.get('isBestSeller') as string) === 'true',
+                // Product options from checkboxes
+                iscustom: (formData.get('iscustom') as string) === 'on',
+                isCustom: (formData.get('iscustom') as string) === 'on',
+                isbestseller: (formData.get('isbestseller') as string) === 'on',
+                isBestSeller: (formData.get('isbestseller') as string) === 'on',
+                featured: (formData.get('featured') as string) === 'on',
                 // Add existing images that weren't removed
                 ...existingImages
               };
@@ -8429,51 +8418,150 @@ case "products":
                     className="sm:col-span-3"
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="price" className="sm:text-right font-medium">
-                    {editShowDiscountFields ? "New Selling Price (₹)" : "Selling Price (₹)"}
-                  </Label>
-                  <Input
-                    id="price"
-                    name="price"
-                    type="number"
-                    step="0.01"
-                    value={editSellingPrice}
-                    onChange={(e) => setEditSellingPrice(e.target.value)}
-                    className="sm:col-span-3"
-                    readOnly={editShowDiscountFields}
-                    style={editShowDiscountFields ? { backgroundColor: '#f0f9ff', cursor: 'not-allowed' } : {}}
-                  />
-                  {editShowDiscountFields && (
-                    <div className="sm:col-span-4 text-xs text-blue-600 mt-1">
-                      This will be calculated automatically from original price and discount
+                {/* Pricing Section - Enhanced */}
+                <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Pricing Information</h3>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="editDiscountOffers" 
+                        checked={editShowDiscountFields}
+                        onCheckedChange={(checked) => {
+                          setEditShowDiscountFields(checked as boolean);
+                          if (checked) {
+                            // When enabling discounts, set original price to current selling price if not set
+                            if (!editOriginalPrice && editSellingPrice) {
+                              setEditOriginalPrice(editSellingPrice);
+                            }
+                            // Calculate selling price from original and discount
+                            const orig = editOriginalPrice && parseFloat(editOriginalPrice) > 0 ? parseFloat(editOriginalPrice) : (editSellingPrice ? parseFloat(editSellingPrice) : null);
+                            if (orig && editDiscountPercentage) {
+                              const percent = parseInt(editDiscountPercentage);
+                              if (percent > 0) {
+                                const discountAmount = orig * percent / 100;
+                                const newSellingPrice = orig - discountAmount;
+                                setEditSellingPrice(newSellingPrice.toFixed(2));
+                              }
+                            }
+                          } else {
+                            // When disabling discounts, clear discount fields
+                            setEditOriginalPrice('');
+                            setEditDiscountPercentage('');
+                          }
+                        }}
+                      />
+                      <Label htmlFor="editDiscountOffers" className="text-sm font-medium">Enable Discounts & Offers</Label>
+                    </div>
+                  </div>
+
+                  {editShowDiscountFields ? (
+                    // Discount Mode - Show original price first, then calculated selling price
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="editOriginalPrice" className="font-medium">Original Price (₹) *</Label>
+                          <Input
+                            id="editOriginalPrice"
+                            name="originalPrice"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={editOriginalPrice || ''}
+                            onChange={(e) => {
+                              setEditOriginalPrice(e.target.value);
+                              // Auto-calculate selling price when original price or discount changes
+                              const originalPriceNum = parseFloat(e.target.value) || 0;
+                              const discountPercentNum = parseInt(editDiscountPercentage) || 0;
+                              if (originalPriceNum > 0 && discountPercentNum > 0) {
+                                const discountAmount = originalPriceNum * discountPercentNum / 100;
+                                const sellingPrice = originalPriceNum - discountAmount;
+                                setEditSellingPrice(sellingPrice.toFixed(2));
+                              }
+                            }}
+                            placeholder="Enter original price"
+                            className="text-sm"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="editDiscountPercentage" className="font-medium">Discount % *</Label>
+                          <Input
+                            id="editDiscountPercentage"
+                            name="discountPercentage"
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={editDiscountPercentage || ''}
+                            onChange={(e) => {
+                              setEditDiscountPercentage(e.target.value);
+                              // Auto-calculate selling price when discount percentage changes
+                              const originalPriceNum = parseFloat(editOriginalPrice) || 0;
+                              const discountPercentNum = parseInt(e.target.value) || 0;
+                              if (originalPriceNum > 0 && discountPercentNum > 0) {
+                                const discountAmount = originalPriceNum * discountPercentNum / 100;
+                                const sellingPrice = originalPriceNum - discountAmount;
+                                setEditSellingPrice(sellingPrice.toFixed(2));
+                              }
+                            }}
+                            placeholder="Enter discount %"
+                            className="text-sm"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="editSellingPrice" className="font-medium">Final Selling Price (₹)</Label>
+                        <Input
+                          id="editSellingPrice"
+                          name="price"
+                          type="number"
+                          step="0.01"
+                          value={editSellingPrice || ''}
+                          onChange={(e) => setEditSellingPrice(e.target.value)}
+                          className="text-sm bg-blue-50"
+                          readOnly
+                          placeholder="Auto-calculated from original price and discount"
+                        />
+                        <p className="text-xs text-blue-600 mt-1">
+                          Auto-calculated from original price and discount percentage
+                        </p>
+                      </div>
+                      
+                      {/* Pricing Preview */}
+                      {editOriginalPrice && editDiscountPercentage && editSellingPrice && (
+                        <div className="p-3 bg-white border rounded-lg">
+                          <p className="text-sm font-medium mb-2">Pricing Preview:</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg text-gray-500 line-through">₹{editOriginalPrice}</span>
+                            <span className="text-lg font-bold text-red-600">₹{editSellingPrice}</span>
+                            <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-bold">
+                              {editDiscountPercentage}% OFF
+                            </span>
+                          </div>
+                          <p className="text-xs text-green-600 mt-1">
+                            Customer saves ₹{(parseFloat(editOriginalPrice) - parseFloat(editSellingPrice)).toFixed(2)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    // Regular Mode - Just selling price
+                    <div>
+                      <Label htmlFor="editSellingPriceRegular" className="font-medium">Selling Price (₹) *</Label>
+                      <Input
+                        id="editSellingPriceRegular"
+                        name="price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={editSellingPrice || ''}
+                        onChange={(e) => setEditSellingPrice(e.target.value)}
+                        placeholder="Enter selling price"
+                        className="text-sm"
+                        required
+                      />
                     </div>
                   )}
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="originalPrice" className="sm:text-right font-medium">Original Price <span className="text-muted-foreground">(Optional)</span></Label>
-                  <Input
-                    id="originalPrice"
-                    name="originalPrice"
-                    type="number"
-                    step="0.01"
-                    defaultValue={selectedProduct.originalPrice || ''}
-                    placeholder="Enter original price before discount"
-                    className="sm:col-span-3"
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="discountPercentage" className="sm:text-right font-medium">Discount % <span className="text-muted-foreground">(Optional)</span></Label>
-                  <Input
-                    id="discountPercentage"
-                    name="discountPercentage"
-                    type="number"
-                    min="0"
-                    max="100"
-                    defaultValue={selectedProduct.discountPercentage || ''}
-                    placeholder="Enter discount percentage (0-100)"
-                    className="sm:col-span-3"
-                  />
                 </div>
                 {/* Categories (Edit) */}
                 <div className="grid grid-cols-1 sm:grid-cols-4 items-start gap-2 lg:gap-4">
@@ -8645,144 +8733,6 @@ case "products":
                     className="sm:col-span-3"
                   />
                 </div>
-                {/* Discount Offers Checkbox */}
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="edit_discounts_offers" className="sm:text-right font-medium">Enable Discount/Offers</Label>
-                  <div className="sm:col-span-3 flex items-center space-x-2">
-                    <Checkbox 
-                      id="edit_discounts_offers" 
-                      name="discounts_offers"
-                      checked={editShowDiscountFields}
-                      onCheckedChange={(checked) => {
-                        setEditShowDiscountFields(checked as boolean);
-                        if (checked) {
-                          // When enabling discount, move current selling price to original price
-                          if (editSellingPrice && parseFloat(editSellingPrice) > 0) {
-                            setEditOriginalPrice(editSellingPrice);
-                          }
-
-                          // If an edit discount % already exists, compute new selling price immediately
-                          const orig = editSellingPrice && parseFloat(editSellingPrice) > 0 ? parseFloat(editSellingPrice) : (editOriginalPrice ? parseFloat(editOriginalPrice) : null);
-                          const pct = editDiscountPercentage ? parseFloat(editDiscountPercentage) : null;
-                          if (orig !== null && pct !== null && pct > 0) {
-                            const newSelling = orig - (orig * pct / 100);
-                            // update preview only
-                            setEditPreviewSellingPrice(newSelling.toFixed(2));
-                          }
-                        } else {
-                          // Clear discount fields when unchecked
-                          setEditOriginalPrice('');
-                          setEditDiscountPercentage('');
-                          setEditPreviewSellingPrice('');
-                        }
-                      }}
-                    />
-                    <span className="text-sm">Check to enable discount pricing</span>
-                  </div>
-                </div>
-
-                {/* Conditional Discount Field - Only show when discount checkbox is checked */}
-                {editShowDiscountFields && (
-                  <div className="p-4 border border-orange-200 rounded-lg bg-orange-50">
-                    <div className="mb-3">
-                      <h4 className="font-medium text-sm text-orange-800 mb-1">Edit Discount Configuration</h4>
-                      <p className="text-xs text-orange-600">Enter a discount percentage to calculate the final selling price. The preview below shows how customers will see it.</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3">
-                      <div>
-                        <Label htmlFor="edit_discountPercentage" className="font-sans text-sm sm:text-base">Discount % <span className="text-red-500">*</span></Label>
-                        <Input 
-                          id="edit_discountPercentage" 
-                          name="discountPercentage" 
-                          type="number" 
-                          min="1" 
-                          max="99" 
-                          className="text-sm sm:text-base" 
-                          placeholder="10"
-                          value={editDiscountPercentage}
-                          required={editShowDiscountFields}
-                          onChange={(e) => {
-                            const discountPercent = parseFloat(e.target.value) || 0;
-                            setEditDiscountPercentage(e.target.value);
-
-                            const originalPriceNum = parseFloat(editOriginalPrice) || 0;
-
-                            if (discountPercent > 0 && originalPriceNum > 0) {
-                              // Calculate new selling price after discount and update preview only
-                              const newSellingPrice = originalPriceNum - (originalPriceNum * discountPercent / 100);
-                              setEditPreviewSellingPrice(newSellingPrice.toFixed(2));
-                            } else if (discountPercent === 0 && originalPriceNum > 0) {
-                              setEditPreviewSellingPrice(editOriginalPrice);
-                            } else {
-                              setEditPreviewSellingPrice('');
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                    
-                    {/* Amazon-style Display Preview for Edit */}
-                    <div className="mt-4 p-4 bg-white border border-green-200 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-green-800">🛍️ Amazon-style Display Preview</span>
-                        <span className="text-xs text-green-600">How customers will see it</span>
-                      </div>
-                      <div className="bg-gray-50 border rounded p-3">
-                        <div className="text-gray-600">
-                          {editDiscountPercentage && editOriginalPrice && (editPreviewSellingPrice || editSellingPrice) ? (
-                            <div className="flex items-center gap-3">
-                              <span className="text-2xl font-bold text-red-600">₹{Math.round(parseFloat(editPreviewSellingPrice || editSellingPrice))}</span>
-                              <span className="text-lg text-gray-500 line-through">₹{Math.round(parseFloat(editOriginalPrice))}</span>
-                              <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-bold">{editDiscountPercentage}% OFF</span>
-                            </div>
-                          ) : (
-                            'Enter discount percentage to see preview'
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">Similar to Amazon product pricing display</p>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-3 bg-blue-50 border border-blue-200 rounded p-3 text-sm">
-                      <div className="font-medium text-blue-800 mb-1">💡 How it works:</div>
-                      <div className="text-blue-700">
-                        1. Your selling price (₹{editOriginalPrice || '700'}) moved to "Original Price"<br/>
-                        2. Enter discount percentage ({editDiscountPercentage || '10'}%)<br/>
-                        3. New selling price preview (does not overwrite your saved selling price): ₹{editPreviewSellingPrice || editSellingPrice || '630'}<br/>
-                        4. Display shows: <strong>₹{Math.round(parseFloat(editPreviewSellingPrice || editSellingPrice || '630'))} ₹{Math.round(parseFloat(editOriginalPrice || '700'))} {editDiscountPercentage || '10'}% OFF</strong>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="edit_isCustom" className="sm:text-right font-medium">Is Custom</Label>
-                  {/* Hidden input to include in FormData */}
-                  <input type="hidden" name="isCustom" value={editIsCustomValue} />
-                  <Select
-                    defaultValue={editIsCustomValue}
-                    onValueChange={(val) => setEditIsCustomValue((val as 'true' | 'false') || 'false')}
-                  >
-                    <SelectTrigger className="sm:col-span-3">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Yes</SelectItem>
-                      <SelectItem value="false">No</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="customLabel" className="sm:text-right font-medium">Custom Label</Label>
-                  <Input
-                    id="customLabel"
-                    name="customLabel"
-                    defaultValue={(selectedProduct as any)?.customLabel || ''}
-                    placeholder="e.g., Anniversary Special"
-                    className="sm:col-span-3"
-                  />
-                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
                   <Label htmlFor="colour" className="sm:text-right font-medium">Colour</Label>
                   <Select name="colour" defaultValue={(selectedProduct as any)?.colour || ''}>
@@ -8799,23 +8749,47 @@ case "products":
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="edit_isBestSeller" className="sm:text-right font-medium">Best Seller</Label>
-                  {/* Hidden input to include in FormData */}
-                  <input type="hidden" name="isBestSeller" value={editBestSellerValue} />
-                  <Select
-                    defaultValue={editBestSellerValue}
-                    onValueChange={(val) => setEditBestSellerValue((val as 'true' | 'false') || 'false')}
-                  >
-                    <SelectTrigger className="sm:col-span-3">
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="true">Enable</SelectItem>
-                      <SelectItem value="false">Disable</SelectItem>
-                    </SelectContent>
-                  </Select>
+                
+                {/* Product Options - Custom, Best Seller, Featured */}
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-start gap-2 lg:gap-4">
+                  <Label className="sm:text-right font-medium mt-2">Product Options</Label>
+                  <div className="sm:col-span-3 space-y-3">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="edit_iscustom" 
+                          name="iscustom" 
+                          defaultChecked={(selectedProduct as any)?.iscustom || (selectedProduct as any)?.isCustom || false}
+                        />
+                        <Label htmlFor="edit_iscustom" className="text-sm sm:text-base">Custom Product</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="edit_isbestseller" 
+                          name="isbestseller" 
+                          defaultChecked={(selectedProduct as any)?.isbestseller || (selectedProduct as any)?.isBestSeller || false}
+                        />
+                        <Label htmlFor="edit_isbestseller" className="text-sm sm:text-base">Best Seller</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="edit_featured" 
+                          name="featured" 
+                          defaultChecked={selectedProduct?.featured || false}
+                        />
+                        <Label htmlFor="edit_featured" className="text-sm sm:text-base">Featured Product</Label>
+                      </div>
+                    </div>
+                    
+                    {/* Hidden inputs to ensure form data is captured correctly */}
+                    <div className="hidden">
+                      <input type="hidden" name="isCustom" value={(selectedProduct as any)?.iscustom || (selectedProduct as any)?.isCustom ? 'true' : 'false'} />
+                      <input type="hidden" name="isBestSeller" value={(selectedProduct as any)?.isbestseller || (selectedProduct as any)?.isBestSeller ? 'true' : 'false'} />
+                    </div>
+                  </div>
                 </div>
+                
+                {/* Best Seller field removed - no longer exists */}
               </div>
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => {
@@ -8830,6 +8804,10 @@ case "products":
                 </Button>
               </DialogFooter>
             </form>
+          ) : (
+            <div className="p-4 text-center text-muted-foreground">
+              <p>No product selected for editing.</p>
+            </div>
           )}
         </DialogContent>
       </Dialog>
