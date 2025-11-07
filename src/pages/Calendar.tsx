@@ -640,6 +640,7 @@ const CalendarPage = () => {
                                       <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
                                       <span className="whitespace-nowrap">
                                         {`Duration: ${getDurationDisplay(event.duration)} hours`}
+                                        {`Duration: ${getDurationDisplay(event.duration)}`}
                                       </span>
                                     </div>
                                   )}

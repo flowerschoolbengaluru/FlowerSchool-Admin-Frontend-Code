@@ -10,7 +10,8 @@ import { Heart, Award, Users, Calendar, Zap, GraduationCap, Briefcase, Palette, 
 import About4 from "@/assets/About4.jpg";
 import FlowerClass from "@/assets/flower-arrangement-class.jpg";
 import BeginnersCourseImage from "@/assets/Beginnerscourse.jpg";
-
+import IntermediateCourseImage from "@/assets/IntermediateCours.jpg";
+import BestGraduationImage from "@/assets/Advanced.jpg";
 import DoorFlower from "@/assets/DoorFlower.jpg";
 import RangoliImage from "@/assets/RangoliImage.jpg";
 import HamperMakingWorkshopImage from "@/assets/HamperMakingWorkshop.jpg";
@@ -686,6 +687,7 @@ const About = () => {
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 md:h-4 md:w-4" />
                                   <span>{course.duration}hours</span>
+                                  <span>{course.duration}</span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Calendar className="h-3 w-3 md:h-4 md:w-4" />

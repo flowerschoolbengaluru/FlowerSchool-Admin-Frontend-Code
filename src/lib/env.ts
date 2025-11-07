@@ -9,16 +9,13 @@ export const isProduction = import.meta.env.PROD;
 
 /**
  * Get the base URL for the application
- * @returns {string} Base URL (localhost in dev, production URL in prod)
+ * @returns {string} Base URL (use site URL env or current origin in dev, production URL in prod)
  */
 export const getBaseURL = (): string => {
   if (isDevelopment) {
-    // Development: use current window location or environment variable
     return import.meta.env.VITE_SITE_URL || `${window.location.protocol}//${window.location.host}`;
   }
-  // Production: use production URL
-  return import.meta.env.VITE_SITE_URL || 'http://localhost:5173';
-  // return import.meta.env.VITE_SITE_URL || 'https://flowerschoolbengaluru.com';
+  return import.meta.env.VITE_SITE_URL || 'https://flowerschoolbengaluru.com';
 };
 
 /**
@@ -28,11 +25,8 @@ export const getBaseURL = (): string => {
 export const getApiBaseURL = (): string => {
   if (isDevelopment) {
     return import.meta.env.VITE_API_URL || 'http://localhost:5000';
-        // return import.meta.env.VITE_API_URL || 'https://flowerschoolbengaluru.com/api';
-
   }
-  return import.meta.env.VITE_API_URL || 'http://localhost:5173';
-    // return import.meta.env.VITE_API_URL || 'https://flowerschoolbengaluru.com/api';
+  return import.meta.env.VITE_API_URL || 'https://flowerschoolbengaluru.com/api';
 };
 
 /**

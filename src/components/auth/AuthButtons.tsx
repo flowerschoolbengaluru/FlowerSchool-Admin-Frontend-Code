@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import api, { endpoints } from '@/lib/api';
+
 import { useAuth } from '@/hooks/user-auth';
 
 export function AuthButtons({ onMenuClose }: { onMenuClose?: () => void }) {
@@ -15,25 +16,16 @@ export function AuthButtons({ onMenuClose }: { onMenuClose?: () => void }) {
   const userName = user?.name || user?.email?.split('@')[0] || '';
 
   useEffect(() => {
-    // Prefer the in-memory auth context for admin status to avoid extra
-    // network calls. Fall back to localStorage for compatibility during dev.
-    const determine = () => {
-      try {
-        if (user && (user as any).usertype === 'admin') {
-          setIsAdmin(true);
-          return;
-        }
-      } catch (e) {
-        // ignore
-      }
+    // Prefer auth context for admin status; fallback to localStorage
+    if (user && (user as any).usertype === 'admin') {
+      setIsAdmin(true);
+      return;
+    }
+    const localIsAdmin = localStorage.getItem('isAdmin') === 'true';
+    setIsAdmin(localIsAdmin);
+  }, [user, isAuthenticated]);
 
-      const localIsAdmin = localStorage.getItem('isAdmin') === 'true';
-      setIsAdmin(localIsAdmin);
-    };
-    determine();
-  }, [isAuthenticated]);
-
- const handleLogout = async () => {
+  const handleLogout = async () => {
     try {
       await api.post(endpoints.logout);
     } catch (error) {
@@ -58,24 +50,19 @@ export function AuthButtons({ onMenuClose }: { onMenuClose?: () => void }) {
     return (
       <div className="flex items-center gap-2 md:gap-4">
         <span className="text-sm font-medium hidden md:inline-flex">Welcome, {userName}</span>
-     {isAdmin && (
-  <Button
-    variant="ghost"
-    size="sm"
-    className="inline-flex"
-    onClick={() => {
-      try {
-        if (onMenuClose) onMenuClose();
-        navigate('/admin');
-        console.log('Navigation to admin attempted'); // Debug log
-      } catch (error) {
-        console.error('Navigation error:', error);
-      }
-    }}
-  >
-    Admin
-  </Button>
-)}
+        {isAdmin && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="inline-flex"
+            onClick={() => {
+              if (onMenuClose) onMenuClose();
+              navigate('/admin');
+            }}
+          >
+            Admin
+          </Button>
+        )}
         <Button variant="outline" size="sm" onClick={handleLogout}>Sign Out</Button>
       </div>
     );

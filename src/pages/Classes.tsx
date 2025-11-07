@@ -533,6 +533,7 @@ const Classes = () => {
                           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                             <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />
                             <span>Duration: {cls.duration} hours</span>
+                            <span>Duration: {cls.duration}</span>
                           </div>
                           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                             <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />

@@ -197,7 +197,7 @@ const Header = ({ onAdminClick, onNavigate }: HeaderProps) => {
                   {/* Tablet Auth Section */}
                   <div className="pt-6 border-t border-pink-200">
                     <AuthButtons onMenuClose={() => setIsOpen(false)} />
-                     
+
                   </div>
                 </div>
               </SheetContent>
