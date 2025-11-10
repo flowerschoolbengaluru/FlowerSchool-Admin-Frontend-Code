@@ -686,8 +686,8 @@ const About = () => {
                               <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500 flex-wrap">
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 md:h-4 md:w-4" />
-                                  <span>{course.duration}hours</span>
-                                  <span>{course.duration}</span>
+                                  <span>{course.duration} hours</span>
+                                  
                                 </div>
                                 <div className="flex items-center gap-1">
                                   <Calendar className="h-3 w-3 md:h-4 md:w-4" />
@@ -738,11 +738,7 @@ const About = () => {
                                     </span>
                                   )}
                                 </div>
-                                {course.capacity && (
-                                  <div className="text-xs text-gray-500">
-                                    {course.enrolled || 0}/{course.capacity} enrolled
-                                  </div>
-                                )}
+                               
                               </div>
 
                               <div className="grid grid-cols-1 gap-2">

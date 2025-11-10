@@ -497,7 +497,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                             <div className="text-center w-full">
                                                 <div className="font-medium text-orange-600 text-sm sm:text-base">Pay Later</div>
                                                 <div className="text-xs text-muted-foreground mt-1 px-2">
-                                                    Reserve your spot now, pay at the venue
+                                                  We will contact you shortly to finalize payment details
                                                 </div>
                                             </div>
                                         </Button>

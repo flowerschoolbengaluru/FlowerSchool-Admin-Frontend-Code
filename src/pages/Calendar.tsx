@@ -336,10 +336,44 @@ const CalendarPage = () => {
 
   // Helper function to format duration display
   const getDurationDisplay = (duration: any): string => {
-    if (typeof duration === 'object' && duration?.hours) {
-        return String(duration.hours);
+    if (!duration) return '';
+    
+    const durationStr = String(duration);
+    
+    // If duration already starts with "Duration:", extract just the number/time part
+    if (durationStr.toLowerCase().startsWith('duration:')) {
+        const cleanedDuration = durationStr.replace(/^duration:\s*/i, '').trim();
+        const durationNum = parseFloat(cleanedDuration);
+        
+        if (!isNaN(durationNum)) {
+            return `${durationNum} hour${durationNum > 1 ? 's' : ''}`;
+        }
+        
+        // If it already contains 'hour' or 'hours', return as is
+        if (cleanedDuration.toLowerCase().includes('hour')) {
+            return cleanedDuration;
+        }
+        
+        return `${cleanedDuration} hours`;
     }
-    return String(duration);
+    
+    if (typeof duration === 'object' && duration?.hours) {
+        const hours = duration.hours;
+        return `${hours} hour${hours > 1 ? 's' : ''}`;
+    }
+    
+    const durationNum = parseFloat(durationStr);
+    
+    if (!isNaN(durationNum)) {
+        return `${durationNum} hour${durationNum > 1 ? 's' : ''}`;
+    }
+    
+    // If duration already contains 'hour' or 'hours', return as is
+    if (durationStr.toLowerCase().includes('hour')) {
+        return durationStr;
+    }
+    
+    return `${durationStr} hours`;
   };
 
   const getEventsForDate = (date: Date) => {
@@ -639,8 +673,7 @@ const CalendarPage = () => {
                                     <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground font-medium font-sans">
                                       <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
                                       <span className="whitespace-nowrap">
-                                        {`Duration: ${getDurationDisplay(event.duration)} hours`}
-                                        {`Duration: ${getDurationDisplay(event.duration)}`}
+                                        Duration: {getDurationDisplay(event.duration)}
                                       </span>
                                     </div>
                                   )}

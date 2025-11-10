@@ -44,9 +44,29 @@ api.interceptors.response.use(
     const isLoginRequest = originalRequest?.url?.includes('/signin') || originalRequest?.url?.includes('/login');
     const hasSession = !!localStorage.getItem('sessionToken');
     if (error.response?.status === 401 && !originalRequest._retry && !isLoginRequest && hasSession) {
+      // Mark as retried to avoid loops
       originalRequest._retry = true;
-      localStorage.removeItem('sessionToken');
-      window.location.href = '/signin';
+      // Clear the local session token (legacy fallback). The app's AuthProvider
+      // should observe the lack of a valid session (via cookies/server) and
+      // perform any necessary navigation. Avoid forcing a hard redirect here
+      // because background requests (e.g. when the user is on another tab)
+      // should not unexpectedly navigate the current page.
+      try {
+        localStorage.removeItem('sessionToken');
+      } catch (e) {
+        // ignore storage errors
+      }
+
+      // Dispatch a custom event so application-level code can react and
+      // perform navigation or show UI. This is safer than forcing
+      // window.location.href from a low-level library file.
+      try {
+        window.dispatchEvent(new CustomEvent('auth:logout', { detail: { reason: '401' } }));
+      } catch (e) {
+        // fallback: log the occurrence
+        // eslint-disable-next-line no-console
+        console.warn('[api] auth:logout dispatch failed');
+      }
     }
     return Promise.reject(error);
   }

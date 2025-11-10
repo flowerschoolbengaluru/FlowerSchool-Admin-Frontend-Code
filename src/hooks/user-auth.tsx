@@ -40,8 +40,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const [user, setUser] = useState<UserData | null>(() => getInitialUser());
+  // Start `ready` as false and only mark true after we've completed
+  // the server-side validation. This prevents consumers (like Admin)
+  // from acting on a premature `ready` value before the provider has
+  // synchronized with the backend session state.
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!getInitialUser());
-  const [ready, setReady] = useState(() => !!getInitialUser());
+  const [ready, setReady] = useState(false);
   const [isAdmin, setIsAdmin] = useState(() => {
     const initialUser = getInitialUser();
     if (initialUser?.usertype === 'admin') return true;
@@ -127,10 +131,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       })();
     } else {
-      // We already had a user (from canonical storage or legacy localStorage)
-      // so mark provider ready and perform a background validation to sync
-      // with the server without blocking the UI.
-      setReady(true);
+      // We already had a user (from canonical storage or legacy localStorage).
+      // Perform a background validation to sync with the server, and only
+      // mark the provider `ready` once that validation finishes. This
+      // prevents routes/components from assuming the initial local value
+      // is the canonical truth and redirecting prematurely.
       (async () => {
         try {
           const resp = await api.get('/api/auth/user');
@@ -141,6 +146,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } catch (e) {
           // ignore transient errors
+        } finally {
+          setReady(true);
         }
       })();
     }
@@ -160,22 +167,58 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsAuthenticated(!!currentUser);
     };
 
-    // Check auth state on focus/visibility change
-    const handleVisibilityChange = () => {
+    // Check auth state on focus/visibility change. Instead of trusting
+    // client-side storage (which may be empty for HTTP-only cookie sessions),
+    // perform a short server validation when the page becomes visible. This
+    // avoids transient sign-out flashes when another tab updates storage or
+    // when cookies are used and localStorage is empty.
+    const handleVisibilityChange = async () => {
       if (document.visibilityState === 'visible') {
-        const currentUser = authStorage.getUser();
-        setUser(currentUser);
-        setIsAuthenticated(!!currentUser);
+        try {
+          const resp = await api.get('/api/auth/user');
+          if (resp && resp.data) {
+            setUser(resp.data as UserData);
+            setIsAuthenticated(true);
+          } else {
+            // If server doesn't return a user, keep the existing client user
+            // until we have stronger evidence to clear it. This prevents a
+            // flash-to-signin when the server is temporarily unreachable.
+          }
+        } catch (e) {
+          // Network error or 401 — do not immediately wipe local UI state.
+          // Let other mechanisms (auth:logout event or explicit server
+          // validation during mount) handle full sign-out to avoid UX jank.
+        }
       }
     };
 
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('auth-update', handleAuthUpdate as EventListener);
+    // Respond to auth:logout dispatched by low-level API code when a 401 is
+    // encountered. The app-level provider can then clear state and navigate.
+    const handleAuthLogout = (ev: Event) => {
+      try {
+        // Clear local session state
+        logout();
+      } catch (e) {
+        // ignore
+      }
+      try {
+        // Perform an in-app navigation to the sign-in page. Use location.href
+        // to ensure navigation works even if this provider is used outside a
+        // router context during tests or edge cases.
+        window.location.href = '/signin';
+      } catch (e) {
+        // ignore
+      }
+    };
+    window.addEventListener('auth:logout', handleAuthLogout as EventListener);
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('auth-update', handleAuthUpdate as EventListener);
+      window.removeEventListener('auth:logout', handleAuthLogout as EventListener);
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);

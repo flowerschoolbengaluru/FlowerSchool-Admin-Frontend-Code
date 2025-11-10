@@ -40,6 +40,7 @@ import {
   Clock,
   Filter
 } from "lucide-react";
+import { ZoomIn, ZoomOut } from "lucide-react";
 import { ChevronRight, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import flowerSchoolLogo from "@/assets/flower-school-logo.png";
@@ -224,6 +225,39 @@ const Admin = () => {
   const [editDiscountPercentage, setEditDiscountPercentage] = useState('');
   // Edit-mode preview selling price (computed)
   const [editPreviewSellingPrice, setEditPreviewSellingPrice] = useState('');
+
+  // Image preview modal state (for custom request images)
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
+  const [imageZoom, setImageZoom] = useState<number>(1);
+
+  const openImageModal = (url?: string | null) => {
+    if (!url) return;
+    setModalImageUrl(url);
+    setImageZoom(1);
+    setShowImageModal(true);
+  };
+
+  const closeImageModal = () => {
+    setShowImageModal(false);
+    setModalImageUrl(null);
+    setImageZoom(1);
+  };
+
+  const zoomIn = () => setImageZoom(z => Math.min(z + 0.25, 5));
+  const zoomOut = () => setImageZoom(z => Math.max(z - 0.25, 0.25));
+  const resetZoom = () => setImageZoom(1);
+
+  // Close image modal on Escape key
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showImageModal) {
+        closeImageModal();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showImageModal]);
 
   // Helper function to determine instock status
   const getInstockStatus = (product: any): boolean => {
@@ -1443,7 +1477,7 @@ const Admin = () => {
     };
 
     checkAuthAndFetchData();
-  }, []);
+  }, [auth.ready, auth.user, navigate]);
 
   // Fetch students when the students tab is selected
   useEffect(() => {
@@ -1500,7 +1534,12 @@ const Admin = () => {
     if (activeTab === 'custom-requests') {
       // Fetch custom requests
       api.get('/api/admin/custom-requests').then((res) => {
-        setCustomRequests(res.data);
+        // backend may return array directly or { data: [...] }
+        const data = Array.isArray(res.data) ? res.data : (res.data.data || res.data);
+        setCustomRequests(data || []);
+      }).catch((err) => {
+        console.error('Failed to fetch custom requests', err);
+        setCustomRequests([]);
       });
       // Fetch products
       api.get('/api/admin/products').then((res) => {
@@ -1750,20 +1789,41 @@ const Admin = () => {
                       const product = products.find(p => p.id === request.product_id || p.id === request.productId);
                       // Debug log for imageUrl
                       console.log('Custom Request Image URL:', request.imageUrl);
+
+                      // Compute product image src (support base64 or URL fields)
+                      const prodImgRaw = product?.imagefirst || product?.image || product?.imagesecond || product?.imagethirder || product?.imagefoure || (product as any)?.imagefive || null;
+                      let productImageSrc: string | null = null;
+                      if (prodImgRaw && typeof prodImgRaw === 'string') {
+                        const trimmed = prodImgRaw.trim();
+                        if (trimmed.startsWith('data:')) {
+                          productImageSrc = trimmed;
+                        } else if (trimmed.startsWith('http') || trimmed.startsWith('/')) {
+                          productImageSrc = trimmed;
+                        } else if (trimmed.length > 0) {
+                          // assume raw base64
+                          productImageSrc = `data:image/jpeg;base64,${trimmed}`;
+                        }
+                      }
+
+                      const requestImage = request.images ? (() => {
+                        try { const imgs = JSON.parse(request.images); return Array.isArray(imgs) && imgs.length ? imgs[0] : null; } catch { return null; }
+                      })() : (request.imageUrl || null);
+
                       return (
                         <div key={request.id || idx} className="border rounded-lg p-4 flex gap-4 items-start">
                           <img
-                            src={
-                              request.images
-                                ? JSON.parse(request.images)[0]
-                                : 'https://via.placeholder.com/96?text=No+Image'
-                            } alt="Custom"
-                            className="w-24 h-24 object-cover rounded"
+                            src={requestImage || 'https://via.placeholder.com/96?text=No+Image'}
+                            alt={request.comment ? `Custom request image for: ${request.comment}` : 'Custom'}
+                            className="w-24 h-24 object-cover rounded cursor-zoom-in"
                             onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/96?text=No+Image'; }}
+                            role="button"
+                            tabIndex={0}
+                            onClick={() => openImageModal(requestImage || productImageSrc || 'https://via.placeholder.com/600?text=No+Image')}
+                            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openImageModal(requestImage || productImageSrc || 'https://via.placeholder.com/600?text=No+Image'); } }}
                           />
                           <div className="flex-1 space-y-2">
                             <div className="font-semibold">Comment: {request.comment}</div>
-                            
+
                             {/* User Details Section */}
                             {(request.user_name || request.user_email || request.user_phone) && (
                               <div className="bg-blue-50 p-3 rounded-lg space-y-1">
@@ -1785,13 +1845,29 @@ const Admin = () => {
                                 )}
                               </div>
                             )}
-                            
+
                             {product && (
                               <div className="mt-2">
-                                <div className="font-bold">Product: {product.name}</div>
-                                <img
-                                  src={`data:image/jpeg;base64,${product.image}`}
-                                  alt={product.name} className="w-16 h-16 object-cover rounded mt-1" />
+                                <div className="flex items-start gap-3">
+                                  <img
+                                    src={productImageSrc || 'https://via.placeholder.com/96?text=No+Image'}
+                                    alt={product.name}
+                                    className="w-16 h-16 object-cover rounded mt-1 flex-shrink-0"
+                                    onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/96?text=No+Image'; }}
+                                  />
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2">
+                                      <div className="font-bold">{product.name}</div>
+                                      {((product as any).isbestseller === true || (product as any).isBestSeller === true) && (
+                                        <Badge className="bg-yellow-500 text-white text-xs">Best Seller</Badge>
+                                      )}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground mt-1">
+                                      <CategoryList cats={getCategoryArray(product.category)} maxVisible={3} />
+                                    </div>
+                                    <DescriptionWithToggle description={product.description} maxLines={2} />
+                                  </div>
+                                </div>
                               </div>
                             )}
                           </div>
@@ -7806,16 +7882,7 @@ case "products":
                             </td>
                             <td className="p-3">
                               <div className="flex gap-2">
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const mailtoLink = `mailto:${record.email_address}?subject=Payment Reminder&body=Dear ${record.full_name},%0A%0AThis is a reminder about your pending payment.%0A%0ABest regards,%0AFlower School Bengaluru`;
-                                    window.open(mailtoLink, '_blank');
-                                  }}
-                                >
-                                  Contact
-                                </Button>
+                               
                                 <Button
                                   variant="destructive"
                                   size="sm"
@@ -8968,6 +9035,55 @@ case "products":
                   OK
                 </Button>
               </DialogFooter>
+            </DialogContent>
+          </Dialog>
+          {/* Image Preview Modal for custom request images */}
+          <Dialog open={showImageModal} onOpenChange={(open) => { if (!open) closeImageModal(); else setShowImageModal(true); }}>
+            <DialogContent className="max-w-4xl max-h-[90vh]">
+              <DialogHeader>
+                <DialogTitle>Image Preview</DialogTitle>
+                <DialogDescription>
+                  Use the controls to zoom in/out or close the preview.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex flex-col items-stretch gap-3">
+                <div className="flex items-center justify-end gap-2">
+                  <Button size="sm" variant="outline" onClick={zoomOut} title="Zoom out">
+                    <ZoomOut className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={resetZoom} title="Reset zoom">
+                    Reset
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={zoomIn} title="Zoom in">
+                    <ZoomIn className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={closeImageModal} title="Close">
+                    Close
+                  </Button>
+                </div>
+
+                <div
+                  className="w-full h-[70vh] flex items-center justify-center overflow-auto bg-black/5 rounded"
+                  onWheel={(e) => {
+                    e.preventDefault();
+                    const delta = e.deltaY;
+                    if (delta < 0) setImageZoom(z => Math.min(z + 0.1, 5));
+                    else setImageZoom(z => Math.max(z - 0.1, 0.25));
+                  }}
+                >
+                  {modalImageUrl ? (
+                    <img
+                      src={modalImageUrl}
+                      alt="Preview"
+                      style={{ transform: `scale(${imageZoom})`, transition: 'transform 120ms ease' }}
+                      className="max-w-[95%] max-h-[95%] object-contain"
+                      onError={(e) => { e.currentTarget.src = 'https://via.placeholder.com/600?text=No+Image'; }}
+                    />
+                  ) : (
+                    <div className="text-muted-foreground">No image</div>
+                  )}
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
           {/* Confirmation Dialog (replaces native confirm) */}

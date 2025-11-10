@@ -41,6 +41,20 @@ export async function apiRequest(
     body?: string;
   }
 ): Promise<Response> {
+  // Diagnostic: trace unexpected sign-in requests
+  try {
+    if (typeof url === 'string' && url.includes('/api/auth/signin')) {
+      // Print a concise message and a stack trace to identify the caller
+      // This is temporary diagnostic logging to help find why POST /api/auth/signin
+      // is triggered on page refresh. Remove once root cause is found.
+      // eslint-disable-next-line no-console
+      console.log('[diag] apiRequest: /api/auth/signin called — options:', { method: options?.method, bodySnippet: options?.body ? options.body.slice(0, 100) : undefined });
+      // eslint-disable-next-line no-console
+      console.trace();
+    }
+  } catch (e) {
+    // ignore diagnostic errors
+  }
   const defaultHeaders: Record<string, string> = {};
   if (options?.body) {
     defaultHeaders["Content-Type"] = "application/json";
