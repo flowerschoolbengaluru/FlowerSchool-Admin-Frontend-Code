@@ -670,18 +670,20 @@ const CalendarPage = () => {
                                   )}
 
                                   {event.duration !== undefined && event.duration !== null && (
-                                    <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground font-medium font-sans">
-                                      <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
-                                      <span className="whitespace-nowrap">
-                                     Duration per Session: {getDurationDisplay(event.duration)}
+                                    <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground font-medium font-sans">
+                                      <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0 mt-0.5" />
+                                      <span className="flex-1 leading-relaxed">
+                                        Duration per Session: {getDurationDisplay(event.duration)}
                                       </span>
                                     </div>
                                   )}
 
                                   {event.sessions !== undefined && event.sessions !== null && (
-                                    <div className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-muted-foreground font-medium font-sans">
-                                      <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0" />
-                                      <span>{event.sessions} session{event.sessions > 1 ? 's' : ''}</span>
+                                    <div className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground font-medium font-sans">
+                                      <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-primary flex-shrink-0 mt-0.5" />
+                                      <span className="flex-1 leading-relaxed">
+                                        {event.sessions} session{event.sessions > 1 ? 's' : ''}
+                                      </span>
                                     </div>
                                   )}
 
