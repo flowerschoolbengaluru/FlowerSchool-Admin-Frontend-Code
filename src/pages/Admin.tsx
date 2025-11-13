@@ -389,6 +389,7 @@ const Admin = () => {
   const [editClassImageFile, setEditClassImageFile] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [expandedCategories, setExpandedCategories] = useState<{[key: string]: boolean}>({});
+  const [expandedCategoryGroups, setExpandedCategoryGroups] = useState<Record<string, Record<number, boolean>>>({});
   const [isProductsLoading, setIsProductsLoading] = useState(false);
   const [isOrdersLoading, setIsOrdersLoading] = useState(false);
   const [lastRefreshTime, setLastRefreshTime] = useState<Date>(new Date());
@@ -543,7 +544,10 @@ const Admin = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [newProductCategories, setNewProductCategories] = useState<string[]>([]);
+  const [newProductMainCategories, setNewProductMainCategories] = useState<string[]>([]);
+  const [newProductSubcategories, setNewProductSubcategories] = useState<string[]>([]);
   const [editProductCategories, setEditProductCategories] = useState<string[]>([]);
+  const [editProductMainCategories, setEditProductMainCategories] = useState<string[]>([]);
   const [typedCategory, setTypedCategory] = useState<string>('');
 
   // Predefined category groups for quick-select in the admin product form
@@ -898,12 +902,20 @@ const Admin = () => {
 
   useEffect(() => {
     if (selectedProduct) {
-      setEditProductCategories(Array.isArray(selectedProduct.category)
-        ? (selectedProduct.category as string[])
-        : getCategoryArray(selectedProduct.category));
+      // Prefer explicit subcategory field if present, otherwise fall back to legacy category
+      const subs = (selectedProduct as any).subcategory ?? (selectedProduct as any).subCategory ?? (selectedProduct as any).category;
+      setEditProductCategories(Array.isArray(subs)
+        ? (subs as string[])
+        : getCategoryArray(subs));
+      // Populate edit main categories from product if present
+      const mains = Array.isArray((selectedProduct as any).main_category)
+        ? ((selectedProduct as any).main_category as string[])
+        : getCategoryArray((selectedProduct as any).main_category ?? (selectedProduct as any).mainCategory);
+      setEditProductMainCategories(mains || []);
       // Custom fields removed - no longer exist
     } else {
       setEditProductCategories([]);
+      setEditProductMainCategories([]);
     }
   }, [selectedProduct]);
 
@@ -2579,6 +2591,10 @@ case "products":
                   return null;
                 })();
 
+                // Use selected quick-select values for main/subcategories
+                const parsedMainCategory = newProductMainCategories.length ? newProductMainCategories : undefined;
+                const parsedSubcategory = newProductSubcategories.length ? newProductSubcategories : (categoriesToSend.length ? categoriesToSend : undefined);
+
                 const productData = {
                   name: formData.get('name')?.toString() || '',
                   description: formData.get('description')?.toString() || '',
@@ -2589,8 +2605,10 @@ case "products":
                   discountPercentage: showDiscountFields && discountPercentNum !== null ? discountPercentNum : null,
                   // discountAmount should be the numeric amount (e.g. 50.00), not the final price
                   discountAmount: computedDiscountAmount,
-                  // send categories as an array
+                  // send categories as an array (legacy) and also explicit main_category/subcategory when provided
                   category: categoriesToSend,
+                  main_category: parsedMainCategory || undefined,
+                  subcategory: parsedSubcategory || (categoriesToSend.length ? categoriesToSend : undefined),
                   stockquantity: Math.max(0, parseInt(formData.get('stockQuantity')?.toString() || '0')),
                   instock: formData.get('instock') === 'true',
                   featured: formData.get('featured') === 'on',
@@ -2621,6 +2639,8 @@ case "products":
                   setShowProductForm(false);
                   setImageFiles([]);
                   setNewProductCategories([]);
+                  setNewProductMainCategories([]);
+                  setNewProductSubcategories([]);
                   toast({
                     title: "Success",
                     description: "Product created successfully with images",
@@ -3034,10 +3054,20 @@ case "products":
                   </Select>
 
                   <Button type="button" onClick={() => {
-                    const v = selectedAllCategoryItem.trim();
-                    if (!v) return;
+                    const v = (selectedAllCategoryItem || '').trim();
+                    const mainId = (selectedAllCategoryId || '').trim();
+                    if (!v || !mainId) return;
+                    // Add to displayed category list (legacy)
                     if (!newProductCategories.includes(v)) {
                       setNewProductCategories(prev => [...prev, v]);
+                    }
+                    // Track subcategory value
+                    if (!newProductSubcategories.includes(v)) {
+                      setNewProductSubcategories(prev => [...prev, v]);
+                    }
+                    // Track main category id
+                    if (!newProductMainCategories.includes(mainId)) {
+                      setNewProductMainCategories(prev => [...prev, mainId]);
                     }
                     setSelectedAllCategoryItem('');
                   }} className="text-xs sm:text-sm">
@@ -3046,6 +3076,7 @@ case "products":
                 </div>
 
                 <div className="mt-3">
+                  <div className="text-sm text-muted-foreground mb-2">Select main category (category set) and items above. Main categories (stored in <code>main_category</code>) are the category set ids (e.g. <em>occasion</em>). Subcategories (stored in <code>subcategory</code>) are the item names you add.</div>
                   <Input
                     id="categoryInput"
                     value={typedCategory}
@@ -3418,42 +3449,174 @@ case "products":
                       </div>
                     </div>
                     
-                    {/* Improved Category Display */}
+                    {/* Improved Category Display — grouped main → sub mapping */}
                     <div className="mt-2">
-                      {getCategoryArray(product.category).length > 0 ? (
-                        <div className="flex flex-wrap gap-1.5">
-                          {getCategoryArray(product.category).slice(0, expandedCategories[product.id] ? undefined : 3).map((cat, index) => (
-                            <span
-                              key={index}
-                              className="inline-flex items-center bg-blue-50 text-blue-700 px-2 py-0.7 rounded text-xs font-medium border border-blue-200 max-w-[250px]"
-                              title={cat}
-                            >
-                              <span className="truncate">{cat}</span>
-                            </span>
-                          ))}
-                          {getCategoryArray(product.category).length > 3 && (
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setExpandedCategories(prev => ({
-                                  ...prev,
-                                  [product.id]: !prev[product.id]
-                                }));
-                              }}
-                              className="inline-flex items-center bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs font-medium border border-gray-300 hover:bg-gray-200 transition-colors cursor-pointer"
-                              title={expandedCategories[product.id] ? 'Show less' : getCategoryArray(product.category).slice(3).join(', ')}
-                            >
-                              {expandedCategories[product.id] 
-                                ? 'Show less' 
-                                : `+${getCategoryArray(product.category).length - 3} more`
+                      {(() => {
+                        const parseToArray = (val: any): string[] => {
+                          if (!val && val !== 0) return [];
+                          if (Array.isArray(val)) return val.filter(Boolean).map(String);
+                          if (typeof val === 'string') {
+                            const s = val.trim();
+                            if (!s) return [];
+                            try {
+                              const parsed = JSON.parse(s);
+                              if (Array.isArray(parsed)) return parsed.filter(Boolean).map(String);
+                            } catch (e) {
+                              // not JSON
+                            }
+                            if (s.includes(',')) return s.split(',').map(x => x.trim()).filter(Boolean);
+                            return [s];
+                          }
+                          return [String(val)];
+                        };
+
+                        // Get main categories and subcategories from database
+                        const rawMain = (product as any).main_category || (product as any).mainCategory;
+                        const rawSub = (product as any).subcategory || (product as any).sub_category || (product as any).subCategory;
+
+                        const mainArr = parseToArray(rawMain);
+                        const subArr = parseToArray(rawSub);
+
+                        // Map main category IDs to display names using allCategories
+                        const getMainCategoryDisplayName = (id: string): string => {
+                          const category = allCategories.find(cat => cat.id === id);
+                          return category ? category.name : id;
+                        };
+
+                        // Find which main category a subcategory item belongs to
+                        const findMainCategoryForSub = (subItem: string): string | null => {
+                          for (const category of allCategories) {
+                            for (const group of category.groups) {
+                              if (group.items.includes(subItem)) {
+                                return category.id;
                               }
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground italic">No categories</span>
-                      )}
+                            }
+                          }
+                          return null;
+                        };
+
+                        // Create proper main → sub mappings
+                        let mappings: Array<{ main: string, mainDisplay: string, sub: string }> = [];
+
+                        if (mainArr.length > 0 && subArr.length > 0) {
+                          // Try to pair main categories with subcategories
+                          if (mainArr.length === subArr.length) {
+                            // One-to-one mapping
+                            for (let i = 0; i < mainArr.length; i++) {
+                              mappings.push({
+                                main: mainArr[i],
+                                mainDisplay: getMainCategoryDisplayName(mainArr[i]),
+                                sub: subArr[i]
+                              });
+                            }
+                          } else {
+                            // Multiple subcategories for main categories
+                            subArr.forEach(sub => {
+                              // First try to find the correct main category for this subcategory
+                              const correctMainId = findMainCategoryForSub(sub);
+                              if (correctMainId && mainArr.includes(correctMainId)) {
+                                mappings.push({
+                                  main: correctMainId,
+                                  mainDisplay: getMainCategoryDisplayName(correctMainId),
+                                  sub: sub
+                                });
+                              } else {
+                                // Fallback: use first main category or mark as unmapped
+                                const fallbackMain = mainArr[0] || 'unmapped';
+                                mappings.push({
+                                  main: fallbackMain,
+                                  mainDisplay: fallbackMain === 'unmapped' ? 'Unmapped' : getMainCategoryDisplayName(fallbackMain),
+                                  sub: sub
+                                });
+                              }
+                            });
+                          }
+                        } else if (subArr.length > 0) {
+                          // Only subcategories, try to find their main categories
+                          subArr.forEach(sub => {
+                            const mainId = findMainCategoryForSub(sub);
+                            mappings.push({
+                              main: mainId || 'unmapped',
+                              mainDisplay: mainId ? getMainCategoryDisplayName(mainId) : 'Unmapped',
+                              sub: sub
+                            });
+                          });
+                        } else if (mainArr.length > 0) {
+                          // Only main categories
+                          mainArr.forEach(main => {
+                            mappings.push({
+                              main: main,
+                              mainDisplay: getMainCategoryDisplayName(main),
+                              sub: ''
+                            });
+                          });
+                        }
+
+                        if (mappings.length > 0) {
+                          return (
+                            <div className="overflow-x-auto max-w-full">
+                              <div className="flex flex-wrap gap-1.5">
+                                {mappings.map((mapping, index) => (
+                                  <span
+                                    key={`mapping-${index}`}
+                                    className="inline-flex items-center bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded px-2 py-1 text-xs max-w-[300px]"
+                                    title={mapping.sub ? `${mapping.mainDisplay} → ${mapping.sub}` : mapping.mainDisplay}
+                                  >
+                                    <span className="text-purple-700 font-medium">
+                                      {mapping.mainDisplay}
+                                    </span>
+                                    {mapping.sub && (
+                                      <>
+                                        <span className="text-gray-500 mx-1">→</span>
+                                        <span className="text-blue-700 truncate">{mapping.sub}</span>
+                                      </>
+                                    )}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        // Fallback to legacy category display
+                        const legacyArr = getCategoryArray((product as any).category);
+                        if (legacyArr.length > 0) {
+                          return (
+                            <div className="flex flex-wrap gap-1.5">
+                              {legacyArr.slice(0, expandedCategories[product.id] ? undefined : 3).map((cat, index) => (
+                                <span
+                                  key={index}
+                                  className="inline-flex items-center bg-blue-50 text-blue-700 px-2 py-0.7 rounded text-xs font-medium border border-blue-200 max-w-[250px]"
+                                  title={cat}
+                                >
+                                  <span className="truncate">{cat}</span>
+                                </span>
+                              ))}
+                              {legacyArr.length > 3 && (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setExpandedCategories(prev => ({
+                                      ...prev,
+                                      [product.id]: !prev[product.id]
+                                    }));
+                                  }}
+                                  className="inline-flex items-center bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs font-medium border border-gray-300 hover:bg-gray-200 transition-colors cursor-pointer"
+                                  title={expandedCategories[product.id] ? 'Show less' : legacyArr.slice(3).join(', ')}
+                                >
+                                  {expandedCategories[product.id] 
+                                    ? 'Show less' 
+                                    : `+${legacyArr.length - 3} more`
+                                  }
+                                </button>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        return <span className="text-xs text-muted-foreground italic">No categories</span>;
+                      })()}
                     </div>
 
                     <DescriptionWithToggle description={product.description} maxLines={2} />
@@ -3597,11 +3760,7 @@ case "products":
                               )}
                             </div>
 
-                            {/* Order Total */}
-                            <div className="flex justify-between items-center pt-2 border-t">
-                              <span className="font-medium">Total:</span>
-                              <span className="font-bold text-lg font-sans">₹{order.total}</span>
-                            </div>
+                           
                           </div>
 
                           {/* Contact Info */}
@@ -3752,21 +3911,12 @@ case "products":
                               </dd>
                             </div>
                             <div>
-                              <dt className="text-sm text-muted-foreground">Subtotal</dt>
+                              <dt className="text-sm text-muted-foreground">Total</dt>
                               <dd>₹{selectedOrder.subtotal}</dd>
                             </div>
-                            <div>
-                              <dt className="text-sm text-muted-foreground">Delivery Charge</dt>
-                              <dd>₹{selectedOrder.deliverycharge}</dd>
-                            </div>
-                            <div>
-                              <dt className="text-sm text-muted-foreground">Discount</dt>
-                              <dd>₹{selectedOrder.discountamount}</dd>
-                            </div>
-                            <div className="pt-2 border-t">
-                              <dt className="text-sm text-muted-foreground">Total Amount</dt>
-                              <dd className="text-xl font-bold">₹{selectedOrder.total}</dd>
-                            </div>
+                            
+                          
+                           
                           </dl>
                         </CardContent>
                       </Card>
@@ -8195,6 +8345,9 @@ case "products":
                 ? editProductCategories
                 : (formData.getAll('category').map(c => c?.toString() || '').filter(Boolean));
 
+              const parsedMainCategory = editProductMainCategories.length ? editProductMainCategories : undefined;
+              const parsedSubcategory = categoriesToSend.length ? categoriesToSend : undefined;
+
               const editOriginalPriceNum = editOriginalPrice ? parseFloat(editOriginalPrice) : null;
               const editDiscountPercentNum = editDiscountPercentage ? parseInt(editDiscountPercentage) : null;
               const computedEditDiscountAmount = (() => {
@@ -8224,6 +8377,9 @@ case "products":
                 isbestseller: (formData.get('isbestseller') as string) === 'on',
                 isBestSeller: (formData.get('isbestseller') as string) === 'on',
                 featured: (formData.get('featured') as string) === 'on',
+                // include main_category and subcategory to support new schema
+                main_category: parsedMainCategory,
+                subcategory: parsedSubcategory,
                 // Add existing images that weren't removed
                 ...existingImages
               };
@@ -8681,6 +8837,10 @@ case "products":
                         if (!v) return;
                         if (!editProductCategories.includes(v)) {
                           setEditProductCategories(prev => [...prev, v]);
+                          // ensure the main category id is tracked so we can send main_category on update
+                          if (editSelectedCategoryId && !editProductMainCategories.includes(editSelectedCategoryId)) {
+                            setEditProductMainCategories(prev => [...prev, editSelectedCategoryId]);
+                          }
                         }
                         setEditSelectedCategoryItem('');
                       }} className="text-xs sm:text-sm">Add</Button>
@@ -8713,6 +8873,7 @@ case "products":
                             if (!v) return;
                             if (!editProductCategories.includes(v)) {
                               setEditProductCategories(prev => [...prev, v]);
+                                // typed categories have no explicit main set - leave main categories unchanged
                             }
                             setEditTypedCategory('');
                           }}
@@ -8722,6 +8883,32 @@ case "products":
                         </Button>
                       </div>
                     </div>
+
+                    {/* Selected Main Categories Display - Edit */}
+                    {editProductMainCategories.length > 0 ? (
+                      <div className="mt-2 p-3 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-2 h-2 rounded-full bg-primary"></div>
+                          <Label className="font-medium text-sm sm:text-base text-foreground">
+                            Selected Main Categories ({editProductMainCategories.length})
+                          </Label>
+                        </div>
+                        <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-1">
+                          {editProductMainCategories.map((main, idx) => (
+                            <div key={`${main}-${idx}`} className="inline-flex items-center gap-1 bg-primary/10 hover:bg-primary/20 border border-primary/30 px-2 py-1 rounded-md text-xs font-medium">
+                              <span className="max-w-[140px] truncate" title={main}>{main}</span>
+                              <Button type="button" variant="ghost" size="icon" onClick={() => setEditProductMainCategories(prev => prev.filter(m => m !== main))} className="h-4 w-4 p-0 hover:bg-destructive/20 hover:text-destructive rounded-sm ml-1 flex-shrink-0">
+                                <X className="h-2.5 w-2.5" />
+                              </Button>
+                              <input type="hidden" name="main_category" value={main} />
+                            </div>
+                          ))}
+                        </div>
+                        {editProductMainCategories.length > 8 && (
+                          <p className="text-xs text-muted-foreground mt-2">Scroll to see all {editProductMainCategories.length} main categories</p>
+                        )}
+                      </div>
+                    ) : null}
 
                     {/* Selected Categories Display - Edit */}
                     {editProductCategories.length > 0 ? (

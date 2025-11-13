@@ -40,6 +40,13 @@ export interface RazorpayPaymentOptions {
   theme?: {
     color?: string;
   };
+  config?: {
+    display?: {
+      hide?: Array<{
+        method: string;
+      }>;
+    };
+  };
   handler: (response: any) => void;
   modal?: {
     ondismiss?: () => void;

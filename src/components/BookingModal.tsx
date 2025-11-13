@@ -262,6 +262,15 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                         theme: {
                             color: '#ec4899' // Pink color to match your theme
                         },
+                        config: {
+                            display: {
+                                hide: [
+                                    {
+                                        method: 'emi'
+                                    }
+                                ]
+                            }
+                        },
                         handler: async (response: any) => {
                             try {
                                 console.log('🎉 Payment successful:', response.razorpay_payment_id);

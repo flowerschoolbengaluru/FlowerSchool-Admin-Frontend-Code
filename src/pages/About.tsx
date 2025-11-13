@@ -686,7 +686,7 @@ const About = () => {
                               <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500 flex-wrap">
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 md:h-4 md:w-4" />
-                                  <span>{course.duration} hours</span>
+                                  <span>Duration per Session: {course.duration} hours</span>
                                   
                                 </div>
                                 <div className="flex items-center gap-1">
