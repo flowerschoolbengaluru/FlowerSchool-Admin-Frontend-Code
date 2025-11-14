@@ -892,7 +892,7 @@ const About = () => {
                               <div className="flex items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500 flex-wrap">
                                 <div className="flex items-center gap-1">
                                   <Clock className="h-3 w-3 md:h-4 md:w-4 text-pink-500" />
-                                  <span>Duration per Session{workshop.duration}hours</span>
+                                  <span>Duration per Session:  {workshop.duration}hours</span>
                                 </div>
                                 <div className="flex items-center gap-1"> 
                                   <Calendar className="h-3 w-3 md:h-4 md:w-4 text-pink-500" />
