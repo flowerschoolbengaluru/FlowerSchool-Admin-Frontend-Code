@@ -71,6 +71,7 @@ interface Product {
   isbestseller?: boolean;
   discounts_offers?: boolean;
   createdat?: string;
+  filter?: string[];
 }
 
 interface Order {
@@ -92,6 +93,8 @@ interface Order {
   items: OrderItem[];
   createdat: string;
   updatedat?: string;
+  delivery_option?: string;
+  distance?: number;
 }
 
 interface OrderItem {
@@ -225,6 +228,7 @@ const Admin = () => {
   const [editDiscountPercentage, setEditDiscountPercentage] = useState('');
   // Edit-mode preview selling price (computed)
   const [editPreviewSellingPrice, setEditPreviewSellingPrice] = useState('');
+    const [appliedFilters, setAppliedFilters] = useState<Array<{ set: string; item: string }>>([]);
 
   // Image preview modal state (for custom request images)
   const [showImageModal, setShowImageModal] = useState(false);
@@ -272,11 +276,31 @@ const Admin = () => {
 
   // Helper function to format product data consistently
   const formatProductData = (products: any[]): Product[] => {
+    // Helper to parse filter field
+    const parseFilter = (filter: any): string[] => {
+      if (!filter) return [];
+      if (Array.isArray(filter)) return filter.map(String);
+      if (typeof filter === 'string') {
+        const str = filter.trim();
+        if (!str) return [];
+        try {
+          const parsed = JSON.parse(str);
+          if (Array.isArray(parsed)) return parsed.map((v: any) => String(v));
+        } catch {}
+        if (str.includes(',')) {
+          return str.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        return [str];
+      }
+      return [String(filter)];
+    };
+
     return products.map(product => ({
       ...product,
       price: parseFloat(product.price) || 0,
       stockquantity: parseInt(product.stockquantity ?? product.stockQuantity) || 0,
-      instock: getInstockStatus(product)
+      instock: getInstockStatus(product),
+      filter: parseFilter(product.filter)
     }));
   };
 
@@ -542,6 +566,11 @@ const Admin = () => {
   const [isViewOrderModalOpen, setIsViewOrderModalOpen] = useState(false);
   const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Edit filter section state variables
+  const [editSelectedFilterSetId, setEditSelectedFilterSetId] = useState('');
+  const [editSelectedFilterItem, setEditSelectedFilterItem] = useState('');
+  const [editAppliedFilters, setEditAppliedFilters] = useState<Array<{ set: string; item: string }>>([]);
 
   const [newProductCategories, setNewProductCategories] = useState<string[]>([]);
   const [newProductMainCategories, setNewProductMainCategories] = useState<string[]>([]);
@@ -549,6 +578,49 @@ const Admin = () => {
   const [editProductCategories, setEditProductCategories] = useState<string[]>([]);
   const [editProductMainCategories, setEditProductMainCategories] = useState<string[]>([]);
   const [typedCategory, setTypedCategory] = useState<string>('');
+  // Filter state for product add form
+  const [newProductFilters, setNewProductFilters] = useState<string[]>([]);
+  const [selectedFilterSetId, setSelectedFilterSetId] = useState<string>('');
+  const [selectedFilterItem, setSelectedFilterItem] = useState<string>('');
+
+  const filters: { id: string; name: string; groups: { title: string; items: string[] }[] }[] = [
+ 
+
+
+    {
+      id: 'flower-types',
+      name: 'Flowers',
+      groups: [
+        { title: 'Popular Flowers', 
+          items: [
+            "Roses",
+         "Tulips",
+          "Lilies",
+          "Carnations",
+          "Orchids",
+          ] },
+       
+      ]
+    },
+
+
+    {
+      id: 'arrangements',
+      name: 'Arrangements',
+      groups: [
+        { title: 'Popular Arrangements',
+           items: [
+             "Bouquet",
+          "Flower Baskets",
+          "Flower Boxes",
+          "Vase Arrangements",
+         
+          
+          ] },
+       
+      ]
+    },
+  ];
 
   // Predefined category groups for quick-select in the admin product form
   const allCategories: { id: string; name: string; groups: { title: string; items: string[] }[] }[] = [
@@ -2616,6 +2688,7 @@ case "products":
                   discounts_offers: showDiscountFields, // Use checkbox state
                   iscustom: formData.get('iscustom') === 'on',
                   isbestseller: formData.get('isbestseller') === 'on',
+                  filter: appliedFilters.length > 0 ? appliedFilters.map(f => f.item) : null,
                 };
 
                 console.log('Product data being sent:', productData);
@@ -3167,6 +3240,120 @@ case "products":
                 </div>
               )}
 
+                 {/* Filter Section */}
+              <div>
+                <Label className="font-sans text-sm sm:text-base">Filter</Label>
+                <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center sm:gap-2">
+                    {/* Filter set select for 'Flower Type' and 'Arrangement' only */}
+                    <Select value={selectedFilterSetId} onValueChange={(val) => {
+                      setSelectedFilterSetId(val);
+                      setSelectedFilterItem('');
+                    }}>
+                      <SelectTrigger className="w-full text-xs sm:text-sm sm:w-48">
+                        <SelectValue placeholder="Select filter set" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="flower-type" className="text-xs sm:text-sm">Flower Type</SelectItem>
+                        <SelectItem value="arrangement" className="text-xs sm:text-sm">Arrangement</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    {/* Filter item select based on chosen filter set */}
+                    <Select value={selectedFilterItem} onValueChange={(val) => setSelectedFilterItem(val)}>
+                      <SelectTrigger className="w-full text-xs sm:text-sm sm:w-64">
+                        <SelectValue placeholder="Select filter item" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {selectedFilterSetId === 'flower-type' && [
+                          'Roses', 'Tulips', 'Lilies', 'Orchids', 'Carnations'
+                        ].map(item => (
+                          <SelectItem key={item} value={item} className="text-xs sm:text-sm">{item}</SelectItem>
+                        ))}
+                        {selectedFilterSetId === 'arrangement' && [
+                          'Vase Arrangement', 'Bouquet', 'Flower Box', 'Flower Basket'
+                        ].map(item => (
+                          <SelectItem key={item} value={item} className="text-xs sm:text-sm">{item}</SelectItem>
+                        ))}
+                        {!selectedFilterSetId && (
+                          <SelectItem disabled value="none" className="px-3 py-2 text-xs text-muted-foreground sm:text-sm">Select a filter set first</SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      type="button"
+                      className="text-xs sm:text-sm mt-2"
+                      disabled={!selectedFilterSetId || !selectedFilterItem}
+                      onClick={() => {
+                        if (!selectedFilterSetId || !selectedFilterItem) return;
+                        // Prevent duplicate filters
+                        if (!appliedFilters.some(f => f.set === selectedFilterSetId && f.item === selectedFilterItem)) {
+                          setAppliedFilters(prev => [...prev, { set: selectedFilterSetId, item: selectedFilterItem }]);
+                        }
+                        setSelectedFilterSetId('');
+                        setSelectedFilterItem('');
+                      }}
+                    >
+                      Add Filter
+                    </Button>
+                </div>
+
+                
+              </div>
+              <div className="mt-2 p-3 border-2 border-dashed border-muted-foreground/20 rounded-lg bg-muted/5">
+                {appliedFilters.length > 0 ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {appliedFilters.map((filter, idx) => (
+                        <div key={idx} className="flex items-center gap-2 bg-primary/10 border border-primary/30 rounded px-2 py-1">
+                          <Tag className="h-4 w-4 text-primary" />
+                          <span className="text-sm font-medium text-primary">
+                            {filter.set === 'flower-type' ? 'Flower' : 'Arrangement'} - {filter.item}
+                          </span>
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            className="h-4 w-4 p-0 ml-1"
+                            title="Remove filter"
+                            onClick={() => setAppliedFilters(prev => prev.filter((_, i) => i !== idx))}
+                          >
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-muted-foreground text-center mt-2">Multiple filters applied</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <Tag className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground mb-1">No Filter selected</p>
+                      <p className="text-xs text-muted-foreground">
+                        Choose from the Filter sets above 
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+ <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
+                  <Label htmlFor="colour" className="sm:text-right font-medium">Colour</Label>
+                  <Select name="colour" defaultValue={(selectedProduct as any)?.colour || ''}>
+                    <SelectTrigger className="sm:col-span-3">
+                      <SelectValue placeholder="Select colour" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Red">Red</SelectItem>
+                      <SelectItem value="Pink">Pink</SelectItem>
+                      <SelectItem value="White">White</SelectItem>
+                      <SelectItem value="Yellow">Yellow</SelectItem>
+                      <SelectItem value="Purple">Purple</SelectItem>
+                      <SelectItem value="Mixed">Mixed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                 <div>
                   <Label htmlFor="stockQuantity" className="text-sm sm:text-base">Stock Quantity</Label>
@@ -3179,33 +3366,26 @@ case "products":
                       <SelectValue placeholder="Select stock status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="true" className="text-xs sm:text-sm">In Stock</SelectItem>
-                      <SelectItem value="false" className="text-xs sm:text-sm">Out of Stock</SelectItem>
+                      <SelectItem value="true">In Stock</SelectItem>
+                      <SelectItem value="false">Out of Stock</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-                <div>
-                  <Label htmlFor="colour" className="text-sm sm:text-base">Colour</Label>
-                  <Select name="colour">
-                    <SelectTrigger className="text-xs sm:text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
+                  <Label htmlFor="colour" className="sm:text-right font-medium">Colour</Label>
+                  <Select name="colour" defaultValue="">
+                    <SelectTrigger className="sm:col-span-3">
                       <SelectValue placeholder="Select colour" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Red" className="text-xs sm:text-sm">Red</SelectItem>
-                      <SelectItem value="Pink" className="text-xs sm:text-sm">Pink</SelectItem>
-                      <SelectItem value="White" className="text-xs sm:text-sm">White</SelectItem>
-                      <SelectItem value="Yellow" className="text-xs sm:text-sm">Yellow</SelectItem>
-                      <SelectItem value="Purple" className="text-xs sm:text-sm">Purple</SelectItem>
-                      <SelectItem value="Mixed" className="text-xs sm:text-sm">Mixed</SelectItem>
+                      <SelectItem value="Red">Red</SelectItem>
+                      <SelectItem value="Pink">Pink</SelectItem>
+                      <SelectItem value="White">White</SelectItem>
+                      <SelectItem value="Yellow">Yellow</SelectItem>
+                      <SelectItem value="Purple">Purple</SelectItem>
+                      <SelectItem value="Mixed">Mixed</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="iscustom" name="iscustom" />
-                  <Label htmlFor="iscustom" className="text-sm sm:text-base">Custom Product</Label>
                 </div>
               </div>
 
@@ -3220,9 +3400,7 @@ case "products":
                 <Label htmlFor="description" className="font-sans text-sm sm:text-base">Description</Label>
                 <Textarea id="description" name="description" required className="font-sans text-sm sm:text-base min-h-[100px]" />
               </div>
-  
-      
-      
+
               <div className="flex items-center space-x-2">
                 <Checkbox id="featured" name="featured" />
                 <Label htmlFor="featured" className="text-sm sm:text-base">Featured Product</Label>
@@ -3886,6 +4064,14 @@ case "products":
                             <div>
                               <dt className="text-sm text-muted-foreground">Delivery Address</dt>
                               <dd className="text-sm">{selectedOrder.deliveryaddress}</dd>
+                            </div>
+                              <div>
+                              <dt className="text-sm text-muted-foreground">Delivery Option</dt>
+                              <dd className="text-sm">{selectedOrder.delivery_option}</dd>
+                            </div>
+                              <div>
+                              <dt className="text-sm text-muted-foreground">Distance</dt>
+                              <dd className="text-sm">{selectedOrder.distance}</dd>
                             </div>
                           </dl>
                         </CardContent>
@@ -8131,7 +8317,9 @@ case "products":
       // Merge image updates with other data
       const finalUpdateData = {
         ...updatedData,
-        ...imageUpdates
+        ...imageUpdates,
+        // Ensure filter is always an array of item values
+        filter: editAppliedFilters.length > 0 ? editAppliedFilters.map(f => f.item) : null
       };
 
       // First update the product data (including removing images)
@@ -8964,6 +9152,140 @@ case "products":
                         </div>
                       </div>
                     )}
+
+                    {/* Filter Section for Edit */}
+                    <div className="mt-4">
+                      <Label className="font-sans text-sm sm:text-base">Filter</Label>
+                      <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center sm:gap-2">
+                        <Select value={editSelectedFilterSetId} onValueChange={(val) => {
+                          setEditSelectedFilterSetId(val);
+                          setEditSelectedFilterItem('');
+                        }}>
+                          <SelectTrigger className="w-full text-xs sm:text-sm sm:w-48">
+                            <SelectValue placeholder="Select filter set" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="flower-type" className="text-xs sm:text-sm">Flower Type</SelectItem>
+                            <SelectItem value="arrangement" className="text-xs sm:text-sm">Arrangement</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Select value={editSelectedFilterItem} onValueChange={(val) => setEditSelectedFilterItem(val)}>
+                          <SelectTrigger className="w-full text-xs sm:text-sm sm:w-64">
+                            <SelectValue placeholder="Select filter item" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {editSelectedFilterSetId === 'flower-type' && [
+                              'Roses', 'Tulips', 'Lilies', 'Orchids', 'Carnations'
+                            ].map(item => (
+                              <SelectItem key={item} value={item} className="text-xs sm:text-sm">{item}</SelectItem>
+                            ))}
+                            {editSelectedFilterSetId === 'arrangement' && [
+                              'Vase Arrangement', 'Bouquet', 'Flower Box', 'Flower Basket'
+                            ].map(item => (
+                              <SelectItem key={item} value={item} className="text-xs sm:text-sm">{item}</SelectItem>
+                            ))}
+                            {!editSelectedFilterSetId && (
+                              <div className="px-3 py-2 text-xs text-muted-foreground sm:text-sm">Select filter set first</div>
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <Button
+                          type="button"
+                          className="text-xs sm:text-sm mt-2"
+                          disabled={!editSelectedFilterSetId || !editSelectedFilterItem}
+                          onClick={() => {
+                            if (!editSelectedFilterSetId || !editSelectedFilterItem) return;
+                            // Prevent duplicate filters
+                            if (!editAppliedFilters.some(f => f.set === editSelectedFilterSetId && f.item === editSelectedFilterItem)) {
+                              setEditAppliedFilters(prev => [...prev, { set: editSelectedFilterSetId, item: editSelectedFilterItem }]);
+                            }
+                            setEditSelectedFilterSetId('');
+                            setEditSelectedFilterItem('');
+                          }}
+                        >
+                          Add Filter
+                        </Button>
+                      </div>
+                      <div className="mt-2 p-3 border-2 border-dashed border-muted-foreground/20 rounded-lg bg-muted/5">
+                        {editAppliedFilters.length > 0 ? (
+                          <div className="flex flex-col gap-2">
+                            <div className="flex flex-wrap gap-2 justify-center">
+                              {editAppliedFilters.map((filter, idx) => (
+                                <span key={idx} className="inline-flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-1 rounded-md text-xs font-medium">
+                                  <span>{filter.set === 'flower-type' ? 'Flower Type' : 'Arrangement'}:</span>
+                                  <span className="font-semibold text-primary">{filter.item}</span>
+                                  <Button
+                                    type="button"
+                                    size="icon"
+                                    variant="ghost"
+                                    className="h-4 w-4 ml-1"
+                                    onClick={() => {
+                                      setEditAppliedFilters(prev => prev.filter((_, i) => i !== idx));
+                                    }}
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </Button>
+                                </span>
+                              ))}
+                            </div>
+                            <p className="text-xs text-muted-foreground text-center mt-2">Multiple filters applied</p>
+                          </div>
+                        ) : (
+                          selectedProduct && Array.isArray(selectedProduct.filter) && selectedProduct.filter.length > 0 ? (
+                            <div className="flex flex-col items-center gap-2 text-center">
+                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                <Tag className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground mb-1">Selected Filters</p>
+                                <div className="flex flex-wrap gap-2 justify-center mt-1">
+                                  {selectedProduct.filter.map((item: string, idx: number) => (
+                                      <span key={idx} className="inline-flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-1 rounded-md text-xs font-medium">
+                                        <span className="font-semibold text-primary">{item}</span>
+                                        <Button
+                                          type="button"
+                                          size="icon"
+                                          variant="ghost"
+                                          className="h-4 w-4 ml-1"
+                                          onClick={() => {
+                                            // Remove this filter from selectedProduct.filter
+                                            // If editAppliedFilters is empty, initialize it from selectedProduct.filter
+                                            setEditAppliedFilters(prev => {
+                                              // If prev is empty, initialize from selectedProduct.filter
+                                              if (!prev || prev.length === 0) {
+                                                return selectedProduct.filter
+                                                  .map(f => ({ set: 'unknown', item: f }));
+                                              }
+                                              // Remove the clicked item
+                                              return prev.filter((f, i) => i !== idx);
+                                            });
+                                            // Optionally, remove from selectedProduct.filter if you want to update UI immediately
+                                          }}
+                                          title={`Remove ${item}`}
+                                        >
+                                          <X className="h-3 w-3" />
+                                        </Button>
+                                      </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2 text-center">
+                              <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                <Tag className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground mb-1">No Filter selected</p>
+                                <p className="text-xs text-muted-foreground">
+                                  Choose from the Filter sets above 
+                                </p>
+                              </div>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
@@ -8997,22 +9319,7 @@ case "products":
                     className="sm:col-span-3"
                   />
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="colour" className="sm:text-right font-medium">Colour</Label>
-                  <Select name="colour" defaultValue={(selectedProduct as any)?.colour || ''}>
-                    <SelectTrigger className="sm:col-span-3">
-                      <SelectValue placeholder="Select colour" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Red">Red</SelectItem>
-                      <SelectItem value="Pink">Pink</SelectItem>
-                      <SelectItem value="White">White</SelectItem>
-                      <SelectItem value="Yellow">Yellow</SelectItem>
-                      <SelectItem value="Purple">Purple</SelectItem>
-                      <SelectItem value="Mixed">Mixed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+              
                 
                 {/* Product Options - Custom, Best Seller, Featured */}
                 <div className="grid grid-cols-1 sm:grid-cols-4 items-start gap-2 lg:gap-4">

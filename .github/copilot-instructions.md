@@ -1,52 +1,50 @@
 # Copilot Instructions for AI Agents
 
 ## Project Overview
-- This is a Vite + React + TypeScript web application for E-Commerce and Flower School management.
-- UI is built with shadcn-ui and styled using Tailwind CSS.
-- The project is structured for modularity: `src/components` for UI, `src/pages` for routes/views, `src/lib` for utilities and API logic, and `src/hooks` for custom React hooks.
+- Vite + React + TypeScript web app for E-Commerce and Flower School management.
+- UI: shadcn-ui primitives, Tailwind CSS for styling.
+- Modular structure: `src/components` (UI), `src/pages` (routes/views), `src/lib` (API/auth/utils), `src/hooks` (custom hooks).
 
-## Key Workflows
-- **Local Development:**
-  - Install dependencies: `npm i`
-  - Start dev server: `npm run dev`
-- **Deployment:**
-  - Use Lovable platform for publishing and domain management.
-  - See README for Lovable integration details.
+## Architecture & Data Flow
+- **Pages** in `src/pages` define route-level logic and views.
+- **UI components** in `src/components` and `src/components/ui` (shadcn-ui) are reused across pages.
+- **API calls** use helpers in `src/lib/api.ts` and React Query (`src/lib/queryClient.ts`) for data fetching/caching.
+- **Auth**: Forms and protected routes in `src/components/auth`, logic in `src/lib/auth.ts` and `src/hooks/user-auth.tsx`.
+- **Custom hooks** in `src/hooks` encapsulate reusable logic (e.g., `use-toast`, `user-auth`).
+- **State**: Prefer React Query for server state, local state for UI interactions.
 
-## Architectural Patterns
-- **Component Structure:**
-  - UI components are in `src/components` and `src/components/ui` (shadcn-ui).
-  - Pages are in `src/pages`, each representing a route.
-  - Shared logic (API, auth, utilities) is in `src/lib`.
-- **State & Data Flow:**
-  - React Query is used for data fetching/caching (see `src/lib/queryClient.ts`).
-  - Custom hooks in `src/hooks` encapsulate reusable logic.
-- **Auth:**
-  - Auth forms and protected routes are in `src/components/auth`.
-  - API logic for auth is in `src/lib/auth.ts`.
+## Developer Workflows
+- **Install dependencies**: `npm i`
+- **Start dev server**: `npm run dev`
+- **Build for production**: `npm run build`
+- **Deployment**: Use Lovable platform (see `README.md` for integration and domain setup).
+- **Containerization**: See `Dockerfile` and `nginx.conf` for deployment config.
 
 ## Project-Specific Conventions
-- Use shadcn-ui primitives for new UI elements (see `src/components/ui`).
-- Use Tailwind CSS for styling; avoid inline styles.
-- Page-level logic goes in `src/pages`, not in components.
-- API calls should use the helpers in `src/lib/api.ts`.
-- Use custom hooks for cross-cutting concerns (e.g., `use-toast`, `user-auth`).
+- Use shadcn-ui primitives for new UI (`src/components/ui`).
+- Style with Tailwind CSS classes, avoid inline styles.
+- Page logic belongs in `src/pages`, not in components.
+- API calls must use `src/lib/api.ts` helpers.
+- Use custom hooks for cross-cutting concerns.
+- Product/category management: See `src/pages/Admin.tsx` for patterns (dynamic forms, category mapping, image upload logic).
+- Discount logic: See product form in `Admin.tsx` for auto-calculation and preview patterns.
 
 ## Integration Points
-- External payments via Razorpay (`src/lib/razorpay.ts`).
-- SEO handled in `src/components/SEO.tsx`.
-- Nginx config for deployment in `nginx.conf`.
-- Dockerfile provided for containerization.
+- **Payments**: Razorpay integration in `src/lib/razorpay.ts`.
+- **SEO**: Handled in `src/components/SEO.tsx`.
+- **Nginx/Docker**: See `nginx.conf`, `Dockerfile` for deployment.
 
 ## Examples
-- To add a new page: create a file in `src/pages`, add route logic in `main.tsx`.
-- To add a new UI component: use shadcn-ui pattern in `src/components/ui`.
-- To fetch data: use React Query via helpers in `src/lib/queryClient.ts`.
+- Add a page: Create in `src/pages`, add route in `main.tsx`.
+- Add UI: Use shadcn-ui pattern in `src/components/ui`.
+- Fetch data: Use React Query via `src/lib/queryClient.ts`.
+- Product CRUD: See `Admin.tsx` for form, image upload, and category logic.
 
 ## References
-- See `README.md` for setup, Lovable integration, and deployment.
-- See `src/lib` for API/auth/payment logic.
-- See `src/components/ui` for UI conventions.
+- `README.md`: Setup, Lovable integration, deployment.
+- `src/lib`: API/auth/payment logic.
+- `src/components/ui`: UI conventions.
+- `src/pages/Admin.tsx`: Product management, category, discount, and image upload patterns.
 
 ---
-For unclear or missing conventions, ask for clarification or review recent code in the referenced directories.
+If conventions are unclear or missing, ask for clarification or review recent code in referenced directories. Please provide feedback if any section is incomplete or unclear.
