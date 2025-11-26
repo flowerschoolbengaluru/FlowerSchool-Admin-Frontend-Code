@@ -984,10 +984,24 @@ const Admin = () => {
         ? ((selectedProduct as any).main_category as string[])
         : getCategoryArray((selectedProduct as any).main_category ?? (selectedProduct as any).mainCategory);
       setEditProductMainCategories(mains || []);
-      // Custom fields removed - no longer exist
+      // Initialize editAppliedFilters from selectedProduct.filter
+      if (Array.isArray(selectedProduct.filter)) {
+        setEditAppliedFilters(selectedProduct.filter
+          .map(f => {
+            if (f == null) {
+              return { set: '', item: '' };
+            }
+           
+            return { set: '', item: String(f) };
+          })
+        );
+      } else {
+        setEditAppliedFilters([]);
+      }
     } else {
       setEditProductCategories([]);
       setEditProductMainCategories([]);
+      setEditAppliedFilters([]);
     }
   }, [selectedProduct]);
 
@@ -3338,22 +3352,7 @@ case "products":
                   </div>
                 )}
               </div>
- <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
-                  <Label htmlFor="colour" className="sm:text-right font-medium">Colour</Label>
-                  <Select name="colour" defaultValue={(selectedProduct as any)?.colour || ''}>
-                    <SelectTrigger className="sm:col-span-3">
-                      <SelectValue placeholder="Select colour" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Red">Red</SelectItem>
-                      <SelectItem value="Pink">Pink</SelectItem>
-                      <SelectItem value="White">White</SelectItem>
-                      <SelectItem value="Yellow">Yellow</SelectItem>
-                      <SelectItem value="Purple">Purple</SelectItem>
-                      <SelectItem value="Mixed">Mixed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                 <div>
                   <Label htmlFor="stockQuantity" className="text-sm sm:text-base">Stock Quantity</Label>
@@ -8545,30 +8544,27 @@ case "products":
                 return null;
               })();
 
+              // Always use editAppliedFilters for saving filters
               const updatedData = {
                 name: formData.get('name') as string,
-                // price should be the final selling price; when edit discounts are enabled use the editSellingPrice state
                 price: editShowDiscountFields ? parseFloat(editSellingPrice || '0') : parseFloat(formData.get('price') as string),
                 originalPrice: editShowDiscountFields && editOriginalPriceNum !== null ? editOriginalPriceNum : null,
                 discountPercentage: editShowDiscountFields && editDiscountPercentNum !== null ? editDiscountPercentNum : null,
                 discountAmount: computedEditDiscountAmount,
-                // send categories as an array (matches create product)
                 category: categoriesToSend,
                 stockquantity: parseInt(formData.get('stockquantity') as string),
                 description: formData.get('description') as string,
                 instock: (formData.get('instock') as string) === 'true',
                 colour: formData.get('colour') as string,
-                discounts_offers: editShowDiscountFields, // Use checkbox state
-                // Product options from checkboxes
+                discounts_offers: editShowDiscountFields,
                 iscustom: (formData.get('iscustom') as string) === 'on',
                 isCustom: (formData.get('iscustom') as string) === 'on',
                 isbestseller: (formData.get('isbestseller') as string) === 'on',
                 isBestSeller: (formData.get('isbestseller') as string) === 'on',
                 featured: (formData.get('featured') as string) === 'on',
-                // include main_category and subcategory to support new schema
                 main_category: parsedMainCategory,
                 subcategory: parsedSubcategory,
-                // Add existing images that weren't removed
+                filter: editAppliedFilters.length > 0 ? editAppliedFilters.map(f => f.item) : [],
                 ...existingImages
               };
               handleUpdateProduct(updatedData);
@@ -9196,9 +9192,12 @@ case "products":
                           onClick={() => {
                             if (!editSelectedFilterSetId || !editSelectedFilterItem) return;
                             // Prevent duplicate filters
-                            if (!editAppliedFilters.some(f => f.set === editSelectedFilterSetId && f.item === editSelectedFilterItem)) {
-                              setEditAppliedFilters(prev => [...prev, { set: editSelectedFilterSetId, item: editSelectedFilterItem }]);
-                            }
+                            setEditAppliedFilters(prev => {
+                              if (!prev.some(f => f.set === editSelectedFilterSetId && f.item === editSelectedFilterItem)) {
+                                return [...prev, { set: editSelectedFilterSetId, item: editSelectedFilterItem }];
+                              }
+                              return prev;
+                            });
                             setEditSelectedFilterSetId('');
                             setEditSelectedFilterItem('');
                           }}
@@ -9212,7 +9211,7 @@ case "products":
                             <div className="flex flex-wrap gap-2 justify-center">
                               {editAppliedFilters.map((filter, idx) => (
                                 <span key={idx} className="inline-flex items-center gap-1 bg-primary/10 border border-primary/30 px-2 py-1 rounded-md text-xs font-medium">
-                                  <span>{filter.set === 'flower-type' ? 'Flower Type' : 'Arrangement'}:</span>
+                                 
                                   <span className="font-semibold text-primary">{filter.item}</span>
                                   <Button
                                     type="button"
