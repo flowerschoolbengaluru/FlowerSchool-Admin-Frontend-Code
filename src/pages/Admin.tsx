@@ -234,6 +234,7 @@ const Admin = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null);
   const [imageZoom, setImageZoom] = useState<number>(1);
+  const [emailError, setEmailError] = useState('');
 
   const openImageModal = (url?: string | null) => {
     if (!url) return;
@@ -491,6 +492,7 @@ const Admin = () => {
   const [isInstructorsLoading, setIsInstructorsLoading] = useState(false);
   const [instructorImageFile, setInstructorImageFile] = useState<string>('');
   const [editInstructorImageFile, setEditInstructorImageFile] = useState<string>('');
+  const [editEmailError, setEditEmailError] = useState("");
 
   // Custom Alert Modal state
   const [alertModal, setAlertModal] = useState<{ open: boolean, title: string, message: string }>({ open: false, title: '', message: '' });
@@ -7367,6 +7369,7 @@ case "products":
                         await fetchInstructors();
                         setShowInstructorForm(false);
                         setInstructorImageFile('');
+                        setEmailError('');
                         e.currentTarget.reset();
 
                         toast({
@@ -7376,12 +7379,20 @@ case "products":
                         });
                       }
                     } catch (error) {
-                      console.error('Error creating instructor:', error);
-                      toast({
-                        title: "Error",
-                        description: "Failed to create instructor. Please try again.",
-                        variant: "destructive",
-                      });
+  console.error('Error creating instructor:', error);
+  let errorMsg = "Failed to create instructor. Please try again.";
+  if (error?.response?.data?.error) {
+    errorMsg = error.response.data.error;
+    if (errorMsg === 'Email already exists') {
+      setEmailError('This email already added for another instructor');
+    }
+  }
+  toast({
+    title: "Error",
+    description: errorMsg,
+    variant: "destructive",
+  });
+
                     } finally {
                       setIsLoading(false);
                     }
@@ -7391,10 +7402,13 @@ case "products":
                         <Label htmlFor="name" className="text-xs sm:text-sm font-medium">Full Name</Label>
                         <Input id="name" name="name" placeholder="Enter instructor name" required className="mt-1 text-xs sm:text-sm" />
                       </div>
-                      <div>
-                        <Label htmlFor="email" className="text-xs sm:text-sm font-medium">Email</Label>
-                        <Input id="email" name="email" type="email" placeholder="instructor@example.com" required className="mt-1 text-xs sm:text-sm" />
-                      </div>
+                     <div>
+  <Label htmlFor="email" className="text-xs sm:text-sm font-medium">Email</Label>
+  <Input id="email" name="email" type="email" placeholder="instructor@example.com" required className="mt-1 text-xs sm:text-sm" />
+  {emailError && (
+    <p className="text-xs text-red-600 mt-1">{emailError}</p>
+  )}
+</div>
                     </div>
 
                     <div className="grid grid-cols-1 gap-2 sm:gap-3 lg:grid-cols-2 lg:gap-4">
@@ -7718,6 +7732,7 @@ case "products":
                         setIsEditInstructorModalOpen(false);
                         setSelectedInstructor(null);
                         setEditInstructorImageFile('');
+                        setEditEmailError("");
 
                         toast({
                           title: "Success",
@@ -7727,9 +7742,16 @@ case "products":
                       }
                     } catch (error) {
                       console.error('Error updating instructor:', error);
+                      let errorMsg = "Failed to update instructor. Please try again.";
+                      if (error?.response?.data?.error) {
+                        errorMsg = error.response.data.error;
+                        if (errorMsg === 'Email already exists') {
+                          setEditEmailError('This email already added for another instructor');
+                        }
+                      }
                       toast({
                         title: "Error",
-                        description: "Failed to update instructor. Please try again.",
+                        description: errorMsg,
                         variant: "destructive",
                       });
                     } finally {
@@ -7758,6 +7780,9 @@ case "products":
                             required
                             className="text-xs sm:text-sm"
                           />
+                          {editEmailError && (
+                            <p className="text-xs text-red-600 mt-1">{editEmailError}</p>
+                          )}
                         </div>
                       </div>
 
