@@ -1614,7 +1614,7 @@ const Admin = () => {
     { title: "Dashboard", id: "dashboard", icon: LayoutDashboard, description: "Overview & Stats" },
     { title: "Products", id: "products", icon: Package, description: "Manage Inventory" },
     { title: "Orders", id: "orders", icon: ShoppingCart, description: "Customer Orders" },
-    // { title: "Classes", id: "classes", icon: GraduationCap, description: "Educational Programs" },
+    { title: "Classes", id: "classes", icon: GraduationCap, description: "Educational Programs" },
     // { title: "Courses & Workshops Enrollments", id: "event-class-enrollments", icon: Users, description: "Courses & Workshops Registrations" },
     { title: "Category Visitor List", id: "category-visitor-list", icon: Eye, description: "Event/Venue & Corporate Visitor Data" },
     { title: "Student Feedback", id: "feedback", icon: MessageSquare, description: "Student Reviews" },
@@ -4275,888 +4275,888 @@ case "products":
         );
 
 
-      // case "classes":
-      //   return (
-      //     <div className="space-y-4 md:space-y-6">
-      //       {/* Header Section */}
-      //       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      //         <div className="space-y-1">
-      //           <h1 className="text-2xl font-bold font-sans sm:text-3xl">Class Management</h1>
-      //           <p className="text-xs text-muted-foreground sm:text-sm">
-      //             Manage courses and educational programs
-      //           </p>
-      //         </div>
-      //         <div className="flex gap-2 w-full sm:w-auto">
-      //           <Button
-      //             variant="outline"
-      //             onClick={refreshClasses}
-      //             disabled={isClassesLoading}
-      //             className="flex-1 text-xs sm:text-sm sm:flex-none"
-      //           >
-      //             {isClassesLoading ? "Refreshing..." : "Refresh"}
-      //           </Button>
-      //           <Button
-      //             onClick={() => setShowClassForm(true)}
-      //             className="flex-1 text-xs sm:text-sm sm:flex-none"
-      //           >
-      //             <Plus className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
-      //             Add Class
-      //           </Button>
-      //         </div>
-      //       </div>
+      case "classes":
+        return (
+          <div className="space-y-4 md:space-y-6">
+            {/* Header Section */}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-bold font-sans sm:text-3xl">Class Management</h1>
+                <p className="text-xs text-muted-foreground sm:text-sm">
+                  Manage courses and educational programs
+                </p>
+              </div>
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button
+                  variant="outline"
+                  onClick={refreshClasses}
+                  disabled={isClassesLoading}
+                  className="flex-1 text-xs sm:text-sm sm:flex-none"
+                >
+                  {isClassesLoading ? "Refreshing..." : "Refresh"}
+                </Button>
+                <Button
+                  onClick={() => setShowClassForm(true)}
+                  className="flex-1 text-xs sm:text-sm sm:flex-none"
+                >
+                  <Plus className="mr-1 h-3 w-3 sm:mr-2 sm:h-4 sm:w-4" />
+                  Add Class
+                </Button>
+              </div>
+            </div>
 
-      //       {showClassForm && (
-      //         <Card>
-      //           <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
-      //             <div className="flex items-center justify-between">
-      //               <CardTitle className="text-lg sm:text-xl">Create New Class</CardTitle>
-      //               <Button variant="ghost" size="icon" onClick={() => {
-      //                 setShowClassForm(false);
-      //                 setClassImageFile(''); // Clear image state
-      //               }} className="h-8 w-8 sm:h-10 sm:w-10">
-      //                 <X className="h-3 w-3 sm:h-4 sm:w-4" />
-      //               </Button>
-      //             </div>
-      //           </CardHeader>
-      //           <CardContent className="px-4 sm:px-6">
-      //             <form className="space-y-4" onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-      //               e.preventDefault();
-      //               setIsLoading(true);
-      //               try {
-      //                 const formData = new FormData(e.currentTarget);
+            {showClassForm && (
+              <Card>
+                <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg sm:text-xl">Create New Class</CardTitle>
+                    <Button variant="ghost" size="icon" onClick={() => {
+                      setShowClassForm(false);
+                      setClassImageFile(''); // Clear image state
+                    }} className="h-8 w-8 sm:h-10 sm:w-10">
+                      <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent className="px-4 sm:px-6">
+                  <form className="space-y-4" onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                    e.preventDefault();
+                    setIsLoading(true);
+                    try {
+                      const formData = new FormData(e.currentTarget);
 
-      //                 // Parse features from textarea
-      //                 const featuresText = formData.get('features')?.toString() || '';
-      //                 const featuresArray = featuresText.split('\n').filter(f => f.trim()).map(f => f.trim());
+                      // Parse features from textarea
+                      const featuresText = formData.get('features')?.toString() || '';
+                      const featuresArray = featuresText.split('\n').filter(f => f.trim()).map(f => f.trim());
 
-      //                 const classData = {
-      //                   title: formData.get('title')?.toString() || '',
-      //                   description: formData.get('description')?.toString() || '',
-      //                   price: parseFloat(formData.get('price')?.toString() || '0'),
-      //                   duration: formData.get('duration')?.toString() || '',
-      //                   sessions: parseInt(formData.get('sessions')?.toString() || '1'),
-      //                   features: featuresArray,
-      //                   nextbatch: formData.get('nextbatch')?.toString() || '',
-      //                   category: formData.get('category')?.toString() || 'General',
-      //                   image: classImageFile || null // Use base64 image
-      //                 };
-      //                 console.log('Creating class with data:', classData);
-      //                 const response = await api.post('/api/admin/AdminClasses/Add', classData);
-      //                 if (response.status === 201) {
-      //                   // Refresh classes list
-      //                   const updatedClasses = await api.get('/api/admin/AdminClasses');
-      //                   const formattedClasses = Array.isArray(updatedClasses.data) ?
-      //                     updatedClasses.data.map(cls => {
-      //                       let features = cls.features;
-      //                       if (typeof features === 'string') {
-      //                         try {
-      //                           features = JSON.parse(features);
-      //                         } catch {
-      //                           features = [];
-      //                         }
-      //                       }
-      //                       return {
-      //                         ...cls,
-      //                         features: Array.isArray(features) ? features : [],
-      //                         price: parseFloat(cls.price) || 0,
-      //                         sessions: parseInt(cls.sessions) || 0
-      //                       };
-      //                     }) : [];
-      //                   setClasses(formattedClasses);
+                      const classData = {
+                        title: formData.get('title')?.toString() || '',
+                        description: formData.get('description')?.toString() || '',
+                        price: parseFloat(formData.get('price')?.toString() || '0'),
+                        duration: formData.get('duration')?.toString() || '',
+                        sessions: parseInt(formData.get('sessions')?.toString() || '1'),
+                        features: featuresArray,
+                        nextbatch: formData.get('nextbatch')?.toString() || '',
+                        category: formData.get('category')?.toString() || 'General',
+                        image: classImageFile || null // Use base64 image
+                      };
+                      console.log('Creating class with data:', classData);
+                      const response = await api.post('/api/admin/AdminClasses/Add', classData);
+                      if (response.status === 201) {
+                        // Refresh classes list
+                        const updatedClasses = await api.get('/api/admin/AdminClasses');
+                        const formattedClasses = Array.isArray(updatedClasses.data) ?
+                          updatedClasses.data.map(cls => {
+                            let features = cls.features;
+                            if (typeof features === 'string') {
+                              try {
+                                features = JSON.parse(features);
+                              } catch {
+                                features = [];
+                              }
+                            }
+                            return {
+                              ...cls,
+                              features: Array.isArray(features) ? features : [],
+                              price: parseFloat(cls.price) || 0,
+                              sessions: parseInt(cls.sessions) || 0
+                            };
+                          }) : [];
+                        setClasses(formattedClasses);
 
-      //                   setShowClassForm(false);
-      //                   setClassImageFile(''); // Clear uploaded image
-      //                   e.currentTarget.reset();
+                        setShowClassForm(false);
+                        setClassImageFile(''); // Clear uploaded image
+                        e.currentTarget.reset();
 
-      //                   toast({
-      //                     title: "Success",
-      //                     description: "Class created successfully",
-      //                     variant: "default",
-      //                   });
-      //                 }
-      //               } catch (error) {
-      //                 console.error('Error creating class:', error);
-      //                 toast({
-      //                   title: "Error",
-      //                   description: "Failed to create class. Please try again.",
-      //                   variant: "destructive",
-      //                 });
-      //               } finally {
-      //                 setIsLoading(false);
-      //               }
-      //             }}>
-      //               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-      //                 <div>
-      //                   <Label htmlFor="title" className="text-sm sm:text-base">Class Title</Label>
-      //                   <Input id="title" name="title" placeholder="Enter class title" required className="text-sm sm:text-base" />
-      //                 </div>
-      //                 <div>
-      //                   <Label htmlFor="category" className="text-sm sm:text-base">Category</Label>
-      //                   <Select name="category" required defaultValue="Diploma Course">
-      //                     <SelectTrigger className="text-xs sm:text-sm">
-      //                       <SelectValue placeholder="Select category" />
-      //                     </SelectTrigger>
-      //                     <SelectContent>
-      //                       <SelectItem value="Diploma Course" className="text-xs sm:text-sm">Diploma Course</SelectItem>
-      //                       <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
-      //                     </SelectContent>
-      //                   </Select>
-      //                 </div>
-      //               </div>
+                        toast({
+                          title: "Success",
+                          description: "Class created successfully",
+                          variant: "default",
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error creating class:', error);
+                      toast({
+                        title: "Error",
+                        description: "Failed to create class. Please try again.",
+                        variant: "destructive",
+                      });
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                      <div>
+                        <Label htmlFor="title" className="text-sm sm:text-base">Class Title</Label>
+                        <Input id="title" name="title" placeholder="Enter class title" required className="text-sm sm:text-base" />
+                      </div>
+                      <div>
+                        <Label htmlFor="category" className="text-sm sm:text-base">Category</Label>
+                        <Select name="category" required defaultValue="Diploma Course">
+                          <SelectTrigger className="text-xs sm:text-sm">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Diploma Course" className="text-xs sm:text-sm">Diploma Course</SelectItem>
+                            <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
 
-      //               <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-      //                 <div>
-      //                   <Label htmlFor="price" className="text-sm sm:text-base">Price (₹)</Label>
-      //                   <Input id="price" name="price" type="number" step="0.01" min="0" placeholder="2500" required className="text-sm sm:text-base" />
-      //                 </div>
-      //                 <div>
-      //                   <Label htmlFor="duration" className="text-sm sm:text-base">Duration</Label>
-      //                   <Input id="duration" name="duration" placeholder="3 hours" required className="text-sm sm:text-base" />
-      //                 </div>
-      //                 <div>
-      //                   <Label htmlFor="sessions" className="text-sm sm:text-base">Number of Sessions</Label>
-      //                   <Input id="sessions" name="sessions" type="number" min="1" placeholder="4" required className="text-sm sm:text-base" />
-      //                 </div>
-      //               </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                      <div>
+                        <Label htmlFor="price" className="text-sm sm:text-base">Price (₹)</Label>
+                        <Input id="price" name="price" type="number" step="0.01" min="0" placeholder="2500" required className="text-sm sm:text-base" />
+                      </div>
+                      <div>
+                        <Label htmlFor="duration" className="text-sm sm:text-base">Duration</Label>
+                        <Input id="duration" name="duration" placeholder="3 hours" required className="text-sm sm:text-base" />
+                      </div>
+                      <div>
+                        <Label htmlFor="sessions" className="text-sm sm:text-base">Number of Sessions</Label>
+                        <Input id="sessions" name="sessions" type="number" min="1" placeholder="4" required className="text-sm sm:text-base" />
+                      </div>
+                    </div>
 
-      //               <div>
-      //                 <Label htmlFor="nextbatch" className="text-sm sm:text-base">Next Batch Date</Label>
-      //                 <Input id="nextbatch" name="nextbatch" type="date" required className="text-sm sm:text-base" />
-      //               </div>
+                    <div>
+                      <Label htmlFor="nextbatch" className="text-sm sm:text-base">Next Batch Date</Label>
+                      <Input id="nextbatch" name="nextbatch" type="date" required className="text-sm sm:text-base" />
+                    </div>
 
-      //               <div>
-      //                 <Label htmlFor="description" className="text-sm sm:text-base">Class Description</Label>
-      //                 <Textarea id="description" name="description" placeholder="Describe what students will learn..." rows={3} required className="text-sm sm:text-base min-h-[80px]" />
-      //               </div>
+                    <div>
+                      <Label htmlFor="description" className="text-sm sm:text-base">Class Description</Label>
+                      <Textarea id="description" name="description" placeholder="Describe what students will learn..." rows={3} required className="text-sm sm:text-base min-h-[80px]" />
+                    </div>
 
-      //               <div>
-      //                 <Label htmlFor="features" className="text-sm sm:text-base">Features (one per line)</Label>
-      //                 <Textarea
-      //                   id="features"
-      //                   name="features"
-      //                   placeholder={`Professional certificate\nHands-on practice\nTake-home materials\nLifetime support`}
-      //                   rows={3}
-      //                   className="text-sm sm:text-base min-h-[80px]"
-      //                 />
-      //               </div>
+                    <div>
+                      <Label htmlFor="features" className="text-sm sm:text-base">Features (one per line)</Label>
+                      <Textarea
+                        id="features"
+                        name="features"
+                        placeholder={`Professional certificate\nHands-on practice\nTake-home materials\nLifetime support`}
+                        rows={3}
+                        className="text-sm sm:text-base min-h-[80px]"
+                      />
+                    </div>
 
-      //               {/* Class Image Upload Section */}
-      //               <div className="space-y-3 p-3 border-2 border-primary/20 rounded-lg bg-primary/5 sm:p-4 sm:space-y-4">
-      //                 <div className="flex items-center justify-between">
-      //                   <Label className="text-sm sm:text-base">Class Image (Optional)</Label>
-      //                   <span className="text-xs text-muted-foreground sm:text-sm">
-      //                     {classImageFile ? '1 image uploaded' : 'No image selected'}
-      //                   </span>
-      //                 </div>
+                    {/* Class Image Upload Section */}
+                    <div className="space-y-3 p-3 border-2 border-primary/20 rounded-lg bg-primary/5 sm:p-4 sm:space-y-4">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm sm:text-base">Class Image (Optional)</Label>
+                        <span className="text-xs text-muted-foreground sm:text-sm">
+                          {classImageFile ? '1 image uploaded' : 'No image selected'}
+                        </span>
+                      </div>
 
-      //                 <div className="space-y-3 sm:space-y-4">
-      //                   <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-      //                     <Input
-      //                       type="file"
-      //                       accept="image/*"
-      //                       className="flex-1 text-xs sm:text-sm"
-      //                       onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-      //                         const files = e.target.files;
-      //                         if (!files || !files[0]) return;
+                      <div className="space-y-3 sm:space-y-4">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
+                          <Input
+                            type="file"
+                            accept="image/*"
+                            className="flex-1 text-xs sm:text-sm"
+                            onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+                              const files = e.target.files;
+                              if (!files || !files[0]) return;
 
-      //                         const file = files[0];
+                              const file = files[0];
 
-      //                         try {
-      //                           setIsLoading(true);
+                              try {
+                                setIsLoading(true);
 
-      //                           // Check file size (limit to 5MB)
-      //                           if (file.size > 5 * 1024 * 1024) {
-      //                             toast({
-      //                               title: "File too large",
-      //                               description: "Please select an image smaller than 5MB",
-      //                               variant: "destructive",
-      //                             });
-      //                             return;
-      //                           }
+                                // Check file size (limit to 5MB)
+                                if (file.size > 5 * 1024 * 1024) {
+                                  toast({
+                                    title: "File too large",
+                                    description: "Please select an image smaller than 5MB",
+                                    variant: "destructive",
+                                  });
+                                  return;
+                                }
 
-      //                           // Compress and convert to base64
-      //                           const reader = new FileReader();
-      //                           reader.onload = () => {
-      //                             // Remove data URL prefix for base64 only if needed
-      //                             const result = reader.result as string;
-      //                             const base64Data = result.split('base64,')[1] || result;
-      //                             setClassImageFile(base64Data);
-      //                             toast({
-      //                               title: "Image uploaded",
-      //                               description: `Image size: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
-      //                               variant: "default",
-      //                             });
-      //                           };
-      //                           reader.onerror = () => {
-      //                             toast({
-      //                               title: "Upload failed",
-      //                               description: "Failed to process image. Please try again.",
-      //                               variant: "destructive",
-      //                             });
-      //                           };
-      //                           reader.readAsDataURL(file);
-      //                         } catch (error) {
-      //                           console.error('Error processing image:', error);
-      //                           toast({
-      //                             title: "Upload failed",
-      //                             description: "Failed to process image. Please try again.",
-      //                             variant: "destructive",
-      //                           });
-      //                         } finally {
-      //                           setIsLoading(false);
-      //                         }
+                                // Compress and convert to base64
+                                const reader = new FileReader();
+                                reader.onload = () => {
+                                  // Remove data URL prefix for base64 only if needed
+                                  const result = reader.result as string;
+                                  const base64Data = result.split('base64,')[1] || result;
+                                  setClassImageFile(base64Data);
+                                  toast({
+                                    title: "Image uploaded",
+                                    description: `Image size: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+                                    variant: "default",
+                                  });
+                                };
+                                reader.onerror = () => {
+                                  toast({
+                                    title: "Upload failed",
+                                    description: "Failed to process image. Please try again.",
+                                    variant: "destructive",
+                                  });
+                                };
+                                reader.readAsDataURL(file);
+                              } catch (error) {
+                                console.error('Error processing image:', error);
+                                toast({
+                                  title: "Upload failed",
+                                  description: "Failed to process image. Please try again.",
+                                  variant: "destructive",
+                                });
+                              } finally {
+                                setIsLoading(false);
+                              }
 
-      //                         e.target.value = '';
-      //                       }}
-      //                     />
+                              e.target.value = '';
+                            }}
+                          />
 
-      //                     {classImageFile && (
-      //                       <Button
-      //                         type="button"
-      //                         variant="outline"
-      //                         size="sm"
-      //                         onClick={() => {
-      //                           setClassImageFile('');
-      //                           toast({
-      //                             title: "Image removed",
-      //                             description: "Class image has been removed",
-      //                           });
-      //                         }}
-      //                         className="text-xs sm:text-sm"
-      //                       >
-      //                         Remove
-      //                       </Button>
-      //                     )}
-      //                   </div>
+                          {classImageFile && (
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setClassImageFile('');
+                                toast({
+                                  title: "Image removed",
+                                  description: "Class image has been removed",
+                                });
+                              }}
+                              className="text-xs sm:text-sm"
+                            >
+                              Remove
+                            </Button>
+                          )}
+                        </div>
 
-      //                   {/* Image Preview */}
-      //                   {classImageFile && (
-      //                     <div className="relative">
-      //                       <div className="aspect-video w-full max-w-xs overflow-hidden rounded-lg border">
-      //                         <img
-      //                           src={`data:image/png;base64,${classImageFile}`}
-      //                           alt="Class preview"
-      //                           className="w-full h-full object-cover"
-      //                         />
-      //                       </div>
-      //                       <p className="text-xs text-muted-foreground mt-1">
-      //                         Size: {getBase64Size(classImageFile).toFixed(2)}MB
-      //                       </p>
-      //                     </div>
-      //                   )}
+                        {/* Image Preview */}
+                        {classImageFile && (
+                          <div className="relative">
+                            <div className="aspect-video w-full max-w-xs overflow-hidden rounded-lg border">
+                              <img
+                                src={`data:image/png;base64,${classImageFile}`}
+                                alt="Class preview"
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Size: {getBase64Size(classImageFile).toFixed(2)}MB
+                            </p>
+                          </div>
+                        )}
 
-      //                   {!classImageFile && (
-      //                     <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center sm:p-6">
-      //                       <Upload className="h-6 w-6 text-muted-foreground/50 mx-auto mb-2 sm:h-8 sm:w-8" />
-      //                       <p className="text-xs text-muted-foreground sm:text-sm">
-      //                         Upload a class image (optional)
-      //                       </p>
-      //                       <p className="text-xs text-muted-foreground/75 mt-1">
-      //                         Supports JPG, PNG. Max 5MB.
-      //                       </p>
-      //                     </div>
-      //                   )}
-      //                 </div>
-      //               </div>
+                        {!classImageFile && (
+                          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center sm:p-6">
+                            <Upload className="h-6 w-6 text-muted-foreground/50 mx-auto mb-2 sm:h-8 sm:w-8" />
+                            <p className="text-xs text-muted-foreground sm:text-sm">
+                              Upload a class image (optional)
+                            </p>
+                            <p className="text-xs text-muted-foreground/75 mt-1">
+                              Supports JPG, PNG. Max 5MB.
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
 
-      //               <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-      //                 <Button type="submit" disabled={isLoading} className="text-xs sm:text-sm flex-1">
-      //                   {isLoading ? "Creating..." : "Create Class"}
-      //                 </Button>
-      //                 <Button type="button" variant="outline" onClick={() => {
-      //                   setShowClassForm(false);
-      //                   setClassImageFile(''); // Clear image state
-      //                 }} className="text-xs sm:text-sm flex-1">
-      //                   Cancel
-      //                 </Button>
-      //               </div>
-      //             </form>
-      //           </CardContent>
-      //         </Card>
-      //       )}
+                    <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
+                      <Button type="submit" disabled={isLoading} className="text-xs sm:text-sm flex-1">
+                        {isLoading ? "Creating..." : "Create Class"}
+                      </Button>
+                      <Button type="button" variant="outline" onClick={() => {
+                        setShowClassForm(false);
+                        setClassImageFile(''); // Clear image state
+                      }} className="text-xs sm:text-sm flex-1">
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
 
-      //       <Card>
-      //         <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
-      //           <CardTitle className="text-lg sm:text-xl">Scheduled Classes</CardTitle>
-      //           <p className="text-xs text-muted-foreground sm:text-sm">
-      //             {isClassesLoading ? "Loading classes..." : `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} total`}
-      //           </p>
-      //         </CardHeader>
-      //         <CardContent className="px-2 sm:px-6">
-      //           {isClassesLoading ? (
-      //             <div className="flex items-center justify-center h-32 gap-2">
-      //               <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-      //               <p className="text-muted-foreground text-sm">Loading classes...</p>
-      //             </div>
-      //           ) : (
-      //             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
-      //               {classes && Array.isArray(classes) && classes.length > 0 ? classes.map((cls) => {
-      //                 if (!cls || typeof cls !== 'object') return null;
+            <Card>
+              <CardHeader className="px-4 py-3 sm:px-6 sm:py-4">
+                <CardTitle className="text-lg sm:text-xl">Scheduled Classes</CardTitle>
+                <p className="text-xs text-muted-foreground sm:text-sm">
+                  {isClassesLoading ? "Loading classes..." : `${classes.length} ${classes.length === 1 ? 'class' : 'classes'} total`}
+                </p>
+              </CardHeader>
+              <CardContent className="px-2 sm:px-6">
+                {isClassesLoading ? (
+                  <div className="flex items-center justify-center h-32 gap-2">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                    <p className="text-muted-foreground text-sm">Loading classes...</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 sm:gap-4">
+                    {classes && Array.isArray(classes) && classes.length > 0 ? classes.map((cls) => {
+                      if (!cls || typeof cls !== 'object') return null;
 
-      //                 return (
-      //                   <div
-      //                     key={cls?.id || Math.random()}
-      //                     className="border rounded-lg bg-card hover:shadow-lg transition-all duration-200"
-      //                   >
-      //                     {/* Class Image */}
-      //                     <div className="aspect-video overflow-hidden relative rounded-t-lg">
-      //                       {cls.image ? (
-      //                         <img
-      //                           src={`data:image/png;base64,${cls.image}`}
-      //                           alt={cls.title}
-      //                           className="w-full h-full object-cover"
-      //                         />
-      //                       ) : (
-      //                         <div className="w-full h-full bg-muted flex items-center justify-center">
-      //                           <GraduationCap className="h-8 w-8 text-muted-foreground/50 sm:h-12 sm:w-12" />
-      //                         </div>
-      //                       )}
+                      return (
+                        <div
+                          key={cls?.id || Math.random()}
+                          className="border rounded-lg bg-card hover:shadow-lg transition-all duration-200"
+                        >
+                          {/* Class Image */}
+                          <div className="aspect-video overflow-hidden relative rounded-t-lg">
+                            {cls.image ? (
+                              <img
+                                src={`data:image/png;base64,${cls.image}`}
+                                alt={cls.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-muted flex items-center justify-center">
+                                <GraduationCap className="h-8 w-8 text-muted-foreground/50 sm:h-12 sm:w-12" />
+                              </div>
+                            )}
 
-      //                       {/* Category Badge */}
-      //                       <div className="absolute top-2 left-2">
-      //                         <Badge variant="secondary" className="shadow-sm text-xs">
-      //                           {cls.category}
-      //                         </Badge>
-      //                       </div>
-      //                     </div>
+                            {/* Category Badge */}
+                            <div className="absolute top-2 left-2">
+                              <Badge variant="secondary" className="shadow-sm text-xs">
+                                {cls.category}
+                              </Badge>
+                            </div>
+                          </div>
 
-      //                     {/* Class Content */}
-      //                     <div className="p-3 space-y-2 sm:p-4 sm:space-y-3">
-      //                       <div>
-      //                         <h3 className="font-semibold text-sm line-clamp-2 font-sans sm:text-lg">{cls.title || 'Untitled Class'}</h3>
-      //                         <p className="text-xs text-muted-foreground line-clamp-2 font-sans sm:text-sm">{cls.description || 'No description available'}</p>
-      //                       </div>
+                          {/* Class Content */}
+                          <div className="p-3 space-y-2 sm:p-4 sm:space-y-3">
+                            <div>
+                              <h3 className="font-semibold text-sm line-clamp-2 font-sans sm:text-lg">{cls.title || 'Untitled Class'}</h3>
+                              <p className="text-xs text-muted-foreground line-clamp-2 font-sans sm:text-sm">{cls.description || 'No description available'}</p>
+                            </div>
 
-      //                       <div className="grid grid-cols-2 gap-1 text-xs sm:gap-2 sm:text-sm">
-      //                         <div>
-      //                           <span className="font-medium">Price:</span> ₹{cls.price || 0}
-      //                         </div>
-      //                         <div>
-      //                           <span className="font-medium">Duration:</span> {cls.duration || 'N/A'}
-      //                         </div>
-      //                         <div>
-      //                           <span className="font-medium">Sessions:</span> {cls.sessions || 0}
-      //                         </div>
-      //                         <div>
-      //                           <span className="font-medium">Next Batch:</span>
-      //                           <span className="text-xs block sm:text-sm">{cls.nextbatch ? String(new Date(cls.nextbatch).toLocaleDateString()) : 'Not scheduled'}</span>
-      //                         </div>
-      //                       </div>
+                            <div className="grid grid-cols-2 gap-1 text-xs sm:gap-2 sm:text-sm">
+                              <div>
+                                <span className="font-medium">Price:</span> ₹{cls.price || 0}
+                              </div>
+                              <div>
+                                <span className="font-medium">Duration:</span> {cls.duration || 'N/A'}
+                              </div>
+                              <div>
+                                <span className="font-medium">Sessions:</span> {cls.sessions || 0}
+                              </div>
+                              <div>
+                                <span className="font-medium">Next Batch:</span>
+                                <span className="text-xs block sm:text-sm">{cls.nextbatch ? String(new Date(cls.nextbatch).toLocaleDateString()) : 'Not scheduled'}</span>
+                              </div>
+                            </div>
 
-      //                       {/* Action Buttons */}
-      //                       <div className="flex gap-1 sm:gap-2">
-      //                         <Button
-      //                           className="flex-1 text-xs sm:text-sm"
-      //                           variant="outline"
-      //                           size="sm"
-      //                           onClick={() => {
-      //                             setSelectedClass(cls);
-      //                             setIsViewClassModalOpen(true);
-      //                           }}
-      //                         >
-      //                           <Eye className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
-      //                           View
-      //                         </Button>
-      //                         <Button
-      //                           variant="outline"
-      //                           size="sm"
-      //                           onClick={() => {
-      //                             setSelectedClass(cls);
-      //                             setEditClassImageFile(''); // Reset edit image state
-      //                             setIsEditClassModalOpen(true);
-      //                           }}
-      //                           className="h-8 w-8 sm:h-9 sm:w-9"
-      //                         >
-      //                           <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
-      //                         </Button>
-      //                         <Button
-      //                           variant="outline"
-      //                           size="sm"
-      //                           onClick={() => {
-      //                             setSelectedClass(cls);
-      //                             setIsDeleteClassModalOpen(true);
-      //                           }}
-      //                           className="h-8 w-8 sm:h-9 sm:w-9"
-      //                         >
-      //                           <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
-      //                         </Button>
-      //                       </div>
-      //                     </div>
-      //                   </div>
-      //                 );
-      //               }) : (
-      //                 <div className="col-span-full flex flex-col items-center justify-center h-32 gap-2">
-      //                   <GraduationCap className="h-6 w-6 text-muted-foreground/50 sm:h-8 sm:w-8" />
-      //                   <p className="text-muted-foreground text-sm">No classes found</p>
-      //                   <Button variant="outline" size="sm" onClick={() => setShowClassForm(true)} className="text-xs sm:text-sm">
-      //                     <Plus className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
-      //                     Add First Class
-      //                   </Button>
-      //                 </div>
-      //               )}
-      //             </div>
-      //           )}
-      //         </CardContent>
-      //       </Card>
+                            {/* Action Buttons */}
+                            <div className="flex gap-1 sm:gap-2">
+                              <Button
+                                className="flex-1 text-xs sm:text-sm"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedClass(cls);
+                                  setIsViewClassModalOpen(true);
+                                }}
+                              >
+                                <Eye className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
+                                View
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedClass(cls);
+                                  setEditClassImageFile(''); // Reset edit image state
+                                  setIsEditClassModalOpen(true);
+                                }}
+                                className="h-8 w-8 sm:h-9 sm:w-9"
+                              >
+                                <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedClass(cls);
+                                  setIsDeleteClassModalOpen(true);
+                                }}
+                                className="h-8 w-8 sm:h-9 sm:w-9"
+                              >
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }) : (
+                      <div className="col-span-full flex flex-col items-center justify-center h-32 gap-2">
+                        <GraduationCap className="h-6 w-6 text-muted-foreground/50 sm:h-8 sm:w-8" />
+                        <p className="text-muted-foreground text-sm">No classes found</p>
+                        <Button variant="outline" size="sm" onClick={() => setShowClassForm(true)} className="text-xs sm:text-sm">
+                          <Plus className="h-3 w-3 mr-1 sm:h-4 sm:w-4 sm:mr-2" />
+                          Add First Class
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
 
-      //       {/* View Class Details Modal */}
-      //       <Dialog open={isViewClassModalOpen} onOpenChange={setIsViewClassModalOpen}>
-      //         <DialogContent className="max-w-[95vw] sm:max-w-2xl">
-      //           <DialogHeader>
-      //             <DialogTitle className="text-lg sm:text-xl">Class Details</DialogTitle>
-      //           </DialogHeader>
-      //           {selectedClass && (
-      //             <div className="space-y-3 sm:space-y-4">
-      //               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-      //                 <div>
-      //                   <strong className="text-sm sm:text-base">Title:</strong> {selectedClass.title || 'N/A'}
-      //                 </div>
-      //                 <div>
-      //                   <strong className="text-sm sm:text-base">Category:</strong> {selectedClass.category || 'N/A'}
-      //                 </div>
-      //                 <div>
-      //                   <strong className="text-sm sm:text-base">Price:</strong> ₹{selectedClass.price || 0}
-      //                 </div>
-      //                 <div>
-      //                   <strong className="text-sm sm:text-base">Duration:</strong> {selectedClass.duration || 'N/A'}
-      //                 </div>
-      //                 <div>
-      //                   <strong className="text-sm sm:text-base">Sessions:</strong> {selectedClass.sessions || 0}
-      //                 </div>
-      //                 <div>
-      //                   <strong className="text-sm sm:text-base">Next Batch:</strong> {selectedClass.nextbatch ? String(new Date(selectedClass.nextbatch).toLocaleDateString()) : 'Not scheduled'}
-      //                 </div>
-      //               </div>
-      //               <div>
-      //                 <strong className="text-sm sm:text-base">Description:</strong>
-      //                 <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{selectedClass.description || 'No description available'}</p>
-      //               </div>
-      //               {selectedClass.features && Array.isArray(selectedClass.features) && selectedClass.features.length > 0 && (
-      //                 <div>
-      //                   <strong className="text-sm sm:text-base">Features:</strong>
-      //                   <ul className="mt-1 list-disc list-inside text-xs text-muted-foreground sm:text-sm">
-      //                     {selectedClass.features.map((feature, index) => (
-      //                       <li key={index}>{String(feature)}</li>
-      //                     ))}
-      //                   </ul>
-      //                 </div>
-      //               )}
-      //             </div>
-      //           )}
-      //           <DialogFooter>
-      //             <Button onClick={() => setIsViewClassModalOpen(false)} className="w-full sm:w-auto">
-      //               Close
-      //             </Button>
-      //           </DialogFooter>
-      //         </DialogContent>
-      //       </Dialog>
+            {/* View Class Details Modal */}
+            <Dialog open={isViewClassModalOpen} onOpenChange={setIsViewClassModalOpen}>
+              <DialogContent className="max-w-[95vw] sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-lg sm:text-xl">Class Details</DialogTitle>
+                </DialogHeader>
+                {selectedClass && (
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                      <div>
+                        <strong className="text-sm sm:text-base">Title:</strong> {selectedClass.title || 'N/A'}
+                      </div>
+                      <div>
+                        <strong className="text-sm sm:text-base">Category:</strong> {selectedClass.category || 'N/A'}
+                      </div>
+                      <div>
+                        <strong className="text-sm sm:text-base">Price:</strong> ₹{selectedClass.price || 0}
+                      </div>
+                      <div>
+                        <strong className="text-sm sm:text-base">Duration:</strong> {selectedClass.duration || 'N/A'}
+                      </div>
+                      <div>
+                        <strong className="text-sm sm:text-base">Sessions:</strong> {selectedClass.sessions || 0}
+                      </div>
+                      <div>
+                        <strong className="text-sm sm:text-base">Next Batch:</strong> {selectedClass.nextbatch ? String(new Date(selectedClass.nextbatch).toLocaleDateString()) : 'Not scheduled'}
+                      </div>
+                    </div>
+                    <div>
+                      <strong className="text-sm sm:text-base">Description:</strong>
+                      <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{selectedClass.description || 'No description available'}</p>
+                    </div>
+                    {selectedClass.features && Array.isArray(selectedClass.features) && selectedClass.features.length > 0 && (
+                      <div>
+                        <strong className="text-sm sm:text-base">Features:</strong>
+                        <ul className="mt-1 list-disc list-inside text-xs text-muted-foreground sm:text-sm">
+                          {selectedClass.features.map((feature, index) => (
+                            <li key={index}>{String(feature)}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <DialogFooter>
+                  <Button onClick={() => setIsViewClassModalOpen(false)} className="w-full sm:w-auto">
+                    Close
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
-      //       {/* Edit Class Modal */}
-      //       <Dialog open={isEditClassModalOpen} onOpenChange={setIsEditClassModalOpen}>
-      //         <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-      //           <DialogHeader>
-      //             <DialogTitle className="text-lg sm:text-xl">Edit Class</DialogTitle>
-      //           </DialogHeader>
-      //           {selectedClass && (
-      //             <form onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
-      //               e.preventDefault();
-      //               setIsLoading(true);
-      //               try {
-      //                 const formData = new FormData(e.currentTarget);
+            {/* Edit Class Modal */}
+            <Dialog open={isEditClassModalOpen} onOpenChange={setIsEditClassModalOpen}>
+              <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle className="text-lg sm:text-xl">Edit Class</DialogTitle>
+                </DialogHeader>
+                {selectedClass && (
+                  <form onSubmit={async (e: React.FormEvent<HTMLFormElement>) => {
+                    e.preventDefault();
+                    setIsLoading(true);
+                    try {
+                      const formData = new FormData(e.currentTarget);
 
-      //                 // Parse features from textarea
-      //                 const featuresText = formData.get('features')?.toString() || '';
-      //                 const featuresArray = featuresText.split('\n').filter(f => f.trim()).map(f => f.trim());
+                      // Parse features from textarea
+                      const featuresText = formData.get('features')?.toString() || '';
+                      const featuresArray = featuresText.split('\n').filter(f => f.trim()).map(f => f.trim());
 
-      //                 const updateData = {
-      //                   title: formData.get('title')?.toString() || '',
-      //                   description: formData.get('description')?.toString() || '',
-      //                   price: parseFloat(formData.get('price')?.toString() || '0'),
-      //                   duration: formData.get('duration')?.toString() || '',
-      //                   sessions: parseInt(formData.get('sessions')?.toString() || '1'),
-      //                   features: featuresArray,
-      //                   nextbatch: formData.get('nextbatch')?.toString() || '',
-      //                   category: formData.get('category')?.toString() || 'General',
-      //                   image: editClassImageFile || selectedClass.image || null // Use new base64 image or keep existing
-      //                 };
+                      const updateData = {
+                        title: formData.get('title')?.toString() || '',
+                        description: formData.get('description')?.toString() || '',
+                        price: parseFloat(formData.get('price')?.toString() || '0'),
+                        duration: formData.get('duration')?.toString() || '',
+                        sessions: parseInt(formData.get('sessions')?.toString() || '1'),
+                        features: featuresArray,
+                        nextbatch: formData.get('nextbatch')?.toString() || '',
+                        category: formData.get('category')?.toString() || 'General',
+                        image: editClassImageFile || selectedClass.image || null // Use new base64 image or keep existing
+                      };
 
-      //                 console.log('Updating class with data:', updateData);
+                      console.log('Updating class with data:', updateData);
 
-      //                 const response = await api.put(`/api/admin/AdminClasses/${selectedClass.id}`, updateData);
+                      const response = await api.put(`/api/admin/AdminClasses/${selectedClass.id}`, updateData);
 
-      //                 if (response.status === 200) {
-      //                   // Refresh classes list
-      //                   const updatedClasses = await api.get('/api/admin/AdminClasses');
-      //                   const formattedClasses = Array.isArray(updatedClasses.data) ?
-      //                     updatedClasses.data.map(cls => {
-      //                       let features = cls.features;
-      //                       if (typeof features === 'string') {
-      //                         try {
-      //                           features = JSON.parse(features);
-      //                         } catch {
-      //                           features = [];
-      //                         }
-      //                       }
-      //                       return {
-      //                         ...cls,
-      //                         features: Array.isArray(features) ? features : [],
-      //                         price: parseFloat(cls.price) || 0,
-      //                         sessions: parseInt(cls.sessions) || 0
-      //                       };
-      //                     }) : [];
-      //                   setClasses(formattedClasses);
+                      if (response.status === 200) {
+                        // Refresh classes list
+                        const updatedClasses = await api.get('/api/admin/AdminClasses');
+                        const formattedClasses = Array.isArray(updatedClasses.data) ?
+                          updatedClasses.data.map(cls => {
+                            let features = cls.features;
+                            if (typeof features === 'string') {
+                              try {
+                                features = JSON.parse(features);
+                              } catch {
+                                features = [];
+                              }
+                            }
+                            return {
+                              ...cls,
+                              features: Array.isArray(features) ? features : [],
+                              price: parseFloat(cls.price) || 0,
+                              sessions: parseInt(cls.sessions) || 0
+                            };
+                          }) : [];
+                        setClasses(formattedClasses);
 
-      //                   setIsEditClassModalOpen(false);
-      //                   setEditClassImageFile(''); // Clear edit image state
-      //                   setSelectedClass(null);
+                        setIsEditClassModalOpen(false);
+                        setEditClassImageFile(''); // Clear edit image state
+                        setSelectedClass(null);
 
-      //                   toast({
-      //                     title: "Success",
-      //                     description: "Class updated successfully",
-      //                     variant: "default",
-      //                   });
-      //                 }
-      //               } catch (error) {
-      //                 console.error('Error updating class:', error);
-      //                 toast({
-      //                   title: "Error",
-      //                   description: "Failed to update class. Please try again.",
-      //                   variant: "destructive",
-      //                 });
-      //               } finally {
-      //                 setIsLoading(false);
-      //               }
-      //             }}>
-      //               <div className="space-y-3 sm:space-y-4">
-      //                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-      //                   <div>
-      //                     <Label htmlFor="edit-title" className="text-sm sm:text-base">Class Title</Label>
-      //                     <Input
-      //                       id="edit-title"
-      //                       name="title"
-      //                       placeholder="Enter class title"
-      //                       defaultValue={selectedClass.title || ''}
-      //                       required
-      //                       className="text-sm sm:text-base"
-      //                     />
-      //                   </div>
-      //                   <div>
-      //                     <Label htmlFor="edit-category" className="text-sm sm:text-base">Category</Label>
-      //                     <Select name="category" defaultValue={selectedClass.category || 'Diploma Course'} required>
-      //                       <SelectTrigger className="text-xs sm:text-sm">
-      //                         <SelectValue placeholder="Select category" />
-      //                       </SelectTrigger>
-      //                       <SelectContent>
-      //                         <SelectItem value="Diploma Course" className="text-xs sm:text-sm">Diploma Course</SelectItem>
-      //                         <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
-      //                       </SelectContent>
-      //                     </Select>
-      //                   </div>
-      //                 </div>
+                        toast({
+                          title: "Success",
+                          description: "Class updated successfully",
+                          variant: "default",
+                        });
+                      }
+                    } catch (error) {
+                      console.error('Error updating class:', error);
+                      toast({
+                        title: "Error",
+                        description: "Failed to update class. Please try again.",
+                        variant: "destructive",
+                      });
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}>
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                        <div>
+                          <Label htmlFor="edit-title" className="text-sm sm:text-base">Class Title</Label>
+                          <Input
+                            id="edit-title"
+                            name="title"
+                            placeholder="Enter class title"
+                            defaultValue={selectedClass.title || ''}
+                            required
+                            className="text-sm sm:text-base"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-category" className="text-sm sm:text-base">Category</Label>
+                          <Select name="category" defaultValue={selectedClass.category || 'Diploma Course'} required>
+                            <SelectTrigger className="text-xs sm:text-sm">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Diploma Course" className="text-xs sm:text-sm">Diploma Course</SelectItem>
+                              <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
 
-      //                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
-      //                   <div>
-      //                     <Label htmlFor="edit-price" className="text-sm sm:text-base">Price (₹)</Label>
-      //                     <Input
-      //                       id="edit-price"
-      //                       name="price"
-      //                       type="number"
-      //                       step="0.01"
-      //                       min="0"
-      //                       placeholder="2500"
-      //                       defaultValue={selectedClass.price || ''}
-      //                       required
-      //                       className="text-sm sm:text-base"
-      //                     />
-      //                   </div>
-      //                   <div>
-      //                     <Label htmlFor="edit-duration" className="text-sm sm:text-base">Duration</Label>
-      //                     <Input
-      //                       id="edit-duration"
-      //                       name="duration"
-      //                       placeholder="3 hours"
-      //                       defaultValue={selectedClass.duration || ''}
-      //                       required
-      //                       className="text-sm sm:text-base"
-      //                     />
-      //                   </div>
-      //                   <div>
-      //                     <Label htmlFor="edit-sessions" className="text-sm sm:text-base">Number of Sessions</Label>
-      //                     <Input
-      //                       id="edit-sessions"
-      //                       name="sessions"
-      //                       type="number"
-      //                       min="1"
-      //                       placeholder="4"
-      //                       defaultValue={selectedClass.sessions || ''}
-      //                       required
-      //                       className="text-sm sm:text-base"
-      //                     />
-      //                   </div>
-      //                 </div>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+                        <div>
+                          <Label htmlFor="edit-price" className="text-sm sm:text-base">Price (₹)</Label>
+                          <Input
+                            id="edit-price"
+                            name="price"
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            placeholder="2500"
+                            defaultValue={selectedClass.price || ''}
+                            required
+                            className="text-sm sm:text-base"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-duration" className="text-sm sm:text-base">Duration</Label>
+                          <Input
+                            id="edit-duration"
+                            name="duration"
+                            placeholder="3 hours"
+                            defaultValue={selectedClass.duration || ''}
+                            required
+                            className="text-sm sm:text-base"
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="edit-sessions" className="text-sm sm:text-base">Number of Sessions</Label>
+                          <Input
+                            id="edit-sessions"
+                            name="sessions"
+                            type="number"
+                            min="1"
+                            placeholder="4"
+                            defaultValue={selectedClass.sessions || ''}
+                            required
+                            className="text-sm sm:text-base"
+                          />
+                        </div>
+                      </div>
 
-      //                 <div>
-      //                   <Label htmlFor="edit-nextbatch" className="text-sm sm:text-base">Next Batch Date</Label>
-      //                   <Input
-      //                     id="edit-nextbatch"
-      //                     name="nextbatch"
-      //                     type="date"
-      //                     defaultValue={selectedClass.nextbatch ? new Date(selectedClass.nextbatch).toISOString().split('T')[0] : ''}
-      //                     required
-      //                     className="text-sm sm:text-base"
-      //                   />
-      //                 </div>
+                      <div>
+                        <Label htmlFor="edit-nextbatch" className="text-sm sm:text-base">Next Batch Date</Label>
+                        <Input
+                          id="edit-nextbatch"
+                          name="nextbatch"
+                          type="date"
+                          defaultValue={selectedClass.nextbatch ? new Date(selectedClass.nextbatch).toISOString().split('T')[0] : ''}
+                          required
+                          className="text-sm sm:text-base"
+                        />
+                      </div>
 
-      //                 <div>
-      //                   <Label htmlFor="edit-description" className="text-sm sm:text-base">Class Description</Label>
-      //                   <Textarea
-      //                     id="edit-description"
-      //                     name="description"
-      //                     placeholder="Describe what students will learn..."
-      //                     rows={3}
-      //                     defaultValue={selectedClass.description || ''}
-      //                     required
-      //                     className="text-sm sm:text-base min-h-[80px]"
-      //                   />
-      //                 </div>
+                      <div>
+                        <Label htmlFor="edit-description" className="text-sm sm:text-base">Class Description</Label>
+                        <Textarea
+                          id="edit-description"
+                          name="description"
+                          placeholder="Describe what students will learn..."
+                          rows={3}
+                          defaultValue={selectedClass.description || ''}
+                          required
+                          className="text-sm sm:text-base min-h-[80px]"
+                        />
+                      </div>
 
-      //                 <div>
-      //                   <Label htmlFor="edit-features" className="text-sm sm:text-base">Features (one per line)</Label>
-      //                   <Textarea
-      //                     id="edit-features"
-      //                     name="features"
-      //                     placeholder="Professional certificate\nHands-on practice\nTake-home materials\nLifetime support"
-      //                     rows={3}
-      //                     defaultValue={Array.isArray(selectedClass.features) ? selectedClass.features.join('\n') : ''}
-      //                     className="text-sm sm:text-base min-h-[80px]"
-      //                   />
-      //                 </div>
+                      <div>
+                        <Label htmlFor="edit-features" className="text-sm sm:text-base">Features (one per line)</Label>
+                        <Textarea
+                          id="edit-features"
+                          name="features"
+                          placeholder="Professional certificate\nHands-on practice\nTake-home materials\nLifetime support"
+                          rows={3}
+                          defaultValue={Array.isArray(selectedClass.features) ? selectedClass.features.join('\n') : ''}
+                          className="text-sm sm:text-base min-h-[80px]"
+                        />
+                      </div>
 
-      //                 {/* Edit Class Image Upload Section */}
-      //                 <div className="space-y-3 p-3 border-2 border-primary/20 rounded-lg bg-primary/5 sm:p-4 sm:space-y-4">
-      //                   <div className="flex items-center justify-between">
-      //                     <Label className="text-sm sm:text-base">Class Image (Optional)</Label>
-      //                     <span className="text-xs text-muted-foreground sm:text-sm">
-      //                       {editClassImageFile || selectedClass.image ? '1 image uploaded' : 'No image selected'}
-      //                     </span>
-      //                   </div>
+                      {/* Edit Class Image Upload Section */}
+                      <div className="space-y-3 p-3 border-2 border-primary/20 rounded-lg bg-primary/5 sm:p-4 sm:space-y-4">
+                        <div className="flex items-center justify-between">
+                          <Label className="text-sm sm:text-base">Class Image (Optional)</Label>
+                          <span className="text-xs text-muted-foreground sm:text-sm">
+                            {editClassImageFile || selectedClass.image ? '1 image uploaded' : 'No image selected'}
+                          </span>
+                        </div>
 
-      //                   <div className="space-y-3 sm:space-y-4">
-      //                     <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
-      //                       <Input
-      //                         type="file"
-      //                         accept="image/*"
-      //                         className="flex-1 text-xs sm:text-sm"
-      //                         onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
-      //                           const files = e.target.files;
-      //                           if (!files || !files[0]) return;
+                        <div className="space-y-3 sm:space-y-4">
+                          <div className="flex flex-col gap-2 sm:flex-row sm:gap-2">
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              className="flex-1 text-xs sm:text-sm"
+                              onChange={async (e: React.ChangeEvent<HTMLInputElement>) => {
+                                const files = e.target.files;
+                                if (!files || !files[0]) return;
 
-      //                           const file = files[0];
+                                const file = files[0];
 
-      //                           try {
-      //                             setIsLoading(true);
+                                try {
+                                  setIsLoading(true);
 
-      //                             // Check file size (limit to 5MB)
-      //                             if (file.size > 5 * 1024 * 1024) {
-      //                               toast({
-      //                                 title: "File too large",
-      //                                 description: "Please select an image smaller than 5MB",
-      //                                 variant: "destructive",
-      //                               });
-      //                               return;
-      //                             }
+                                  // Check file size (limit to 5MB)
+                                  if (file.size > 5 * 1024 * 1024) {
+                                    toast({
+                                      title: "File too large",
+                                      description: "Please select an image smaller than 5MB",
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
 
-      //                             // Compress and convert to base64
-      //                             const compressedImage = await compressImage(file, 0.1);
-      //                             const base64Data = compressedImage.split('base64,')[1] || compressedImage;
+                                  // Compress and convert to base64
+                                  const compressedImage = await compressImage(file, 0.1);
+                                  const base64Data = compressedImage.split('base64,')[1] || compressedImage;
 
-      //                             // Check final size
-      //                             const sizeInMB = getBase64Size(base64Data);
-      //                             if (sizeInMB > 0.1) {
-      //                               toast({
-      //                                 title: "Image still too large",
-      //                                 description: `Compressed image is ${sizeInMB.toFixed(2)}MB. Please try a smaller image.`,
-      //                                 variant: "destructive",
-      //                               });
-      //                               return;
-      //                             }
+                                  // Check final size
+                                  const sizeInMB = getBase64Size(base64Data);
+                                  if (sizeInMB > 0.1) {
+                                    toast({
+                                      title: "Image still too large",
+                                      description: `Compressed image is ${sizeInMB.toFixed(2)}MB. Please try a smaller image.`,
+                                      variant: "destructive",
+                                    });
+                                    return;
+                                  }
 
-      //                             setEditClassImageFile(base64Data);
+                                  setEditClassImageFile(base64Data);
 
-      //                             toast({
-      //                               title: "Image uploaded",
-      //                               description: `Image compressed to ${sizeInMB.toFixed(2)}MB`,
-      //                               variant: "default",
-      //                             });
-      //                           } catch (error) {
-      //                             console.error('Error processing image:', error);
-      //                             toast({
-      //                               title: "Upload failed",
-      //                               description: "Failed to process image. Please try again.",
-      //                               variant: "destructive",
-      //                             });
-      //                           } finally {
-      //                             setIsLoading(false);
-      //                           }
+                                  toast({
+                                    title: "Image uploaded",
+                                    description: `Image compressed to ${sizeInMB.toFixed(2)}MB`,
+                                    variant: "default",
+                                  });
+                                } catch (error) {
+                                  console.error('Error processing image:', error);
+                                  toast({
+                                    title: "Upload failed",
+                                    description: "Failed to process image. Please try again.",
+                                    variant: "destructive",
+                                  });
+                                } finally {
+                                  setIsLoading(false);
+                                }
 
-      //                           e.target.value = '';
-      //                         }}
-      //                       />
+                                e.target.value = '';
+                              }}
+                            />
 
-      //                       {(editClassImageFile || selectedClass.image) && (
-      //                         <Button
-      //                           type="button"
-      //                           variant="outline"
-      //                           size="sm"
-      //                           onClick={() => {
-      //                             setEditClassImageFile('');
-      //                             toast({
-      //                               title: "Image removed",
-      //                               description: "Class image has been removed",
-      //                             });
-      //                           }}
-      //                           className="text-xs sm:text-sm"
-      //                         >
-      //                           Remove
-      //                         </Button>
-      //                       )}
-      //                     </div>
+                            {(editClassImageFile || selectedClass.image) && (
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setEditClassImageFile('');
+                                  toast({
+                                    title: "Image removed",
+                                    description: "Class image has been removed",
+                                  });
+                                }}
+                                className="text-xs sm:text-sm"
+                              >
+                                Remove
+                              </Button>
+                            )}
+                          </div>
 
-      //                     {/* Image Preview */}
-      //                     {(editClassImageFile || selectedClass.image) && (
-      //                       <div className="relative">
-      //                         <div className="aspect-video w-full max-w-xs overflow-hidden rounded-lg border">
-      //                           <img
-      //                             src={`data:image/png;base64,${editClassImageFile || selectedClass.image}`}
-      //                             alt="Class preview"
-      //                             className="w-full h-full object-cover"
-      //                           />
-      //                         </div>
-      //                         <p className="text-xs text-muted-foreground mt-1">
-      //                           {editClassImageFile
-      //                             ? `Size: ${getBase64Size(editClassImageFile).toFixed(2)}MB`
-      //                             : 'Current image'
-      //                           }
-      //                         </p>
-      //                       </div>
-      //                     )}
+                          {/* Image Preview */}
+                          {(editClassImageFile || selectedClass.image) && (
+                            <div className="relative">
+                              <div className="aspect-video w-full max-w-xs overflow-hidden rounded-lg border">
+                                <img
+                                  src={`data:image/png;base64,${editClassImageFile || selectedClass.image}`}
+                                  alt="Class preview"
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {editClassImageFile
+                                  ? `Size: ${getBase64Size(editClassImageFile).toFixed(2)}MB`
+                                  : 'Current image'
+                                }
+                              </p>
+                            </div>
+                          )}
 
-      //                     {!editClassImageFile && !selectedClass.image && (
-      //                       <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center sm:p-6">
-      //                         <Upload className="h-6 w-6 text-muted-foreground/50 mx-auto mb-2 sm:h-8 sm:w-8" />
-      //                         <p className="text-xs text-muted-foreground sm:text-sm">
-      //                           Upload a class image (optional)
-      //                         </p>
-      //                         <p className="text-xs text-muted-foreground/75 mt-1">
-      //                           Supports JPG, PNG. Max 5MB.
-      //                         </p>
-      //                       </div>
-      //                     )}
-      //                   </div>
-      //                 </div>
-      //               </div>
+                          {!editClassImageFile && !selectedClass.image && (
+                            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-4 text-center sm:p-6">
+                              <Upload className="h-6 w-6 text-muted-foreground/50 mx-auto mb-2 sm:h-8 sm:w-8" />
+                              <p className="text-xs text-muted-foreground sm:text-sm">
+                                Upload a class image (optional)
+                              </p>
+                              <p className="text-xs text-muted-foreground/75 mt-1">
+                                Supports JPG, PNG. Max 5MB.
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
-      //               <DialogFooter className="gap-2 mt-4 sm:mt-6">
-      //                 <Button type="button" variant="outline" onClick={() => setIsEditClassModalOpen(false)} className="flex-1 sm:flex-none">
-      //                   Cancel
-      //                 </Button>
-      //                 <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-none">
-      //                   {isLoading ? "Updating..." : "Update Class"}
-      //                 </Button>
-      //               </DialogFooter>
-      //             </form>
-      //           )}
-      //         </DialogContent>
-      //       </Dialog>
+                    <DialogFooter className="gap-2 mt-4 sm:mt-6">
+                      <Button type="button" variant="outline" onClick={() => setIsEditClassModalOpen(false)} className="flex-1 sm:flex-none">
+                        Cancel
+                      </Button>
+                      <Button type="submit" disabled={isLoading} className="flex-1 sm:flex-none">
+                        {isLoading ? "Updating..." : "Update Class"}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                )}
+              </DialogContent>
+            </Dialog>
 
-      //       {/* Delete Class Modal */}
-      //       <Dialog open={isDeleteClassModalOpen} onOpenChange={setIsDeleteClassModalOpen}>
-      //         <DialogContent className="max-w-[95vw] sm:max-w-[425px]">
-      //           <DialogHeader>
-      //             <DialogTitle className="text-lg sm:text-xl">Delete Class</DialogTitle>
-      //             <DialogDescription className="text-xs sm:text-sm">
-      //               Are you sure you want to delete this class? This action cannot be undone.
-      //             </DialogDescription>
-      //           </DialogHeader>
-      //           {selectedClass && (
-      //             <div className="space-y-3 sm:space-y-4">
-      //               <div className="p-3 border rounded-lg bg-muted sm:p-4">
-      //                 <h3 className="font-semibold text-sm sm:text-base">{selectedClass.title}</h3>
-      //                 <p className="text-xs text-muted-foreground sm:text-sm">{selectedClass.category} • ₹{selectedClass.price}</p>
-      //               </div>
-      //             </div>
-      //           )}
-      //           <DialogFooter className="flex-col gap-2 sm:flex-row">
-      //             <Button
-      //               variant="outline"
-      //               onClick={() => setIsDeleteClassModalOpen(false)}
-      //               className="w-full sm:w-auto"
-      //             >
-      //               Cancel
-      //             </Button>
-      //             <Button
-      //               variant="destructive"
-      //               onClick={async () => {
-      //                 if (!selectedClass?.id) return;
+            {/* Delete Class Modal */}
+            <Dialog open={isDeleteClassModalOpen} onOpenChange={setIsDeleteClassModalOpen}>
+              <DialogContent className="max-w-[95vw] sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle className="text-lg sm:text-xl">Delete Class</DialogTitle>
+                  <DialogDescription className="text-xs sm:text-sm">
+                    Are you sure you want to delete this class? This action cannot be undone.
+                  </DialogDescription>
+                </DialogHeader>
+                {selectedClass && (
+                  <div className="space-y-3 sm:space-y-4">
+                    <div className="p-3 border rounded-lg bg-muted sm:p-4">
+                      <h3 className="font-semibold text-sm sm:text-base">{selectedClass.title}</h3>
+                      <p className="text-xs text-muted-foreground sm:text-sm">{selectedClass.category} • ₹{selectedClass.price}</p>
+                    </div>
+                  </div>
+                )}
+                <DialogFooter className="flex-col gap-2 sm:flex-row">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsDeleteClassModalOpen(false)}
+                    className="w-full sm:w-auto"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={async () => {
+                      if (!selectedClass?.id) return;
 
-      //                 setIsLoading(true);
-      //                 try {
-      //                   console.log('Deleting class with ID:', selectedClass.id);
+                      setIsLoading(true);
+                      try {
+                        console.log('Deleting class with ID:', selectedClass.id);
 
-      //                   const response = await api.delete(`/api/admin/AdminClasses/${selectedClass.id}`);
+                        const response = await api.delete(`/api/admin/AdminClasses/${selectedClass.id}`);
 
-      //                   if (response.status === 200) {
-      //                     // Refresh classes list
-      //                     const updatedClasses = await api.get('/api/admin/AdminClasses');
-      //                     const formattedClasses = Array.isArray(updatedClasses.data) ?
-      //                       updatedClasses.data.map(cls => {
-      //                         let features = cls.features;
-      //                         if (typeof features === 'string') {
-      //                           try {
-      //                             features = JSON.parse(features);
-      //                           } catch {
-      //                             features = [];
-      //                           }
-      //                         }
-      //                         return {
-      //                           ...cls,
-      //                           features: Array.isArray(features) ? features : [],
-      //                           price: parseFloat(cls.price) || 0,
-      //                           sessions: parseInt(cls.sessions) || 0
-      //                         };
-      //                       }) : [];
-      //                     setClasses(formattedClasses);
+                        if (response.status === 200) {
+                          // Refresh classes list
+                          const updatedClasses = await api.get('/api/admin/AdminClasses');
+                          const formattedClasses = Array.isArray(updatedClasses.data) ?
+                            updatedClasses.data.map(cls => {
+                              let features = cls.features;
+                              if (typeof features === 'string') {
+                                try {
+                                  features = JSON.parse(features);
+                                } catch {
+                                  features = [];
+                                }
+                              }
+                              return {
+                                ...cls,
+                                features: Array.isArray(features) ? features : [],
+                                price: parseFloat(cls.price) || 0,
+                                sessions: parseInt(cls.sessions) || 0
+                              };
+                            }) : [];
+                          setClasses(formattedClasses);
 
-      //                     setIsDeleteClassModalOpen(false);
-      //                     setSelectedClass(null);
+                          setIsDeleteClassModalOpen(false);
+                          setSelectedClass(null);
 
-      //                     toast({
-      //                       title: "Success",
-      //                       description: "Class deleted successfully",
-      //                       variant: "default",
-      //                     });
-      //                   }
-      //                 } catch (error) {
-      //                   console.error('Error deleting class:', error);
-      //                   toast({
-      //                     title: "Error",
-      //                     description: "Failed to delete class. Please try again.",
-      //                     variant: "destructive",
-      //                   });
-      //                 } finally {
-      //                   setIsLoading(false);
-      //                 }
-      //               }}
-      //               disabled={isLoading}
-      //               className="w-full sm:w-auto"
-      //             >
-      //               {isLoading ? "Deleting..." : "Delete"}
-      //             </Button>
-      //           </DialogFooter>
-      //         </DialogContent>
-      //       </Dialog>
-      //     </div>
-      //   );
+                          toast({
+                            title: "Success",
+                            description: "Class deleted successfully",
+                            variant: "default",
+                          });
+                        }
+                      } catch (error) {
+                        console.error('Error deleting class:', error);
+                        toast({
+                          title: "Error",
+                          description: "Failed to delete class. Please try again.",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    }}
+                    disabled={isLoading}
+                    className="w-full sm:w-auto"
+                  >
+                    {isLoading ? "Deleting..." : "Delete"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+        );
 
 
       case "event-class-enrollments":
