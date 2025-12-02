@@ -2273,7 +2273,7 @@ const Admin = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 font-sans">
                     <Mail className="h-5 w-5" />
-                    Recent Visitors ({landingContacts.length})
+                   Subscribers ({landingContacts.length})
                   </CardTitle>
                   <p className="text-sm text-muted-foreground font-sans">The user come to our website — recent name, email, phone, city and address collected from landing form</p>
                 </CardHeader>
