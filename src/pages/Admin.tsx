@@ -7402,13 +7402,13 @@ case "products":
                         <Label htmlFor="name" className="text-xs sm:text-sm font-medium">Full Name</Label>
                         <Input id="name" name="name" placeholder="Enter instructor name" required className="mt-1 text-xs sm:text-sm" />
                       </div>
-                     <div>
+                     {/* <div>
   <Label htmlFor="email" className="text-xs sm:text-sm font-medium">Email</Label>
   <Input id="email" name="email" type="email" placeholder="instructor@example.com" required className="mt-1 text-xs sm:text-sm" />
   {emailError && (
     <p className="text-xs text-red-600 mt-1">{emailError}</p>
   )}
-</div>
+</div> */}
                     </div>
 
                     <div className="grid grid-cols-1 gap-2 sm:gap-3 lg:grid-cols-2 lg:gap-4">
@@ -7563,7 +7563,7 @@ case "products":
                             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-1 sm:gap-2">
                               <div className="min-w-0 flex-1">
                                 <h3 className="font-semibold text-sm truncate font-sans sm:text-base lg:text-lg">{instructor.name}</h3>
-                                <p className="text-xs text-muted-foreground truncate font-sans sm:text-sm">{instructor.email}</p>
+                                {/* <p className="text-xs text-muted-foreground truncate font-sans sm:text-sm">{instructor.email}</p> */}
                               </div>
                               
                             </div>
@@ -7770,7 +7770,7 @@ case "products":
                             className="text-xs sm:text-sm"
                           />
                         </div>
-                        <div>
+                        {/* <div>
                           <Label htmlFor="edit_email" className="text-xs sm:text-sm">Email</Label>
                           <Input
                             id="edit_email"
@@ -7783,7 +7783,7 @@ case "products":
                           {editEmailError && (
                             <p className="text-xs text-red-600 mt-1">{editEmailError}</p>
                           )}
-                        </div>
+                        </div> */}
                       </div>
 
                       <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:gap-4">
