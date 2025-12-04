@@ -2,20 +2,20 @@
 
 # Copilot Instructions for AI Agents — Flower School E-Commerce Frontend
 
-## Project Architecture
+## Architecture Overview
 - **Vite + React + TypeScript** SPA for e-commerce and course management
 - **UI**: Built with shadcn-ui primitives (`src/components/ui`), styled using Tailwind CSS
-- **Structure**:
-  - `src/pages`: Route-level views, page logic only
-  - `src/components`: Shared UI/features; `ui/` for shadcn-ui
-  - `src/lib`: API, auth, payment, utilities
+- **Directory Structure**:
+  - `src/pages`: Route-level views and page logic (no business logic in components)
+  - `src/components`: Shared UI/features; `ui/` for shadcn-ui-based primitives
+  - `src/lib`: API helpers, authentication, payment, and utilities
   - `src/hooks`: Custom hooks for cross-cutting logic
 
 ## Data Flow & Patterns
-- **API calls**: Use `src/lib/api.ts` helpers and React Query (`src/lib/queryClient.ts`) for all server communication
-- **Auth**: Forms and protected routes in `src/components/auth`; logic in `src/lib/auth.ts` and `src/hooks/user-auth.tsx`
-- **State**: Prefer React Query for server state; use local state for UI interactions
-- **Product/category management**: See `src/pages/Admin.tsx` for dynamic forms, category mapping, image upload, and discount logic
+- **API calls**: Always use `src/lib/api.ts` helpers and React Query (`src/lib/queryClient.ts`) for server communication. Do not call fetch/axios directly in components.
+- **Authentication**: Forms and protected routes in `src/components/auth`; logic in `src/lib/auth.ts` and `src/hooks/user-auth.tsx`.
+- **State Management**: Use React Query for server state; use local state only for UI interactions.
+- **Product & Category Management**: See `src/pages/Admin.tsx` for dynamic forms, category mapping, image upload, and discount logic. Discount preview is auto-calculated in the product form.
 
 ## Developer Workflows
 - Install dependencies: `npm i`
@@ -25,12 +25,12 @@
 - Containerization: See `Dockerfile` and `nginx.conf` for deployment config
 
 ## Project-Specific Conventions
-- Use shadcn-ui primitives for new UI (`src/components/ui`)
+- Use shadcn-ui primitives for all new UI (`src/components/ui`)
 - Style exclusively with Tailwind CSS classes (no inline styles)
 - Page logic must reside in `src/pages`, not in components
 - API calls must use `src/lib/api.ts` helpers
 - Use custom hooks for reusable/cross-cutting logic
-- Discount logic: Product form in `Admin.tsx` auto-calculates and previews discounts
+- Product discount logic: Handled in `Admin.tsx` with auto-calculation and preview
 
 ## Integration Points
 - **Payments**: Razorpay integration in `src/lib/razorpay.ts`
@@ -50,4 +50,4 @@
 - `src/pages/Admin.tsx`: Product/category/discount/image upload patterns
 
 ---
-If any section is unclear or missing, ask for clarification or review recent code in referenced directories. Please provide feedback to improve these instructions.
+If any section is unclear, incomplete, or missing, please provide feedback or review referenced files for clarification. These instructions are living documentation—improvements are welcome.
