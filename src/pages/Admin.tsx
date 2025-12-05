@@ -400,6 +400,8 @@ const Admin = () => {
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+    const [calendarOrderDate, setCalendarOrderDate] = useState<Date | null>(null);
+    const [ordersForDate, setOrdersForDate] = useState<Order[]>([]);
   const [imageFiles, setImageFiles] = useState<string[]>([]);
   const [editImageFiles, setEditImageFiles] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<{[key: string]: string}>({});
@@ -1078,24 +1080,10 @@ const Admin = () => {
   const fetchImpacts = async () => {
     try {
       setIsImpactsLoading(true);
-      const response = await api.get('/api/impacts');
-      if (response.status === 200 && response.data) {
-        // Accept either array or wrapped object
-        const data = Array.isArray(response.data) ? response.data : (response.data.data || response.data.impacts || []);
-        setImpacts(data);
-      }
-    } catch (error) {
-      console.error('Error fetching impacts:', error);
-      toast({ title: 'Error', description: 'Failed to fetch impacts', variant: 'destructive' });
-      setImpacts([]);
+      // ...existing code...
     } finally {
       setIsImpactsLoading(false);
     }
-  };
-
-  const refreshImpacts = async () => {
-    await fetchImpacts();
-    toast({ title: 'Success', description: 'Impacts refreshed successfully' });
   };
 
   // Event pricing state & API
@@ -1829,6 +1817,27 @@ const Admin = () => {
     return opts;
   };
   const timeOptions = generateTimeOptions();
+
+  // Fetch orders for a specific date (calendar filter)
+  const fetchOrdersForDate = async (date: Date) => {
+    setIsOrdersLoading(true);
+    try {
+      const formattedDate = format(date, 'yyyy-MM-dd');
+      const response = await api.get(`/api/admin/orders?date=${formattedDate}`);
+      if (response.status === 200 && response.data) {
+        setOrdersForDate(response.data);
+        toast({ title: 'Success', description: `Orders for ${format(date, 'PPP')} loaded.` });
+      } else {
+        setOrdersForDate([]);
+        toast({ title: 'No Orders', description: `No orders found for ${format(date, 'PPP')}.`, variant: 'destructive' });
+      }
+    } catch (error) {
+      setOrdersForDate([]);
+      toast({ title: 'Error', description: 'Failed to fetch orders for selected date.', variant: 'destructive' });
+    } finally {
+      setIsOrdersLoading(false);
+    }
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -3833,172 +3842,321 @@ case "products":
         
   
   case "orders":
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold font-sans">Order Management</h1>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Last updated: {lastRefreshTime ? String(lastRefreshTime.toLocaleTimeString()) : 'Never'}
-                </p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={refreshOrders}
-                disabled={isOrdersLoading}
-              >
-                {isOrdersLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-2"></div>
-                    Refreshing...
-                  </>
-                ) : (
-                  <>
-                    <Clock className="mr-2 h-4 w-4" />
-                    Refresh
-                  </>
-                )}
-              </Button>
-            </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Order List</CardTitle>
-                <p className="text-sm text-muted-foreground">
-                  {orders.length} {orders.length === 1 ? 'order' : 'orders'} total
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="relative">
-                  {isOrdersLoading && (
-                    <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
-                      <div className="flex flex-col items-center gap-2">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                        <p className="text-sm text-muted-foreground">Loading orders...</p>
+                return (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h1 className="text-3xl font-bold font-sans">Order Management</h1>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Last updated: {lastRefreshTime ? String(lastRefreshTime.toLocaleTimeString()) : 'Never'}
+                        </p>
                       </div>
-                    </div>
-                  )}
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {orders.map((order) => (
-                      <div
-                        key={order.id}
-                        className="border rounded-lg bg-card hover:shadow-lg transition-all duration-200"
+                      <Button
+                        variant="outline"
+                        onClick={refreshOrders}
+                        disabled={isOrdersLoading}
                       >
-                        {/* Order Header */}
-                        <div className="p-4 border-b border-border bg-muted/30">
-                          <div className="flex justify-between items-start mb-2">
-                            <div>
-                              <h3 className="font-semibold font-sans">Order #{order.ordernumber}</h3>
-                              <p className="text-sm text-muted-foreground font-sans">{order.customername}</p>
-                            </div>
-                            <Badge
-                              variant={
-                                order.status === 'completed' ? 'default' :
-                                  order.status === 'pending' ? 'secondary' :
-                                    order.status === 'cancelled' ? 'destructive' :
-                                      order.status === 'delivered' ? 'default' :
-                                        'outline'
-                              }
-                              className="ml-2"
-                            >
-                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                            </Badge>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {order.createdat ? String(new Date(order.createdat).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })) : 'Unknown date'}
-                          </div>
-                        </div>
+                        {isOrdersLoading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 mr-2"></div>
+                            Refreshing...
+                          </>
 
-                        {/* Order Content */}
-                        <div className="p-4">
-                          <div className="space-y-3 mb-4">
-                            {/* Order Items */}
-                            <div className="space-y-2">
-                              <h4 className="text-sm font-medium">Order Items ({(order.items && Array.isArray(order.items)) ? order.items.length : 0})</h4>
-                              {(order.items && Array.isArray(order.items) && order.items.length > 0) ? (
-                                <div className="space-y-1">
-                                  {order.items.slice(0, 2).map((item, index) => (
-                                    <div key={index} className="flex justify-between text-sm">
-                                      <span className="truncate flex-1 mr-2">{item.productName || 'Unknown Product'}</span>
-                                      <span className="text-muted-foreground">
-                                        {item.quantity || 0}x ₹{item.unitPrice || 0}
-                                      </span>
-                                    </div>
-                                  ))}
-                                  {order.items && order.items.length > 2 && (
-                                    <div className="text-xs text-muted-foreground">
-                                      +{order.items.length - 2} more items
-                                    </div>
-                                  )}
-                                </div>
-                              ) : (
-                                <p className="text-sm text-muted-foreground">No items</p>
-                              )}
-                            </div>
 
-                           
-                          </div>
-
-                          {/* Contact Info */}
-                          <div className="space-y-1 text-sm text-muted-foreground mb-4">
-                            <p className="flex items-center gap-2">
-                              <Mail className="h-4 w-4" />
-                              <span className="truncate">{order.email}</span>
-                            </p>
-                            <p className="flex items-center gap-2">
-                              <Phone className="h-4 w-4" />
-                              {order.phone}
-                            </p>
-                            <p className="text-xs">
-                              Payment: {order.paymentmethod} | {order.paymentstatus}
-                            </p>
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="flex gap-2">
-                            <Button
-                              className="flex-1"
-                              variant="outline"
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setIsViewOrderModalOpen(true);
-                              }}
-                            >
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Details
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setIsEditOrderModalOpen(true);
-                              }}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {orders.length === 0 && (
-                    <div className="flex flex-col items-center justify-center h-32 gap-2">
-                      <ShoppingCart className="h-8 w-8 text-muted-foreground/50" />
-                      <p className="text-muted-foreground">No orders found</p>
+                        ) : (
+                          <>
+                            <Clock className="mr-2 h-4 w-4" />
+                            Refresh
+                          </>
+                        )}
+                      </Button>
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* View Order Details Modal */}
-            <Dialog open={isViewOrderModalOpen} onOpenChange={setIsViewOrderModalOpen}>
+                    {/* Calendar Filter */}
+                    <Card className="mb-6">
+                      <CardHeader>
+                        <CardTitle>Filter Orders by Date</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center gap-4">
+                          <Calendar
+                            mode="single"
+                            selected={calendarOrderDate}
+                            onSelect={date => {
+                              setCalendarOrderDate(date);
+                              if (date) fetchOrdersForDate(date);
+                            }}
+                          />
+                          {/* {calendarOrderDate && (
+                            <div>
+                              <p className="text-sm">Selected: {format(calendarOrderDate, 'PPP')}</p>
+                            </div>
+                          )} */}
+                        </div>
+                        {isOrdersLoading && (
+                          <div className="flex items-center gap-2 mt-4">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                            <span className="text-muted-foreground">Loading orders for selected date...</span>
+                          </div>
+                        )}
+                        {calendarOrderDate && ordersForDate.length > 0 && (
+                          <div className="mt-6">
+                            <h2 className="text-lg font-semibold mb-2">Selected Orders for {format(calendarOrderDate, 'PPP')}</h2>
+                            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {ordersForDate.map((order) => (
+                                <div
+                                  key={order.id}
+                                  className="border rounded-lg bg-card hover:shadow-lg transition-all duration-200"
+                                >
+                                  {/* Order Header */}
+                                  <div className="p-4 border-b border-border bg-muted/30">
+                                    <div className="flex justify-between items-start mb-2">
+                                      <div>
+                                        <h3 className="font-semibold font-sans">Order #{order.ordernumber}</h3>
+                                        <p className="text-sm text-muted-foreground font-sans">{order.customername}</p>
+                                      </div>
+                                      <Badge
+                                        variant={
+                                          order.status === 'completed' ? 'default' :
+                                            order.status === 'pending' ? 'secondary' :
+                                              order.status === 'cancelled' ? 'destructive' :
+                                                order.status === 'delivered' ? 'default' :
+                                                  'outline'
+                                        }
+                                        className="ml-2"
+                                      >
+                                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                      </Badge>
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {order.createdat ? String(new Date(order.createdat).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'short',
+                                        day: 'numeric',
+                                      })) : 'Unknown date'}
+                                    </div>
+                                  </div>
+                                  {/* Order Content */}
+                                  <div className="p-4">
+                                    <div className="space-y-3 mb-4">
+                                      {/* Order Items */}
+                                      <div className="space-y-2">
+                                        <h4 className="text-sm font-medium">Order Items ({(order.items && Array.isArray(order.items)) ? order.items.length : 0})</h4>
+                                        {(order.items && Array.isArray(order.items) && order.items.length > 0) ? (
+                                          <div className="space-y-1">
+                                            {order.items.slice(0, 2).map((item, index) => (
+                                              <div key={index} className="flex justify-between text-sm">
+                                                <span className="truncate flex-1 mr-2">{item.productName || 'Unknown Product'}</span>
+                                                <span className="text-muted-foreground">
+                                                  {item.quantity || 0}x ₹{item.unitPrice || 0}
+                                                </span>
+                                              </div>
+                                            ))}
+                                            {order.items && order.items.length > 2 && (
+                                              <div className="text-xs text-muted-foreground">
+                                                +{order.items.length - 2} more items
+                                              </div>
+                                            )}
+                                          </div>
+                                        ) : (
+                                          <p className="text-sm text-muted-foreground">No items</p>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {/* Contact Info */}
+                                    <div className="space-y-1 text-sm text-muted-foreground mb-4">
+                                      <p className="flex items-center gap-2">
+                                        <Mail className="h-4 w-4" />
+                                        <span className="truncate">{order.email}</span>
+                                      </p>
+                                      <p className="flex items-center gap-2">
+                                        <Phone className="h-4 w-4" />
+                                        {order.phone}
+                                      </p>
+                                      <p className="text-xs">
+                                        Payment: {order.paymentmethod} | {order.paymentstatus}
+                                      </p>
+                                    </div>
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-2">
+                                      <Button
+                                        className="flex-1"
+                                        variant="outline"
+                                        onClick={() => {
+                                          setSelectedOrder(order);
+                                          setIsViewOrderModalOpen(true);
+                                        }}
+                                      >
+                                        <Eye className="h-4 w-4 mr-2" />
+                                        View Details
+                                      </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={() => {
+                                          setSelectedOrder(order);
+                                          setIsEditOrderModalOpen(true);
+                                        }}
+                                      >
+                                        <Edit className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+
+                            {ordersForDate.length === 0 && (
+                              <div className="flex flex-col items-center justify-center h-32 gap-2">
+                                <ShoppingCart className="h-8 w-8 text-muted-foreground/50" />
+                                <p className="text-muted-foreground">No orders found for selected date</p>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Existing Order List (all orders) */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Order List</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          {orders.length} {orders.length === 1 ? 'order' : 'orders'} total
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="relative">
+                          {isOrdersLoading && (
+                            <div className="absolute inset-0 bg-background/80 backdrop-blur-sm z-10 flex items-center justify-center">
+                              <div className="flex flex-col items-center gap-2">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                                <p className="text-sm text-muted-foreground">Loading orders...</p>
+                              </div>
+                            </div>
+                          )}
+                          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {orders.map((order) => (
+                              <div
+                                key={order.id}
+                                className="border rounded-lg bg-card hover:shadow-lg transition-all duration-200"
+                              >
+                                {/* Order Header */}
+                                <div className="p-4 border-b border-border bg-muted/30">
+                                  <div className="flex justify-between items-start mb-2">
+                                    <div>
+                                      <h3 className="font-semibold font-sans">Order #{order.ordernumber}</h3>
+                                      <p className="text-sm text-muted-foreground font-sans">{order.customername}</p>
+                                    </div>
+                                    <Badge
+                                      variant={
+                                        order.status === 'completed' ? 'default' :
+                                          order.status === 'pending' ? 'secondary' :
+                                            order.status === 'cancelled' ? 'destructive' :
+                                              order.status === 'delivered' ? 'default' :
+                                                'outline'
+                                      }
+                                      className="ml-2"
+                                    >
+                                      {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                                    </Badge>
+                                  </div>
+                                  <div className="text-xs text-muted-foreground">
+                                    {order.createdat ? String(new Date(order.createdat).toLocaleDateString('en-US', {
+                                      year: 'numeric',
+                                      month: 'short',
+                                      day: 'numeric',
+                                    })) : 'Unknown date'}
+                                  </div>
+                                </div>
+
+                                {/* Order Content */}
+                                <div className="p-4">
+                                  <div className="space-y-3 mb-4">
+                                    {/* Order Items */}
+                                    <div className="space-y-2">
+                                      <h4 className="text-sm font-medium">Order Items ({(order.items && Array.isArray(order.items)) ? order.items.length : 0})</h4>
+                                      {(order.items && Array.isArray(order.items) && order.items.length > 0) ? (
+                                        <div className="space-y-1">
+                                          {order.items.slice(0, 2).map((item, index) => (
+                                            <div key={index} className="flex justify-between text-sm">
+                                              <span className="truncate flex-1 mr-2">{item.productName || 'Unknown Product'}</span>
+                                              <span className="text-muted-foreground">
+                                                {item.quantity || 0}x ₹{item.unitPrice || 0}
+                                              </span>
+                                            </div>
+                                          ))}
+                                          {order.items && order.items.length > 2 && (
+                                            <div className="text-xs text-muted-foreground">
+                                              +{order.items.length - 2} more items
+                                            </div>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <p className="text-sm text-muted-foreground">No items</p>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  {/* Contact Info */}
+                                  <div className="space-y-1 text-sm text-muted-foreground mb-4">
+                                    <p className="flex items-center gap-2">
+                                      <Mail className="h-4 w-4" />
+                                      <span className="truncate">{order.email}</span>
+                                    </p>
+                                    <p className="flex items-center gap-2">
+                                      <Phone className="h-4 w-4" />
+                                      {order.phone}
+                                    </p>
+                                    <p className="text-xs">
+                                      Payment: {order.paymentmethod} | {order.paymentstatus}
+                                    </p>
+                                  </div>
+
+                                  {/* Action Buttons */}
+                                  <div className="flex gap-2">
+                                    <Button
+                                      className="flex-1"
+                                      variant="outline"
+                                      onClick={() => {
+                                        setSelectedOrder(order);
+                                        console.log('Selected order for viewing:', order);
+                                        setIsViewOrderModalOpen(true);
+
+                                      }}
+                                    >
+                                      <Eye className="h-4 w-4 mr-2" />
+                                      View Details
+                                    </Button>
+                                    <Button
+                                      variant="outline"
+                                      size="icon"
+                                      onClick={() => {
+                                        setSelectedOrder(order);
+                                        setIsEditOrderModalOpen(true);
+                                      }}
+                                    >
+                                      <Edit className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {orders.length === 0 && (
+                            <div className="flex flex-col items-center justify-center h-32 gap-2">
+                              <ShoppingCart className="h-8 w-8 text-muted-foreground/50" />
+                              <p className="text-muted-foreground">No orders found</p>
+                            </div>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* View Order Details Modal */}
+                    {/* ...existing code for modals... */}
+                     <Dialog open={isViewOrderModalOpen} onOpenChange={setIsViewOrderModalOpen}>
               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Order Details</DialogTitle>
@@ -4222,6 +4380,14 @@ case "products":
                                   ? { ...o, status: value }
                                   : o
                               ));
+                              // Also update ordersForDate if present
+                              setOrdersForDate(prev =>
+                                prev.map(o =>
+                                  o.id === selectedOrder.id
+                                    ? { ...o, status: value }
+                                    : o
+                                )
+                              );
 
                               setIsEditOrderModalOpen(false);
 
@@ -4273,6 +4439,8 @@ case "products":
             </Dialog>
           </div>
         );
+          
+    
 
 
       case "classes":
@@ -7996,7 +8164,7 @@ case "products":
               <div className="flex gap-2 w-full sm:w-auto">
                 <Button
                   variant="outline"
-                  onClick={refreshImpacts}
+                  // onClick={refreshImpacts}
                   disabled={isImpactsLoading}
                   className="flex-1 text-xs sm:text-sm sm:flex-none"
                 >
