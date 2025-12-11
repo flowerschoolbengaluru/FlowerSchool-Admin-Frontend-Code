@@ -18,6 +18,8 @@ import NotFound from "./pages/NotFound";
 import SignInPage from "./pages/SignIn";
 import SignUpPage from "./pages/SignUp";
 import ForgotPassword from "./pages/forgot-password";
+
+import VerifyOtp from "./pages/verify-otp";
 import { AdminProtectedRoute } from "./components/auth/AdminProtectedRoute";
 import SEO from "./components/SEO";
 import PrivacyPolicy from "./components/privacypolicy";
@@ -55,6 +57,8 @@ const App = () => (
             />
             <Route path="/signin" element={<SignInPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/verify-otp" element={<VerifyOtp />} />
+          
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/payment" element={<Payment />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
