@@ -8,10 +8,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeft, Phone } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
+
 import { apiRequest } from "@/lib/queryClient";
 import logoPath from "@/assets/Flower_School_Logo_1757484169081 copy.png";
 
 export default function ForgotPassword() {
+
+
+// ...existing code...
+
   const [phoneNumber, setPhoneNumber] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
   const { toast } = useToast();
@@ -30,9 +35,9 @@ export default function ForgotPassword() {
         title: "OTP Sent!",
         description: "Verification code sent to your phone via SMS",
       });
-  // Navigate to OTP verification with contact info
-  const fullPhoneNumber = countryCode + phoneNumber;
-  navigate(`/verify-otp?contact=${encodeURIComponent(fullPhoneNumber)}&type=phone`);
+      // Navigate to OTP verification with contact info
+      const fullPhoneNumber = countryCode + phoneNumber;
+      navigate(`/verify-otp?contact=${encodeURIComponent(fullPhoneNumber)}&type=phone`);
     },
     onError: (error: any) => {
       toast({

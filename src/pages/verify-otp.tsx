@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Link, useLocation } from "wouter";
-import { ArrowLeft, ShieldCheck, Lock } from "lucide-react";
+import { Link } from "wouter";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft, ShieldCheck, Lock, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -16,11 +17,13 @@ export default function VerifyOtp() {
     newPassword: "",
     confirmPassword: ""
   });
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [contact, setContact] = useState("");
   const [contactType, setContactType] = useState("email");
   const [step, setStep] = useState(1); // 1: OTP verification, 2: New password
   const { toast } = useToast();
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
 
   // Get contact info from URL params
   useEffect(() => {
@@ -69,9 +72,7 @@ export default function VerifyOtp() {
         title: "Password Reset Successfully!",
         description: "You can now sign in with your new password",
       });
-      setTimeout(() => {
-        setLocation("/signin");
-      }, 1000);
+      setTimeout(() => navigate("/signin"), 100);
     },
     onError: (error: any) => {
       toast({
@@ -87,7 +88,7 @@ export default function VerifyOtp() {
       return await apiRequest("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contact, contactType }),
+        body: JSON.stringify({ contact, contactType, resend: true }),
       });
     },
     onSuccess: () => {
@@ -310,14 +311,23 @@ export default function VerifyOtp() {
                         <Input
                           id="newPassword"
                           name="newPassword"
-                          type="password"
+                          type={showNewPassword ? "text" : "password"}
                           required
-                          className="pl-10 border-gray-200 focus:border-primary focus:ring-primary/20"
+                          className="pl-10 pr-10 border-gray-200 focus:border-primary focus:ring-primary/20"
                           placeholder="Enter new password"
                           value={formData.newPassword}
                           onChange={handleInputChange}
                           data-testid="input-new-password"
                         />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                          tabIndex={-1}
+                          onClick={() => setShowNewPassword((v) => !v)}
+                          aria-label={showNewPassword ? "Hide password" : "Show password"}
+                        >
+                          {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                       </div>
                     </div>
 
@@ -330,14 +340,23 @@ export default function VerifyOtp() {
                         <Input
                           id="confirmPassword"
                           name="confirmPassword"
-                          type="password"
+                          type={showConfirmPassword ? "text" : "password"}
                           required
-                          className="pl-10 border-gray-200 focus:border-primary focus:ring-primary/20"
+                          className="pl-10 pr-10 border-gray-200 focus:border-primary focus:ring-primary/20"
                           placeholder="Confirm new password"
                           value={formData.confirmPassword}
                           onChange={handleInputChange}
                           data-testid="input-confirm-password"
                         />
+                        <button
+                          type="button"
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                          tabIndex={-1}
+                          onClick={() => setShowConfirmPassword((v) => !v)}
+                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        >
+                          {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                        </button>
                       </div>
                     </div>
 
