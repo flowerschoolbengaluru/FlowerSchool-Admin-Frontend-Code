@@ -71,154 +71,161 @@ function FrontCard({ isVisible, onClose, onSubscribe }: {
     setAddress("");
   };
 
+  //Add line to remove pop up
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8, y: 50 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.8, y: 50 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="w-full max-w-md mx-2"
-          >
-            <Card className="relative overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-white to-pink-50/30">
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-pink-200/20 rounded-full -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full -translate-x-12 translate-y-12"></div>
-
-              <CardHeader className="text-center relative z-10 pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
-                <button
-                  onClick={handleClose}
-                  className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <X className="h-4 w-4 text-gray-500" />
-                </button>
-
-                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-sm">
-                  <img src={EcommerceBouquetLogo} alt="Flower School Logo" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
-                </div>
-
-                <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">
-                  {isSubmitted ? "Welcome to Flower School! 🌸" : "Get updates!"}
-                </CardTitle>
-                <p className="text-gray-600 mt-2 text-sm sm:text-base">
-                  {isSubmitted
-                    ? "Thank you for subscribing! We'll contact you soon with floral updates."
-                    : "Subscribe to get exclusive flower tips, class updates, and special offers."
-                  }
-                </p>
-              </CardHeader>
-
-              <CardContent className="relative z-10 px-4 sm:px-6 pb-4 sm:pb-6">
-                {!isSubmitted ? (
-                  <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="text"
-                        placeholder="Enter your full name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
-                        required
-                        disabled={isSubmitting}
-                      />
-                    </div>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="tel"
-                        placeholder="Enter your phone number"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
-                        required
-                        disabled={isSubmitting}
-                      />
-                    </div>
-
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="email"
-                        placeholder="Enter your email address"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
-                        required
-                        disabled={isSubmitting}
-                      />
-                    </div>
-
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="text"
-                        placeholder="Enter your city (Optional)"
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
-                        disabled={isSubmitting}
-                      />
-                    </div>
-
-                    <div className="relative">
-                      <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <Input
-                        type="text"
-                        placeholder="Enter your address (Optional)"
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
-                        disabled={isSubmitting}
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting || !email.trim() || !name.trim() || !phone.trim()}
-                      className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-2 sm:py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
-                    >
-                      {isSubmitting ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          Subscribing...
-                        </div>
-                      ) : (
-                        "Subscribe Now"
-                      )}
-                    </Button>
-
-                    <p className="text-xs text-gray-500 text-center">
-                      No spam, unsubscribe at any time
-                    </p>
-                  </form>
-                ) : (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="text-center py-3 sm:py-4"
-                  >
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                      <Check className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-                    </div>
-                    <p className="text-green-600 font-semibold text-sm sm:text-base">
-                      Successfully subscribed!
-                    </p>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
-                      Closing in 3 seconds...
-                    </p>
-                  </motion.div>
-                )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        </div>
-      )}
-    </AnimatePresence>
+    <section>
+      ...
+    </section>
   );
-}
+};
+//   return (
+//     <AnimatePresence>
+//       {isVisible && (
+//         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+//           <motion.div
+//             initial={{ opacity: 0, scale: 0.8, y: 50 }}
+//             animate={{ opacity: 1, scale: 1, y: 0 }}
+//             exit={{ opacity: 0, scale: 0.8, y: 50 }}
+//             transition={{ type: "spring", damping: 25, stiffness: 300 }}
+//             className="w-full max-w-md mx-2"
+//           >
+//             <Card className="relative overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-white to-pink-50/30">
+//               {/* Decorative elements */}
+//               <div className="absolute top-0 right-0 w-32 h-32 bg-pink-200/20 rounded-full -translate-y-16 translate-x-16"></div>
+//               <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-200/20 rounded-full -translate-x-12 translate-y-12"></div>
+
+//               <CardHeader className="text-center relative z-10 pb-4 px-4 sm:px-6 pt-4 sm:pt-6">
+//                 <button
+//                   onClick={handleClose}
+//                   className="absolute top-3 right-3 sm:top-4 sm:right-4 p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+//                 >
+//                   <X className="h-4 w-4 text-gray-500" />
+//                 </button>
+
+//                 <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-3 sm:mb-4 shadow-sm">
+//                   <img src={EcommerceBouquetLogo} alt="Flower School Logo" className="w-8 h-8 sm:w-12 sm:h-12 object-contain" />
+//                 </div>
+
+//                 <CardTitle className="text-xl sm:text-2xl font-bold text-gray-900">
+//                   {isSubmitted ? "Welcome to Flower School! 🌸" : "Get updates!"}
+//                 </CardTitle>
+//                 <p className="text-gray-600 mt-2 text-sm sm:text-base">
+//                   {isSubmitted
+//                     ? "Thank you for subscribing! We'll contact you soon with floral updates."
+//                     : "Subscribe to get exclusive flower tips, class updates, and special offers."
+//                   }
+//                 </p>
+//               </CardHeader>
+
+//               <CardContent className="relative z-10 px-4 sm:px-6 pb-4 sm:pb-6">
+//                 {!isSubmitted ? (
+//                   <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+//                     <div className="relative">
+//                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+//                       <Input
+//                         type="text"
+//                         placeholder="Enter your full name"
+//                         value={name}
+//                         onChange={(e) => setName(e.target.value)}
+//                         className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
+//                         required
+//                         disabled={isSubmitting}
+//                       />
+//                     </div>
+//                     <div className="relative">
+//                       <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+//                       <Input
+//                         type="tel"
+//                         placeholder="Enter your phone number"
+//                         value={phone}
+//                         onChange={(e) => setPhone(e.target.value)}
+//                         className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
+//                         required
+//                         disabled={isSubmitting}
+//                       />
+//                     </div>
+
+//                     <div className="relative">
+//                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+//                       <Input
+//                         type="email"
+//                         placeholder="Enter your email address"
+//                         value={email}
+//                         onChange={(e) => setEmail(e.target.value)}
+//                         className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
+//                         required
+//                         disabled={isSubmitting}
+//                       />
+//                     </div>
+
+//                     <div className="relative">
+//                       <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+//                       <Input
+//                         type="text"
+//                         placeholder="Enter your city (Optional)"
+//                         value={city}
+//                         onChange={(e) => setCity(e.target.value)}
+//                         className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
+//                         disabled={isSubmitting}
+//                       />
+//                     </div>
+
+//                     <div className="relative">
+//                       <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+//                       <Input
+//                         type="text"
+//                         placeholder="Enter your address (Optional)"
+//                         value={address}
+//                         onChange={(e) => setAddress(e.target.value)}
+//                         className="pl-10 pr-4 py-2 sm:py-3 border-gray-300 focus:border-pink-500 focus:ring-pink-500 rounded-xl text-sm sm:text-base"
+//                         disabled={isSubmitting}
+//                       />
+//                     </div>
+
+//                     <Button
+//                       type="submit"
+//                       disabled={isSubmitting || !email.trim() || !name.trim() || !phone.trim()}
+//                       className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-semibold py-2 sm:py-3 px-4 rounded-xl transition-all duration-300 transform hover:scale-105 text-sm sm:text-base"
+//                     >
+//                       {isSubmitting ? (
+//                         <div className="flex items-center gap-2">
+//                           <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+//                           Subscribing...
+//                         </div>
+//                       ) : (
+//                         "Subscribe Now"
+//                       )}
+//                     </Button>
+
+//                     <p className="text-xs text-gray-500 text-center">
+//                       No spam, unsubscribe at any time
+//                     </p>
+//                   </form>
+//                 ) : (
+//                   <motion.div
+//                     initial={{ opacity: 0, scale: 0.8 }}
+//                     animate={{ opacity: 1, scale: 1 }}
+//                     className="text-center py-3 sm:py-4"
+//                   >
+//                     <div className="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+//                       <Check className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
+//                     </div>
+//                     <p className="text-green-600 font-semibold text-sm sm:text-base">
+//                       Successfully subscribed!
+//                     </p>
+//                     <p className="text-xs sm:text-sm text-gray-600 mt-1">
+//                       Closing in 3 seconds...
+//                     </p>
+//                   </motion.div>
+//                 )}
+//               </CardContent>
+//             </Card>
+//           </motion.div>
+//         </div>
+//       )}
+//     </AnimatePresence>
+//   );
+// }
 
 interface HeroProps {
   onNavigate?: (section: string) => void;
@@ -330,26 +337,26 @@ const Hero = ({ onNavigate }: HeroProps) => {
 
         <div className="container mx-auto px-3 sm:px-4 lg:px-8 relative z-10">
           <div className="flex flex-col items-center justify-center max-w-7xl mx-auto">
-
+            {/* as per client removed content */}
             {/* Hero Header */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6 }}
               className="mb-8 md:mb-16 px-2 text-center"
-            >
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 md:mb-10">
+            > */}
+            {/* <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-6 md:mb-10">
                 <span className="bg-gradient-to-r from-pink-500 via-pink-600 to-pink-700 bg-clip-text text-transparent">
-                  Welcome to The 
+                  Welcome to The
                 </span>
                 <br />
                 <span className="bg-gradient-to-r from-pink-500 via-pink-600 to-pink-700 bg-clip-text text-transparent">
                   Flower School Bengaluru
                 </span>
-              </h1>
+              </h1> */}
 
-              {/* Typing Animation */}
-              <motion.div
+            {/* Typing Animation */}
+            {/* <motion.div
                 initial={{ opacity: 0 }}
                 animate={isInView ? { opacity: 1 } : {}}
                 transition={{ duration: 0.6, delay: 0.3 }}
@@ -358,10 +365,10 @@ const Hero = ({ onNavigate }: HeroProps) => {
                 {displayText}
                 <span className="animate-pulse ml-1">|</span>
               </motion.div>
-            </motion.div>
+            </motion.div> */}
 
             {/* Mission Statement */}
-            <motion.div
+            {/* <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: 0.6 }}
@@ -373,11 +380,11 @@ const Hero = ({ onNavigate }: HeroProps) => {
                   with deep respect for both artistry and environment."
                 </blockquote>
               </div>
-            </motion.div>
+            </motion.div> */}
 
             {/* Services Grid */}
             <div className="w-full max-w-7xl space-y-12 md:space-y-20 px-2 sm:px-4">
-              
+
               {/* Flower School and Bouquet Bar - Equal Size Grid */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
@@ -466,7 +473,7 @@ const Hero = ({ onNavigate }: HeroProps) => {
                           </div>
 
                           <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-rose-600 mb-4 md:mb-6">
-                          Shop Flowers
+                            Shop Flowers
                           </h3>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 mb-4 md:mb-6">
@@ -525,11 +532,11 @@ const Hero = ({ onNavigate }: HeroProps) => {
                     <div className="w-2 h-2 sm:w-3 sm:h-3 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full"></div>
                     <span className="text-xs sm:text-sm font-semibold text-block uppercase tracking-wide">Venue Rental</span>
                   </div>
-                  
+
                   <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-rose-600">
                     Event Venue
                   </h3>
-              
+
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 py-3 md:py-4">
                     <div className="flex items-center gap-2 sm:gap-3">
                       <div className="w-6 h-6 sm:w-8 sm:h-8 bg-rose-100 rounded-lg flex items-center justify-center flex-shrink-0">

@@ -17,7 +17,7 @@ const Testimonials = () => {
   const [feedbackData, setFeedbackData] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,11 +25,11 @@ const Testimonials = () => {
       try {
         setLoading(true);
         console.log('Fetching feedback...');
-        
+
         const response = await api.get('/api/Feedback');
         console.log('API Response:', response);
         console.log('Response data:', response.data);
-        
+
         if (response.data && response.data.success) {
           if (response.data.data && Array.isArray(response.data.data)) {
             console.log('Setting feedback data:', response.data.data);
@@ -46,7 +46,7 @@ const Testimonials = () => {
       } catch (err) {
         console.error('Error fetching feedback:', err);
         setError(err instanceof Error ? err.message : 'Failed to load testimonials');
-        
+
         // Set fallback data on error
         setFeedbackData([
           {
@@ -102,7 +102,7 @@ const Testimonials = () => {
   // Auto-scroll for mobile carousel
   useEffect(() => {
     if (feedbackData.length === 0) return;
-    
+
     const interval = setInterval(() => {
       nextSlide();
     }, 5000);
@@ -159,7 +159,7 @@ const Testimonials = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header - No animations */}
         <div className="text-center mb-8 md:mb-12 lg:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight mb-4 md:mb-6">
+          <h2 className="text-1xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-4 md:mb-6">
             <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
               What Our Happy Students Say
             </span>
@@ -191,21 +191,20 @@ const Testimonials = () => {
                 >
                   <ChevronLeft className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                 </button>
-                
+
                 <div className="flex gap-1">
                   {feedbackData.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => scrollToSlide(index)}
-                      className={`w-2 h-2 rounded-full ${
-                        currentSlide === index 
-                          ? 'bg-gradient-to-r from-pink-500 to-rose-500 w-4' 
-                          : 'bg-gray-300'
-                      }`}
+                      className={`w-2 h-2 rounded-full ${currentSlide === index
+                        ? 'bg-gradient-to-r from-pink-500 to-rose-500 w-4'
+                        : 'bg-gray-300'
+                        }`}
                     />
                   ))}
                 </div>
-                
+
                 <button
                   onClick={nextSlide}
                   className="p-2 sm:p-3 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200 shadow-lg hover:shadow-xl z-20"
@@ -215,11 +214,11 @@ const Testimonials = () => {
               </div>
 
               {/* Mobile Carousel Container */}
-              <div 
+              <div
                 ref={scrollContainerRef}
                 className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide space-x-4 pb-4 -mx-4 px-4"
-                style={{ 
-                  scrollbarWidth: 'none', 
+                style={{
+                  scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
                   scrollSnapType: 'x mandatory'
                 }}
@@ -231,7 +230,7 @@ const Testimonials = () => {
                   >
                     <Card className="group relative overflow-hidden border border-gray-200/60 hover:border-pink-300 shadow-lg hover:shadow-xl cursor-pointer h-full">
                       <div className={`absolute inset-0 bg-gradient-to-br ${getGradient(feedback.rating)} opacity-0 group-hover:opacity-10 z-0`} />
-                      
+
                       <CardContent className="p-4 sm:p-6 relative z-10">
                         <div className="flex items-center mb-3 sm:mb-4">
                           <div className="text-3xl sm:text-4xl mr-3 sm:mr-4">
@@ -247,7 +246,7 @@ const Testimonials = () => {
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center mb-3 sm:mb-4">
                           {[...Array(Math.min(Math.max(feedback.rating, 1), 5))].map((_, i) => (
                             <Star
@@ -257,7 +256,7 @@ const Testimonials = () => {
                           ))}
                           <span className="ml-2 text-xs sm:text-sm text-gray-600 font-medium">{feedback.rating}.0</span>
                         </div>
-                        
+
                         <div className="relative">
                           <Quote className="h-4 w-4 sm:h-6 sm:w-6 text-pink-200 absolute -top-1 -left-1" />
                           <p className="text-gray-600 leading-relaxed italic pl-4 sm:pl-6 text-xs sm:text-sm">
@@ -281,7 +280,7 @@ const Testimonials = () => {
                 >
                   <Card className="group relative overflow-hidden border border-gray-200/60 hover:border-pink-300 shadow-lg hover:shadow-2xl cursor-pointer h-full">
                     <div className={`absolute inset-0 bg-gradient-to-br ${getGradient(feedback.rating)} opacity-0 group-hover:opacity-10 z-0`} />
-                    
+
                     <CardContent className="p-6 relative z-10">
                       <div className="flex items-center mb-4">
                         <div className="text-4xl mr-4">
@@ -297,7 +296,7 @@ const Testimonials = () => {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center mb-4">
                         {[...Array(Math.min(Math.max(feedback.rating, 1), 5))].map((_, i) => (
                           <Star
@@ -307,7 +306,7 @@ const Testimonials = () => {
                         ))}
                         <span className="ml-2 text-sm text-gray-600 font-medium">{feedback.rating}.0</span>
                       </div>
-                      
+
                       <div className="relative">
                         <Quote className="h-8 w-8 text-pink-200 absolute -top-2 -left-2" />
                         <p className="text-gray-600 leading-relaxed italic pl-6 text-sm">

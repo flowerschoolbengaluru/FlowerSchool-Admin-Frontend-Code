@@ -9,7 +9,7 @@ import { Calendar, Clock, Users, Star, BookOpen, ImageIcon, ArrowRight, Graduati
 import api, { endpoints } from "@/lib/api";
 import { BookingModal } from "@/components/BookingModal";
 import schoolClassroomImage from "@/assets/school-classroom.jpg";
-import schoolGraduationImage from "@/assets/school-graduation.jpg";      
+import schoolGraduationImage from "@/assets/school-graduation.jpg";
 
 interface Feature {
   topic: string;
@@ -169,76 +169,76 @@ const Classes = () => {
           return data.map((cls: any) => {
             console.log('Processing course image:', cls.title, 'Image type:', typeof cls.image, 'Image length:', cls.image?.length);
 
-              // normalize features: backend may return JSON-string, bracketed string, comma-separated or array
-              const normalizeFeatures = (raw: any): Feature[] => {
-                try {
-                  if (!raw) return [{ topic: "Comprehensive floral training" }];
+            // normalize features: backend may return JSON-string, bracketed string, comma-separated or array
+            const normalizeFeatures = (raw: any): Feature[] => {
+              try {
+                if (!raw) return [{ topic: "Comprehensive floral training" }];
 
-                  // If it's already an array
-                  if (Array.isArray(raw)) {
-                    return raw.map((f: any) => ({ topic: typeof f === 'string' ? f : (f.topic || 'Feature') }));
-                  }
+                // If it's already an array
+                if (Array.isArray(raw)) {
+                  return raw.map((f: any) => ({ topic: typeof f === 'string' ? f : (f.topic || 'Feature') }));
+                }
 
-                  // If it's a JSON string like '["a","b"]'
-                  if (typeof raw === 'string') {
-                    const trimmed = raw.trim();
+                // If it's a JSON string like '["a","b"]'
+                if (typeof raw === 'string') {
+                  const trimmed = raw.trim();
 
-                    // Sometimes the backend stores a JS-style array as a string, try JSON.parse
-                    if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
-                      try {
-                        const parsed = JSON.parse(trimmed);
-                        if (Array.isArray(parsed)) {
-                          return parsed.map((f: any) => ({ topic: typeof f === 'string' ? f : (f.topic || 'Feature') }));
-                        }
-                        // if parsed object, fallthrough
-                      } catch (e) {
-                        // fallthrough to comma-split
+                  // Sometimes the backend stores a JS-style array as a string, try JSON.parse
+                  if ((trimmed.startsWith('[') && trimmed.endsWith(']')) || (trimmed.startsWith('{') && trimmed.endsWith('}'))) {
+                    try {
+                      const parsed = JSON.parse(trimmed);
+                      if (Array.isArray(parsed)) {
+                        return parsed.map((f: any) => ({ topic: typeof f === 'string' ? f : (f.topic || 'Feature') }));
                       }
+                      // if parsed object, fallthrough
+                    } catch (e) {
+                      // fallthrough to comma-split
                     }
-
-                    // Fallback: comma separated string
-                    return trimmed.split(/,|\n/).map(s => ({ topic: s.trim() })).filter(f => f.topic.length > 0);
                   }
 
-                  // final fallback
-                  return [{ topic: String(raw) }];
-                } catch (e) {
-                  return [{ topic: "Comprehensive floral training" }];
+                  // Fallback: comma separated string
+                  return trimmed.split(/,|\n/).map(s => ({ topic: s.trim() })).filter(f => f.topic.length > 0);
                 }
-              };
 
-              // Normalize category to match filter options
-              let normalizedCategory = "";
-              if (typeof cls.category === "string") {
-                const cat = cls.category.trim().toLowerCase();
-                if (cat === "diploma course" || cat === "diploma courses") {
-                  normalizedCategory = "Diploma Course";
-                } else if (cat === "workshops" || cat === "special workshops") {
-                  normalizedCategory = "Workshops";
-                } else {
-                  normalizedCategory = cls.category;
-                }
-              } else {
-                normalizedCategory = "Beginner";
+                // final fallback
+                return [{ topic: String(raw) }];
+              } catch (e) {
+                return [{ topic: "Comprehensive floral training" }];
               }
+            };
 
-              return {
-                id: cls.id?.toString() || crypto.randomUUID(),
-                title: cls.title || "Untitled Course",
-                description: cls.description || "No description available",
-                price: cls.price?.toString() || "0",
-                duration: cls.duration || "Not specified",
-                sessions: cls.sessions || 1,
-                features: normalizeFeatures(cls.features),
-                popular: Boolean(cls.popular),
-                nextbatch: cls.nextbatch || "Coming soon",
-                created_at: cls.created_at || new Date().toISOString(),
-                image: cls.image, // Keep original image data for processing
-                category: normalizedCategory,
-                capacity: cls.capacity || 20,
-                enrolled: cls.enrolled || 0,
-                rating: cls.rating || 4.5,
-              };
+            // Normalize category to match filter options
+            let normalizedCategory = "";
+            if (typeof cls.category === "string") {
+              const cat = cls.category.trim().toLowerCase();
+              if (cat === "diploma course" || cat === "diploma courses") {
+                normalizedCategory = "Diploma Course";
+              } else if (cat === "workshops" || cat === "special workshops") {
+                normalizedCategory = "Workshops";
+              } else {
+                normalizedCategory = cls.category;
+              }
+            } else {
+              normalizedCategory = "Beginner";
+            }
+
+            return {
+              id: cls.id?.toString() || crypto.randomUUID(),
+              title: cls.title || "Untitled Course",
+              description: cls.description || "No description available",
+              price: cls.price?.toString() || "0",
+              duration: cls.duration || "Not specified",
+              sessions: cls.sessions || 1,
+              features: normalizeFeatures(cls.features),
+              popular: Boolean(cls.popular),
+              nextbatch: cls.nextbatch || "Coming soon",
+              created_at: cls.created_at || new Date().toISOString(),
+              image: cls.image, // Keep original image data for processing
+              category: normalizedCategory,
+              capacity: cls.capacity || 20,
+              enrolled: cls.enrolled || 0,
+              rating: cls.rating || 4.5,
+            };
           });
         };
 
@@ -313,7 +313,7 @@ const Classes = () => {
             </div>
           </section>
 
-          
+
           <section className="py-6 sm:py-8 bg-white">
             <div className="container mx-auto px-3 sm:px-4">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-2xl mx-auto">
@@ -326,7 +326,7 @@ const Classes = () => {
                     <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
                   </div>
                   <div className="text-left min-w-0 flex-1">
-                    <div className="text-sm sm:text-base font-semibold text-gray-900 truncate">Diploma Courses</div>
+                    <div className="text-sm sm:text-base font-semibold text-gray-900 truncate">Professional Courses</div>
                     <div className="text-xs sm:text-sm text-gray-600 truncate">Professional certification programs</div>
                   </div>
                 </div>
@@ -408,11 +408,10 @@ const Classes = () => {
                     variant={selectedLevel === level ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedLevel(level)}
-                    className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 ${
-                      selectedLevel === level
-                        ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
-                        : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
-                    }`}
+                    className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 ${selectedLevel === level
+                      ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
+                      : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
+                      }`}
                   >
                     {level}
                     <span className="ml-1 text-xs">
@@ -499,9 +498,8 @@ const Classes = () => {
 
                         {/* Description */}
                         <div className="space-y-1 sm:space-y-2">
-                          <div className={`text-xs sm:text-sm text-gray-600 leading-relaxed ${
-                            isDescriptionExpanded(cls.id) ? '' : 'line-clamp-2'
-                          }`}>
+                          <div className={`text-xs sm:text-sm text-gray-600 leading-relaxed ${isDescriptionExpanded(cls.id) ? '' : 'line-clamp-2'
+                            }`}>
                             {cls.description}
                           </div>
                           {cls.description.length > 100 && (
@@ -533,7 +531,7 @@ const Classes = () => {
                           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                             <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />
                             <span>Duration per Session: {cls.duration} hours</span>
-                          
+
                           </div>
                           <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                             <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-pink-500 flex-shrink-0" />
@@ -604,7 +602,7 @@ const Classes = () => {
                                 </span>
                               )}
                             </div>
-                        
+
                           </div>
 
                           <div className="grid grid-cols-1 gap-2">
@@ -634,12 +632,12 @@ const Classes = () => {
             <div className="container mx-auto px-3 sm:px-4">
               {/* Section Header */}
               <div className="text-center mb-8 sm:mb-10 md:mb-12">
-                <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-pink-100 border border-pink-200">
-                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full animate-pulse"></div>
-                  <span className="text-xs sm:text-sm font-semibold text-pink-700 uppercase tracking-wide">Why Choose Us</span>
-                </div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
-                   <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">What Makes Our School Special</span>
+                {/* <div className="inline-flex items-center gap-2 mb-3 sm:mb-4 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-pink-100 border border-pink-200"> */}
+                {/* <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-pink-500 rounded-full animate-pulse"></div>
+                  <span className="text-xs sm:text-sm font-semibold text-pink-700 uppercase tracking-wide">Why Choose Us</span> */}
+                {/* </div> */}
+                <h2 className="text-xl sm:text-xl md:text-3xl lg:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+                  <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">What Makes Our School Special</span>
                 </h2>
                 <p className="text-sm sm:text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
                   We're committed to providing the best floral education experience with industry-leading standards and passionate mentorship.
@@ -658,7 +656,7 @@ const Classes = () => {
                     <Card className="h-full border border-pink-100 hover:border-pink-300 hover:shadow-xl transition-all duration-300 group bg-white/80 backdrop-blur-sm">
                       <CardContent className="p-4 sm:p-5 md:p-6 text-center">
                         {/* Gradient Icon Container */}
-                        <div className={`w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 mx-auto mb-4 sm:mb-5 md:mb-6 rounded-xl sm:rounded-2xl bg-gradient-to-br ${achievement.gradient} flex items-center justify-center group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                        <div className={`w-12 h-12 sm:w-14 sm:h-14 md:w-18 md:h-18 mx-auto mb-4 sm:mb-5 md:mb-6 rounded-xl sm:rounded-2xl bg-gradient-to-br ${achievement.gradient} flex items-center justify-center group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
                           <div className="text-white">
                             {achievement.icon}
                           </div>

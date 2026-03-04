@@ -49,7 +49,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
     const [loading, setLoading] = useState(false);
     const [paymentChoice, setPaymentChoice] = useState<'now' | 'later' | null>(null);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
+    const [validationErrors, setValidationErrors] = useState<{ [key: string]: string }>({});
     const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -64,7 +64,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
     };
 
     const validateForm = () => {
-        const errors: {[key: string]: string} = {};
+        const errors: { [key: string]: string } = {};
 
         if (!formData.firstName.trim()) {
             errors.firstName = 'First name is required';
@@ -92,7 +92,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        
+
         // Clear validation error for this field
         if (validationErrors[name]) {
             setValidationErrors(prev => {
@@ -192,7 +192,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
 
                 try {
                     const response = await api.post('/api/paylater', payLaterData);
-                    
+
                     if (response.data.success || response.status === 201) {
                         console.log('✅ Pay later record created successfully');
                         setShowSuccessModal(true);
@@ -203,7 +203,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                 } catch (apiError: any) {
                     console.error('❌ Pay Later API call failed:', apiError);
                     setErrorMessage(
-                        apiError.response?.data?.error || 
+                        apiError.response?.data?.error ||
                         `Network error: ${apiError.message}. Please check if the server is running.`
                     );
                 }
@@ -213,7 +213,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
             if (paymentChoice === 'now') {
                 // For pay now, process Razorpay payment
                 console.log('� Initiating Razorpay payment for amount:', event.amount);
-                
+
                 const enrollmentData = {
                     full_name: `${formData.firstName} ${formData.lastName}`,
                     email_address: formData.email,
@@ -274,7 +274,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                         handler: async (response: any) => {
                             try {
                                 console.log('🎉 Payment successful:', response.razorpay_payment_id);
-                                
+
                                 // Verify payment and save enrollment
                                 const verificationResponse = await verifyRazorpayPayment({
                                     razorpay_order_id: response.razorpay_order_id,
@@ -335,12 +335,12 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                 <DialogContent className="max-w-[95vw] mx-2 sm:max-w-[500px] md:max-w-[600px] max-h-[90vh] sm:max-h-[95vh] overflow-y-auto rounded-lg sm:rounded-xl">
                     <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
                         <DialogTitle className="text-lg sm:text-xl font-bold text-center sm:text-left">
-                            {event.event_type === 'Course' ? 'Enroll in Course' : 
-                             event.event_type === 'Workshop' ? 'Register for Workshop' : 
-                             'Book Event'}: {event.title}
+                            {event.event_type === 'Course' ? 'Enroll in Course' :
+                                event.event_type === 'Workshop' ? 'Register for Workshop' :
+                                    'Book Event'}: {event.title}
                         </DialogTitle>
                         <DialogDescription className="text-sm sm:text-base text-center sm:text-left">
-                            {step === 1 
+                            {step === 1
                                 ? `${event.event_date} ${event.event_time ? `at ${event.event_time}` : ''} - Fill out the form below to reserve your spot`
                                 : `${event.event_date} ${event.event_time ? `at ${event.event_time}` : ''} - Choose your preferred payment option`
                             }
@@ -427,15 +427,15 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                         name="specialRequirements"
                                         value={formData.specialRequirements}
                                         onChange={handleInputChange}
-                                        placeholder="Any special requirements or dietary restrictions..."
+                                        // placeholder="Any special requirements or dietary restrictions..."
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-h-[80px] resize-vertical text-sm sm:text-base"
                                     />
                                 </div>
                             </div>
                             <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-3 px-4 sm:px-6 pb-4 sm:pb-6">
-                                <Button 
-                                    variant="outline" 
-                                    onClick={handleClose} 
+                                <Button
+                                    variant="outline"
+                                    onClick={handleClose}
                                     className="w-full sm:w-auto border-pink-600 text-pink-600 hover:bg-pink-50 h-10 sm:h-11 text-sm sm:text-base"
                                 >
                                     Cancel
@@ -455,9 +455,9 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                             Processing...
                                         </span>
                                     ) : (
-                                        event.event_type === 'Course' ? 'Enroll Now' : 
-                                        event.event_type === 'Workshop' ? 'Register Now' : 
-                                        'Book Now'
+                                        event.event_type === 'Course' ? 'Enroll Now' :
+                                            event.event_type === 'Workshop' ? 'Register Now' :
+                                                'Book Now'
                                     )}
                                 </Button>
                             </DialogFooter>
@@ -468,9 +468,9 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                             <div className="space-y-4 sm:space-y-6 py-2 sm:py-4 px-4 sm:px-6">
                                 <div className="text-center space-y-2">
                                     <h4 className="font-medium text-base sm:text-lg text-green-600">
-                                        ✅ {event.event_type === 'Course' ? 'Enrollment Registered!' : 
-                                            event.event_type === 'Workshop' ? 'Registration Complete!' : 
-                                            'Booking Registered!'}
+                                        ✅ {event.event_type === 'Course' ? 'Enrollment Registered!' :
+                                            event.event_type === 'Workshop' ? 'Registration Complete!' :
+                                                'Booking Registered!'}
                                     </h4>
                                     <p className="text-xs sm:text-sm text-muted-foreground">
                                         Your spot has been reserved. Choose your payment option:
@@ -492,7 +492,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                 {/* Payment Options */}
                                 <div className="space-y-3 sm:space-y-4">
                                     <h4 className="font-medium text-base sm:text-lg text-center sm:text-left">Choose Payment Option</h4>
-                                    
+
                                     <div className="grid grid-cols-1 gap-3 sm:gap-4">
                                         <Button
                                             variant="outline"
@@ -506,7 +506,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                                             <div className="text-center w-full">
                                                 <div className="font-medium text-orange-600 text-sm sm:text-base">Pay Later</div>
                                                 <div className="text-xs text-muted-foreground mt-1 px-2">
-                                                  We will contact you shortly to finalize payment details
+                                                    We will contact you shortly to finalize payment details
                                                 </div>
                                             </div>
                                         </Button>
@@ -539,7 +539,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                             🎉 Success!
                         </DialogTitle>
                         <DialogDescription className="text-center text-sm sm:text-base">
-                            {paymentChoice === 'later' 
+                            {paymentChoice === 'later'
                                 ? 'Your enrollment has been registered successfully with pay later option.'
                                 : 'Your enrollment has been completed successfully.'
                             }
@@ -547,21 +547,21 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                     </DialogHeader>
                     <div className="text-center space-y-3 sm:space-y-4 py-3 sm:py-4 px-4 sm:px-6">
                         <p className="text-base sm:text-lg font-medium">
-                            {paymentChoice === 'later' 
+                            {paymentChoice === 'later'
                                 ? 'Your spot has been reserved!'
                                 : 'Payment completed successfully!'
                             }
                         </p>
                         <p className="text-xs sm:text-sm text-muted-foreground">
-                            {paymentChoice === 'later' 
+                            {paymentChoice === 'later'
                                 ? 'You can pay at the venue. We\'ll send you a confirmation message shortly.'
                                 : 'Thank you for your payment. You\'ll receive a confirmation shortly.'
                             }
                         </p>
                     </div>
                     <DialogFooter className="px-4 sm:px-6 pb-4 sm:pb-6">
-                        <Button 
-                            onClick={handleSuccessClose} 
+                        <Button
+                            onClick={handleSuccessClose}
                             className="w-full h-10 sm:h-11 text-sm sm:text-base"
                         >
                             Close
