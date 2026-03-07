@@ -1080,7 +1080,20 @@ const Admin = () => {
   const fetchImpacts = async () => {
     try {
       setIsImpactsLoading(true);
-      // ...existing code...
+      const response = await api.get('/api/impacts');
+      if (response.status === 200 && response.data) {
+        // Support both wrapped { data: [...] } or direct array
+        const impactsData = Array.isArray(response.data) ? response.data : (response.data.data || []);
+        setImpacts(impactsData);
+        console.log('Fetched impacts:', impactsData);
+      } else {
+        setImpacts([]);
+        console.warn('No impacts data found');
+      }
+    } catch (error) {
+      console.error('Error fetching impacts:', error);
+      setImpacts([]);
+      toast({ title: 'Error', description: 'Failed to fetch impacts', variant: 'destructive' });
     } finally {
       setIsImpactsLoading(false);
     }
