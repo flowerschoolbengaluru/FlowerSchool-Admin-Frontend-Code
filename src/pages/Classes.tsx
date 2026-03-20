@@ -30,7 +30,7 @@ interface FlowerClass {
   nextbatch: string;
   created_at: string;
   image: string | null;
-  category?: "Diploma Course" | "Workshops" | string | null;
+  category?: " Professional Course" | "Workshops" | string | null;
   capacity?: number;
   enrolled?: number;
   rating?: number;
@@ -138,7 +138,7 @@ const Classes = () => {
     return {
       id: course.id,
       title: course.title,
-      event_type: course.category === "Diploma Course" ? "Course" : "Workshop",
+      event_type: course.category === " Professional Course" ? "Course" : "Workshop",
       event_date: course.nextbatch || "TBD",
       event_time: "Contact for timing",
       duration: course.duration,
@@ -211,8 +211,8 @@ const Classes = () => {
             let normalizedCategory = "";
             if (typeof cls.category === "string") {
               const cat = cls.category.trim().toLowerCase();
-              if (cat === "diploma course" || cat === "diploma courses") {
-                normalizedCategory = "Diploma Course";
+              if (cat === " professional course" || cat === "professional courses") {
+                normalizedCategory = " Professional Course";
               } else if (cat === "workshops" || cat === "special workshops") {
                 normalizedCategory = "Workshops";
               } else {
@@ -317,10 +317,10 @@ const Classes = () => {
           <section className="py-6 sm:py-8 bg-white">
             <div className="container mx-auto px-3 sm:px-4">
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-2xl mx-auto">
-                {/* Diploma Courses Box */}
+                
                 <div
                   className="flex items-center gap-3 sm:gap-4 bg-white border-2 border-pink-200 rounded-xl p-3 sm:p-4 w-full sm:w-auto hover:border-pink-400 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                  onClick={() => handleCourseTypeClick("Diploma Course")}
+                  onClick={() => handleCourseTypeClick(" Professional Course")}
                 >
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -402,7 +402,7 @@ const Classes = () => {
 
               {/* Level Filter */}
               <div className="flex justify-center gap-1 sm:gap-2 mb-6 sm:mb-8 flex-wrap">
-                {["Diploma Course", "Workshops"].map((level) => (
+                {[" Professional Course", "Workshops"].map((level) => (
                   <Button
                     key={level}
                     variant={selectedLevel === level ? "default" : "outline"}

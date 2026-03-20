@@ -4573,12 +4573,12 @@ case "products":
                       </div>
                       <div>
                         <Label htmlFor="category" className="text-sm sm:text-base">Category</Label>
-                        <Select name="category" required defaultValue="Diploma Course">
+                        <Select name="category" required defaultValue="Professional Course">
                           <SelectTrigger className="text-xs sm:text-sm">
                             <SelectValue placeholder="Select category" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Diploma Course" className="text-xs sm:text-sm">Diploma Course</SelectItem>
+                            <SelectItem value=" Professional Course" className="text-xs sm:text-sm">Professional Course</SelectItem>
                             <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
                           </SelectContent>
                         </Select>
@@ -5023,12 +5023,12 @@ case "products":
                         </div>
                         <div>
                           <Label htmlFor="edit-category" className="text-sm sm:text-base">Category</Label>
-                          <Select name="category" defaultValue={selectedClass.category || 'Diploma Course'} required>
+                          <Select name="category" defaultValue={selectedClass.category || ' Professional Course'} required>
                             <SelectTrigger className="text-xs sm:text-sm">
                               <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="Diploma Course" className="text-xs sm:text-sm">Diploma Course</SelectItem>
+                              <SelectItem value=" Professional Course" className="text-xs sm:text-sm">Professional Course</SelectItem>
                               <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
                             </SelectContent>
                           </Select>

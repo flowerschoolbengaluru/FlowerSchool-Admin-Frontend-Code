@@ -312,7 +312,7 @@ const About = () => {
     return {
       id: course.id,
       title: course.title,
-      event_type: course.category === "Diploma Course" ? "Course" : "Workshop",
+      event_type: course.category === " Professional Course" ? "Course" : "Workshop",
       event_date: course.nextbatch || "TBD",
       event_time: "Contact for timing",
       duration: course.duration,
@@ -328,7 +328,7 @@ const About = () => {
 
   // Filter courses for display (use normalized category values)
   const professionalCourses = classes.filter(cls => 
-    cls.category === "Diploma Course"
+    cls.category === " Professional Course"
   );
 
   const specialWorkshops = classes.filter(cls => 
@@ -579,7 +579,7 @@ const About = () => {
                 <div className="text-center mb-8 md:mb-12">
                   <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4">
                     <span className="bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">
-                      Diploma course
+                      Professional course
                     </span>
                   </h2>
                   <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto font-sans">
