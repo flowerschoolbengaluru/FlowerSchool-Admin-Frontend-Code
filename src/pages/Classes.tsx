@@ -135,10 +135,11 @@ const Classes = () => {
 
   // Convert FlowerClass data to Event format for BookingModal
   const convertToEvent = (course: FlowerClass) => {
+    const isProCourse = course.category?.includes('Professional Course');
     return {
       id: course.id,
       title: course.title,
-      event_type: course.category === " Professional Course" ? "Course" : "Workshop",
+      event_type: isProCourse ? "Course" : "Workshop",
       event_date: course.nextbatch || "TBD",
       event_time: "Contact for timing",
       duration: course.duration,
@@ -207,16 +208,18 @@ const Classes = () => {
               }
             };
 
-            // Normalize category to match filter options
+            // Normalize category to match filter options - keep Professional Course variants specific
             let normalizedCategory = "";
             if (typeof cls.category === "string") {
-              const cat = cls.category.trim().toLowerCase();
-              if (cat === " professional course" || cat === "professional courses") {
-                normalizedCategory = " Professional Course";
-              } else if (cat === "workshops" || cat === "special workshops") {
+              const cat = cls.category.trim();
+              const catLower = cat.toLowerCase();
+              // Keep specific Professional Course types (e.g., "Professional Course - Beginners")
+              if (catLower.includes("professional course")) {
+                normalizedCategory = cat; // Keep full category name
+              } else if (catLower === "workshops" || catLower === "special workshops") {
                 normalizedCategory = "Workshops";
               } else {
-                normalizedCategory = cls.category;
+                normalizedCategory = cat;
               }
             } else {
               normalizedCategory = "Beginner";
@@ -258,7 +261,7 @@ const Classes = () => {
   }, []);
 
   useEffect(() => {
-    // Trigger animation on component mount
+  
     const timer = setTimeout(() => setIsVisible(true), 100);
     return () => clearTimeout(timer);
   }, []);
@@ -273,7 +276,7 @@ const Classes = () => {
 
   const filtered = selectedLevel === "All"
     ? classes
-    : classes.filter((cls) => cls.category === selectedLevel);
+    : classes.filter((cls) => cls.category?.includes(selectedLevel));
 
   // Scroll to courses section and set filter
   const handleCourseTypeClick = (level: string) => {
@@ -320,7 +323,7 @@ const Classes = () => {
                 
                 <div
                   className="flex items-center gap-3 sm:gap-4 bg-white border-2 border-pink-200 rounded-xl p-3 sm:p-4 w-full sm:w-auto hover:border-pink-400 hover:shadow-lg transition-all duration-300 cursor-pointer group"
-                  onClick={() => handleCourseTypeClick(" Professional Course")}
+                  onClick={() => handleCourseTypeClick("Professional Course")}
                 >
                   <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
                     <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -402,23 +405,48 @@ const Classes = () => {
 
               {/* Level Filter */}
               <div className="flex justify-center gap-1 sm:gap-2 mb-6 sm:mb-8 flex-wrap">
-                {[" Professional Course", "Workshops"].map((level) => (
-                  <Button
-                    key={level}
-                    variant={selectedLevel === level ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedLevel(level)}
-                    className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 ${selectedLevel === level
-                      ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
-                      : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
-                      }`}
-                  >
-                    {level}
-                    <span className="ml-1 text-xs">
-                      ({classes.filter(cls => cls.category === level).length})
-                    </span>
-                  </Button>
-                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedLevel("All")}
+                  className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 ${selectedLevel === "All"
+                    ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
+                    : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
+                    }`}
+                >
+                  All Courses
+                  <span className="ml-1 text-xs">
+                    ({classes.length})
+                  </span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedLevel("Professional Course")}
+                  className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 ${selectedLevel === "Professional Course"
+                    ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
+                    : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
+                    }`}
+                >
+                  Professional Courses
+                  <span className="ml-1 text-xs">
+                    ({classes.filter(cls => cls.category?.toLowerCase().includes("professional course")).length})
+                  </span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedLevel("Workshops")}
+                  className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 ${selectedLevel === "Workshops"
+                    ? "bg-pink-500 hover:bg-pink-600 text-white border-pink-500"
+                    : "border-pink-300 text-pink-600 hover:bg-pink-50 hover:text-pink-700 hover:border-pink-400"
+                    }`}
+                >
+                  Workshops
+                  <span className="ml-1 text-xs">
+                    ({classes.filter(cls => cls.category === "Workshops").length})
+                  </span>
+                </Button>
               </div>
             </div>
           </section>
@@ -474,7 +502,7 @@ const Classes = () => {
                             )}
                             {cls.category && (
                               <Badge variant="secondary" className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-pink-100 text-pink-700 border-pink-200 text-xs">
-                                {cls.category}
+                                {cls.category.includes('Professional Course') ? 'Professional Course' : cls.category}
                               </Badge>
                             )}
                           </>

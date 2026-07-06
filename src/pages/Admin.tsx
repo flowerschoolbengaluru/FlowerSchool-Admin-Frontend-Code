@@ -42,9 +42,10 @@ import {
 } from "lucide-react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { ChevronRight, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getProductImageUrl } from "@/lib/utils";
 import flowerSchoolLogo from "@/assets/flower-school-logo.png";
 import api from '@/lib/api';
+import { getApiBaseURL } from '@/lib/env';
 
 // Import event types
 import { Event, EventFormData, EventType } from '@/types/event';
@@ -402,8 +403,10 @@ const Admin = () => {
   const [orders, setOrders] = useState<Order[]>([]);
     const [calendarOrderDate, setCalendarOrderDate] = useState<Date | null>(null);
     const [ordersForDate, setOrdersForDate] = useState<Order[]>([]);
-  const [imageFiles, setImageFiles] = useState<string[]>([]);
-  const [editImageFiles, setEditImageFiles] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [editImageFiles, setEditImageFiles] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [editImagePreviewUrls, setEditImagePreviewUrls] = useState<string[]>([]);
   const [existingImages, setExistingImages] = useState<{[key: string]: string}>({});
   // Image zoom state
   const [zoomImageSrc, setZoomImageSrc] = useState<string | null>(null);
@@ -414,6 +417,20 @@ const Admin = () => {
   const [editTypedCategory, setEditTypedCategory] = useState<string>('');
   const [classImageFile, setClassImageFile] = useState<string>('');
   const [editClassImageFile, setEditClassImageFile] = useState<string>('');
+  
+  // Course category structure
+  const courseCategories = {
+    'Professional Course': ['Beginners', 'Intermediate', 'Advanced', 'Ikebana'],
+    'Workshops': []
+  };
+  
+  // Create form category states
+  const [createMainCategory, setCreateMainCategory] = useState<string>('Professional Course');
+  const [createSubcategory, setCreateSubcategory] = useState<string>('Beginners');
+  
+  // Edit form category states
+  const [editMainCategory, setEditMainCategory] = useState<string>('Professional Course');
+  const [editSubcategory, setEditSubcategory] = useState<string>('Beginners');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [expandedCategories, setExpandedCategories] = useState<{[key: string]: boolean}>({});
   const [expandedCategoryGroups, setExpandedCategoryGroups] = useState<Record<string, Record<number, boolean>>>({});
@@ -2749,7 +2766,9 @@ case "products":
                   setProducts(formattedUpdatedProducts);
 
                   setShowProductForm(false);
+                  imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
                   setImageFiles([]);
+                  setImagePreviewUrls([]);
                   setNewProductCategories([]);
                   setNewProductMainCategories([]);
                   setNewProductSubcategories([]);
@@ -2815,25 +2834,17 @@ case "products":
                           setIsLoading(true);
                           toast({
                             title: "Processing",
-                            description: "Compressing image...",
+                            description: "Adding image...",
                           });
 
-                          const reader = new FileReader();
-                          reader.onload = () => {
-                            setImageFiles(prev => [...prev, reader.result as string]);
-                            toast({
-                              title: "Success",
-                              description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
-                            });
-                          };
-                          reader.onerror = () => {
-                            toast({
-                              title: "Error",
-                              description: "Failed to read image",
-                              variant: "destructive",
-                            });
-                          };
-                          reader.readAsDataURL(file);
+                          // Store file object directly instead of Base64
+                          const previewUrl = URL.createObjectURL(file);
+                          setImageFiles(prev => [...prev, file]);
+                          setImagePreviewUrls(prev => [...prev, previewUrl]);
+                          toast({
+                            title: "Success",
+                            description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
+                          });
                         } catch (error) {
                           console.error('Error processing image:', error);
                           toast({
@@ -2854,7 +2865,11 @@ case "products":
                         type="button"
                         variant="destructive"
                         size="sm"
-                        onClick={() => setImageFiles([])}
+                        onClick={() => {
+                          imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+                          setImageFiles([]);
+                          setImagePreviewUrls([]);
+                        }}
                         className="text-xs sm:text-sm"
                       >
                         Clear All
@@ -2864,16 +2879,16 @@ case "products":
 
                   {/* Image Previews */}
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 sm:gap-4">
-                    {imageFiles.map((image, index) => (
+                    {imagePreviewUrls.map((previewUrl, index) => (
                       <div
                         key={index}
                         className="relative group aspect-square cursor-zoom-in"
                         title="Click to zoom"
-                        onClick={() => { setZoomImageSrc(image); setZoomScale(1); }}
+                        onClick={() => { setZoomImageSrc(previewUrl); setZoomScale(1); }}
                       >
                         <div className="absolute inset-0 rounded-lg overflow-hidden border border-border">
                           <img
-                            src={image}
+                            src={previewUrl}
                             alt={`Preview ${index + 1}`}
                             className="w-full h-full object-cover"
                           />
@@ -2881,7 +2896,12 @@ case "products":
                         <button
                           type="button"
                           className="absolute top-1 right-1 p-1 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity sm:top-2 sm:right-2"
-                          onClick={(e) => { e.stopPropagation(); setImageFiles(imageFiles.filter((_, i) => i !== index)); }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            URL.revokeObjectURL(previewUrl);
+                            setImageFiles(imageFiles.filter((_, i) => i !== index));
+                            setImagePreviewUrls(imagePreviewUrls.filter((_, i) => i !== index));
+                          }}
                         >
                           <X className="h-2 w-2 sm:h-3 sm:w-3" />
                         </button>
@@ -2927,25 +2947,17 @@ case "products":
                               setIsLoading(true);
                               toast({
                                 title: "Processing",
-                                description: "Compressing image...",
+                                description: "Adding image...",
                               });
 
-                              const reader = new FileReader();
-                              reader.onload = () => {
-                                setImageFiles(prev => [...prev, reader.result as string]);
-                                toast({
-                                  title: "Success",
-                                  description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
-                                });
-                              };
-                              reader.onerror = () => {
-                                toast({
-                                  title: "Error",
-                                  description: "Failed to read image",
-                                  variant: "destructive",
-                                });
-                              };
-                              reader.readAsDataURL(file);
+                              // Store file object directly instead of Base64
+                              const previewUrl = URL.createObjectURL(file);
+                              setImageFiles(prev => [...prev, file]);
+                              setImagePreviewUrls(prev => [...prev, previewUrl]);
+                              toast({
+                                title: "Success",
+                                description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
+                              });
                             } catch (error) {
                               console.error('Error processing image:', error);
                               toast({
@@ -3473,9 +3485,9 @@ case "products":
                 >
                   {/* Product Image */}
                   <div className="aspect-square overflow-hidden relative">
-                    {product.image ? (
+                    {product.imagePath || product.image || product.imagefirst ? (
                       <img
-                        src={product.image.startsWith('data:') ? product.image : `data:image/jpeg;base64,${product.image}`}
+                        src={getProductImageUrl(product)}
                         alt={product.name || 'Product'}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                         onError={(e) => {
@@ -3547,7 +3559,8 @@ case "products":
                           
                           // Clear any previous edit form states
                           setEditImageFiles([]);
-                          
+                          setEditImagePreviewUrls([]);
+
                           console.log('Opening edit modal...');
                           setIsEditModalOpen(true);
                         }}
@@ -4452,9 +4465,6 @@ case "products":
             </Dialog>
           </div>
         );
-          
-    
-
 
       case "classes":
         return (
@@ -4510,6 +4520,11 @@ case "products":
                       const featuresText = formData.get('features')?.toString() || '';
                       const featuresArray = featuresText.split('\n').filter(f => f.trim()).map(f => f.trim());
 
+                      // Combine main category and subcategory
+                      const combinedCategory = createMainCategory === 'Professional Course' 
+                        ? `${createMainCategory} - ${createSubcategory}`
+                        : createMainCategory;
+                      
                       const classData = {
                         title: formData.get('title')?.toString() || '',
                         description: formData.get('description')?.toString() || '',
@@ -4518,8 +4533,8 @@ case "products":
                         sessions: parseInt(formData.get('sessions')?.toString() || '1'),
                         features: featuresArray,
                         nextbatch: formData.get('nextbatch')?.toString() || '',
-                        category: formData.get('category')?.toString() || 'General',
-                        image: classImageFile || null // Use base64 image
+                        category: combinedCategory,
+                        image: classImageFile || null 
                       };
                       console.log('Creating class with data:', classData);
                       const response = await api.post('/api/admin/AdminClasses/Add', classData);
@@ -4546,7 +4561,7 @@ case "products":
                         setClasses(formattedClasses);
 
                         setShowClassForm(false);
-                        setClassImageFile(''); // Clear uploaded image
+                        setClassImageFile(''); 
                         e.currentTarget.reset();
 
                         toast({
@@ -4564,26 +4579,52 @@ case "products":
                       });
                     } finally {
                       setIsLoading(false);
-                    }
-                  }}>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
-                      <div>
-                        <Label htmlFor="title" className="text-sm sm:text-base">Class Title</Label>
-                        <Input id="title" name="title" placeholder="Enter class title" required className="text-sm sm:text-base" />
+                      }
+                    }}>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+                        <div>
+                          <Label htmlFor="title" className="text-sm sm:text-base">Class Title</Label>
+                          <Input id="title" name="title" placeholder="Enter class title" required className="text-sm sm:text-base" />
+                        </div>
+                        <div>
+                          <Label htmlFor="category" className="text-sm sm:text-base">Category</Label>
+                          <Select value={createMainCategory} onValueChange={(value) => {
+                            setCreateMainCategory(value);
+                            // Reset subcategory when main category changes
+                            if (value === 'Professional Course') {
+                              setCreateSubcategory('Beginners');
+                            } else {
+                              setCreateSubcategory('');
+                            }
+                          }} required>
+                            <SelectTrigger className="text-xs sm:text-sm">
+                              <SelectValue placeholder="Select category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Professional Course" className="text-xs sm:text-sm">Professional Course</SelectItem>
+                              <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="category" className="text-sm sm:text-base">Category</Label>
-                        <Select name="category" required defaultValue="Professional Course">
-                          <SelectTrigger className="text-xs sm:text-sm">
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value=" Professional Course" className="text-xs sm:text-sm">Professional Course</SelectItem>
-                            <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                      
+                      {createMainCategory === 'Professional Course' && (
+                        <div>
+                          <Label htmlFor="subcategory" className="text-sm sm:text-base">Course Level</Label>
+                          <Select value={createSubcategory} onValueChange={setCreateSubcategory} required>
+                            <SelectTrigger className="text-xs sm:text-sm">
+                              <SelectValue placeholder="Select level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {courseCategories['Professional Course'].map((level) => (
+                                <SelectItem key={level} value={level} className="text-xs sm:text-sm">
+                                  {level}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                       <div>
@@ -4949,6 +4990,11 @@ case "products":
                       const featuresText = formData.get('features')?.toString() || '';
                       const featuresArray = featuresText.split('\n').filter(f => f.trim()).map(f => f.trim());
 
+                      // Combine main category and subcategory
+                      const combinedCategory = editMainCategory === 'Professional Course' 
+                        ? `${editMainCategory} - ${editSubcategory}`
+                        : editMainCategory;
+
                       const updateData = {
                         title: formData.get('title')?.toString() || '',
                         description: formData.get('description')?.toString() || '',
@@ -4957,7 +5003,7 @@ case "products":
                         sessions: parseInt(formData.get('sessions')?.toString() || '1'),
                         features: featuresArray,
                         nextbatch: formData.get('nextbatch')?.toString() || '',
-                        category: formData.get('category')?.toString() || 'General',
+                        category: combinedCategory,
                         image: editClassImageFile || selectedClass.image || null // Use new base64 image or keep existing
                       };
 
@@ -5009,6 +5055,18 @@ case "products":
                     }
                   }}>
                     <div className="space-y-3 sm:space-y-4">
+                      {/* Initialize edit form states based on selectedClass */}
+                      {(() => {
+                        const category = selectedClass.category || '';
+                        const isProCourse = category.includes('Professional Course');
+                        if (isProCourse && !editMainCategory.includes('Professional')) {
+                          const parts = category.split(' - ');
+                          setEditMainCategory('Professional Course');
+                          setEditSubcategory(parts[1] || 'Beginners');
+                        }
+                        return null;
+                      })()}
+                      
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
                         <div>
                           <Label htmlFor="edit-title" className="text-sm sm:text-base">Class Title</Label>
@@ -5023,17 +5081,42 @@ case "products":
                         </div>
                         <div>
                           <Label htmlFor="edit-category" className="text-sm sm:text-base">Category</Label>
-                          <Select name="category" defaultValue={selectedClass.category || ' Professional Course'} required>
+                          <Select value={editMainCategory} onValueChange={(value) => {
+                            setEditMainCategory(value);
+                            if (value === 'Professional Course') {
+                              setEditSubcategory('Beginners');
+                            } else {
+                              setEditSubcategory('');
+                            }
+                          }} required>
                             <SelectTrigger className="text-xs sm:text-sm">
                               <SelectValue placeholder="Select category" />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value=" Professional Course" className="text-xs sm:text-sm">Professional Course</SelectItem>
+                              <SelectItem value="Professional Course" className="text-xs sm:text-sm">Professional Course</SelectItem>
                               <SelectItem value="Workshops" className="text-xs sm:text-sm">Workshops</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
+
+                      {editMainCategory === 'Professional Course' && (
+                        <div>
+                          <Label htmlFor="edit-subcategory" className="text-sm sm:text-base">Course Level</Label>
+                          <Select value={editSubcategory} onValueChange={setEditSubcategory} required>
+                            <SelectTrigger className="text-xs sm:text-sm">
+                              <SelectValue placeholder="Select level" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {courseCategories['Professional Course'].map((level) => (
+                                <SelectItem key={level} value={level} className="text-xs sm:text-sm">
+                                  {level}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      )}
 
                       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                         <div>
@@ -8497,7 +8580,9 @@ case "products":
         setProducts(products.map(p => p.id === selectedProduct.id ? response.data : p));
         setIsEditModalOpen(false);
         setSelectedProduct(null);
+        editImagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
         setEditImageFiles([]); // Clear edit images
+        setEditImagePreviewUrls([]);
         setExistingImages({}); // Reset existing images tracking
 
         // Refresh products list to ensure sync
@@ -8521,38 +8606,53 @@ case "products":
     }
   };
 
-  const uploadImagesOneByOne = async (productId: string, images: string[]): Promise<void> => {
-    const imageFields = ['image', 'imagefirst', 'imagesecond', 'imagethirder', 'imagefoure'];
+const uploadImagesOneByOne = async (productId: string, files: File[]) => {
+  console.log(`[IMAGE UPLOAD] Starting upload for product ${productId} with ${files.length} files`);
+  
+  for (let i = 0; i < files.length; i++) {
+    try {
+      console.log(`[IMAGE UPLOAD] Uploading image ${i + 1}/${files.length}: ${files[i].name}`);
+      
+      const formData = new FormData();
+      formData.append('image', files[i]);
+      formData.append('imageIndex', String(i));
 
-    for (let i = 0; i < Math.min(images.length, 5); i++) {
-      try {
-        const fieldName = imageFields[i];
-        const imageData = images[i];
+      const response = await fetch(`${getApiBaseURL()}/api/admin/products/${productId}/upload-images`, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include',
+        // Do NOT set Content-Type header — browser sets it automatically with boundary for FormData
+      });
 
-        // Clean base64 data
-        const cleanImage = imageData.includes('base64,')
-          ? imageData.split('base64,')[1]
-          : imageData;
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error(`[IMAGE UPLOAD] ERROR ${response.status}:`, errorData);
+        throw new Error(`Upload failed with status ${response.status}: ${errorData.error || 'Unknown error'}`);
+      }
 
-        await api.put(`/api/admin/products/${productId}`, {
-          [fieldName]: cleanImage
-        });
-
-        console.log(`Uploaded image ${i + 1} to ${fieldName}`);
-      } catch (error: any) {
-        console.error(`Failed to upload image ${i + 1}:`, error);
-        const errorMessage = error?.response?.status === 431
-          ? `Image ${i + 1} is too large. Try compressing it further.`
-          : `Failed to upload image ${i + 1}`;
-
+      const result = await response.json();
+      console.log(`[IMAGE UPLOAD] SUCCESS:`, result);
+      
+      // Show success notification with URL
+      if (result.imageUrl) {
         toast({
-          title: "Upload Error",
-          description: errorMessage,
-          variant: "destructive",
+          title: "Success",
+          description: `Image ${i + 1} uploaded: ${result.imageUrl}`,
+          variant: "default",
         });
       }
+    } catch (err) {
+      console.error(`[IMAGE UPLOAD] FAILED - Image ${i + 1}:`, err);
+      toast({
+        title: "Upload Error",
+        description: `Failed to upload image ${i + 1}: ${err instanceof Error ? err.message : String(err)}`,
+        variant: "destructive",
+      });
     }
-  };
+  }
+  
+  console.log(`[IMAGE UPLOAD] Batch upload completed`);
+};
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -8567,9 +8667,12 @@ case "products":
               <>
                 <div className="flex justify-center">
                   <img
-                    src={`data:image/png;base64,${selectedProduct.image}`}
+                    src={getProductImageUrl(selectedProduct)}
                     alt={selectedProduct.name}
                     className="w-24 h-24 lg:w-32 lg:h-32 object-cover rounded-lg"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = '/placeholder.svg';
+                    }}
                   />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-4 items-center gap-2 lg:gap-4">
@@ -8748,12 +8851,61 @@ case "products":
                     {/* Show all existing images */}
                     {(() => {
                       const images = [];
-                      const imageFields = ['image', 'imagefirst', 'imagesecond', 'imagethirder', 'imagefoure'];
+                      // Check new image path columns first, then fall back to Base64 columns
+                      const imagePathFields = ['imagePath', 'imageFirstPath', 'imageSecondPath', 'imageThirdPath', 'imageFourthPath', 'imageFifthPath'];
+                      const imageBase64Fields = ['image', 'imagefirst', 'imagesecond', 'imagethirder', 'imagefoure', 'imagefive'];
                       
-                      imageFields.forEach((field, index) => {
+                      // First, show images from new path columns
+                      imagePathFields.forEach((field, index) => {
                         const imageData = (selectedProduct as any)[field];
                         if (imageData && existingImages[field] !== null) {
-                          const imageUrl = imageData.startsWith('data:') ? imageData : `data:image/jpeg;base64,${imageData}`;
+                          images.push(
+                            <div
+                              key={field}
+                              className="relative group aspect-square cursor-zoom-in"
+                              title="Click to zoom"
+                              onClick={() => { setZoomImageSrc(getProductImageUrl({ ...selectedProduct, imagePath: imageData })); setZoomScale(1); }}
+                            >
+                              <div className="absolute inset-0 rounded-lg overflow-hidden border border-border">
+                                <img
+                                  src={getProductImageUrl({ [field]: imageData })}
+                                  alt={`Current ${index + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src = '/placeholder.svg';
+                                  }}
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                className="absolute top-1 right-1 p-1 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExistingImages(prev => ({ ...prev, [field]: null }));
+                                  toast({
+                                    title: "Image Removed",
+                                    description: `Image ${index + 1} will be removed when you save`,
+                                  });
+                                }}
+                                title={`Remove image ${index + 1}`}
+                              >
+                                <X className="h-3 w-3" />
+                              </button>
+                              <span className="absolute bottom-1 left-1 text-xs bg-black/50 text-white px-1 py-0.5 rounded">
+                                {index + 1}
+                              </span>
+                            </div>
+                          );
+                        }
+                      });
+                      
+                      // Then, show images from old Base64 columns (for backward compatibility)
+                      imageBase64Fields.forEach((field, index) => {
+                        const imageData = (selectedProduct as any)[field];
+                        if (imageData && existingImages[field] !== null) {
+                          const imageUrl = (imageData.startsWith('data:') || imageData.startsWith('http'))
+                            ? imageData
+                            : `data:image/jpeg;base64,${imageData}`;
                           images.push(
                             <div
                               key={field}
@@ -8784,7 +8936,7 @@ case "products":
                                 <X className="h-3 w-3" />
                               </button>
                               <span className="absolute bottom-1 left-1 text-xs bg-black/50 text-white px-1 py-0.5 rounded">
-                                {index + 1}
+                                {index + 1 + imagePathFields.length}
                               </span>
                             </div>
                           );
@@ -8844,25 +8996,17 @@ case "products":
                             setIsLoading(true);
                             toast({
                               title: "Processing",
-                              description: "Compressing image...",
+                              description: "Adding image...",
                             });
 
-                            const reader = new FileReader();
-                            reader.onload = () => {
-                              setEditImageFiles(prev => [...prev, reader.result as string]);
-                              toast({
-                                title: "Success",
-                                description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
-                              });
-                            };
-                            reader.onerror = () => {
-                              toast({
-                                title: "Error",
-                                description: "Failed to read image",
-                                variant: "destructive",
-                              });
-                            };
-                            reader.readAsDataURL(file);
+                            // Store file object directly instead of Base64
+                            const previewUrl = URL.createObjectURL(file);
+                            setEditImageFiles(prev => [...prev, file]);
+                            setEditImagePreviewUrls(prev => [...prev, previewUrl]);
+                            toast({
+                              title: "Success",
+                              description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
+                            });
                           } catch (error) {
                             console.error('Error processing image:', error);
                             toast({
@@ -8883,7 +9027,11 @@ case "products":
                           type="button"
                           variant="destructive"
                           size="sm"
-                          onClick={() => setEditImageFiles([])}
+                          onClick={() => {
+                            editImagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+                            setEditImageFiles([]);
+                            setEditImagePreviewUrls([]);
+                          }}
                           className="text-xs sm:text-sm"
                         >
                           Clear All
@@ -8892,18 +9040,18 @@ case "products":
                     </div>
 
                     {/* New Image Previews */}
-                    {editImageFiles.length > 0 && (
+                    {editImagePreviewUrls.length > 0 && (
                       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5 sm:gap-4">
-                        {editImageFiles.map((image, index) => (
+                        {editImagePreviewUrls.map((previewUrl, index) => (
                           <div
                             key={index}
                             className="relative group aspect-square cursor-zoom-in"
                             title="Click to zoom"
-                            onClick={() => { setZoomImageSrc(image); setZoomScale(1); }}
+                            onClick={() => { setZoomImageSrc(previewUrl); setZoomScale(1); }}
                           >
                             <div className="absolute inset-0 rounded-lg overflow-hidden border border-border">
                               <img
-                                src={image}
+                                src={previewUrl}
                                 alt={`New Preview ${index + 1}`}
                                 className="w-full h-full object-cover"
                               />
@@ -8911,7 +9059,12 @@ case "products":
                             <button
                               type="button"
                               className="absolute top-1 right-1 p-1 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity sm:top-2 sm:right-2"
-                              onClick={(e) => { e.stopPropagation(); setEditImageFiles(editImageFiles.filter((_, i) => i !== index)); }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                URL.revokeObjectURL(previewUrl);
+                                setEditImageFiles(editImageFiles.filter((_, i) => i !== index));
+                                setEditImagePreviewUrls(editImagePreviewUrls.filter((_, i) => i !== index));
+                              }}
                             >
                               <X className="h-2 w-2 sm:h-3 sm:w-3" />
                             </button>
@@ -8953,15 +9106,14 @@ case "products":
                                   }
 
                                   setIsLoading(true);
-                                  const reader = new FileReader();
-                                  reader.onload = () => {
-                                    setEditImageFiles(prev => [...prev, reader.result as string]);
-                                    toast({
-                                      title: "Success",
-                                      description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
-                                    });
-                                  };
-                                  reader.readAsDataURL(file);
+                                  // Store file object directly instead of Base64
+                                  const previewUrl = URL.createObjectURL(file);
+                                  setEditImageFiles(prev => [...prev, file]);
+                                  setEditImagePreviewUrls(prev => [...prev, previewUrl]);
+                                  toast({
+                                    title: "Success",
+                                    description: `Image added (${(file.size / 1024 / 1024).toFixed(1)}MB)`,
+                                  });
                                 } catch (error) {
                                   console.error('Error processing image:', error);
                                   toast({
@@ -8982,7 +9134,7 @@ case "products":
                         )}
                       </div>
                     )}
-                    
+
                     {editImageFiles.length === 0 && (
                       <p className="text-xs text-muted-foreground text-center py-2">
                         Upload new images to add to this product
@@ -9314,7 +9466,7 @@ case "products":
                       </div>
                     )}
 
-                    {/* Filter Section for Edit */}
+                    
                     <div className="mt-4">
                       <Label className="font-sans text-sm sm:text-base">Filter</Label>
                       <div className="flex flex-col gap-2 mt-2 sm:flex-row sm:items-center sm:gap-2">
@@ -9529,7 +9681,9 @@ case "products":
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => {
                   setIsEditModalOpen(false);
+                  editImagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
                   setEditImageFiles([]); // Clear edit images when closing
+                  setEditImagePreviewUrls([]);
                   setExistingImages({}); // Reset existing images tracking
                 }}>
                   Cancel

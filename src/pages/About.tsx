@@ -312,7 +312,7 @@ const About = () => {
     return {
       id: course.id,
       title: course.title,
-      event_type: course.category === " Professional Course" ? "Course" : "Workshop",
+      event_type: course.category && course.category.includes("Professional Course") ? "Course" : "Workshop",
       event_date: course.nextbatch || "TBD",
       event_time: "Contact for timing",
       duration: course.duration,
@@ -328,11 +328,11 @@ const About = () => {
 
   // Filter courses for display (use normalized category values)
   const professionalCourses = classes.filter(cls => 
-    cls.category === " Professional Course"
+    cls.category && cls.category.includes("Professional Course")
   );
 
   const specialWorkshops = classes.filter(cls => 
-    cls.category === "Workshops"
+    cls.category && cls.category.toLowerCase().includes("workshop")
   );
 
   return (
