@@ -310,7 +310,7 @@ const Admin = () => {
   const refreshProducts = async () => {
     setIsProductsLoading(true);
     try {
-      const productsResponse = await api.get('/api/admin/products');
+      const productsResponse = await api.get('/api/admin/products?includeImages=true');
       if (productsResponse.status === 200 && productsResponse.data) {
         const formattedProducts = formatProductData(productsResponse.data);
         setProducts(formattedProducts);
@@ -1493,7 +1493,7 @@ const Admin = () => {
         setIsOrdersLoading(true);
 
         // Fetch products
-        const productsResponse = await api.get('/api/admin/products');
+        const productsResponse = await api.get('/api/admin/products?includeImages=true');
         if (productsResponse.status === 200 && productsResponse.data) {
           const formattedProducts = formatProductData(productsResponse.data);
           setProducts(formattedProducts);
@@ -1661,7 +1661,7 @@ const Admin = () => {
         setCustomRequests([]);
       });
       // Fetch products
-      api.get('/api/admin/products').then((res) => {
+      api.get('/api/admin/products?includeImages=true').then((res) => {
         setProducts(res.data);
       });
     }
@@ -2761,7 +2761,7 @@ case "products":
                   }
 
                   // Refresh products list
-                  const updatedProducts = await api.get('/api/admin/products');
+                  const updatedProducts = await api.get('/api/admin/products?includeImages=true');
                   const formattedUpdatedProducts = formatProductData(updatedProducts.data);
                   setProducts(formattedUpdatedProducts);
 
@@ -8572,9 +8572,38 @@ case "products":
       // First update the product data (including removing images)
       const response = await api.put(`/api/admin/products/${selectedProduct.id}`, finalUpdateData);
       if (response.status === 200) {
-        // If there are new images to upload, upload them
+        // If there are new images to upload, upload them into the next free
+        // image slots instead of always starting over at slot 0 (which would
+        // overwrite the existing "image" field).
         if (editImageFiles.length > 0) {
-          await uploadImagesOneByOne(selectedProduct.id, editImageFiles);
+          const imageSlotOrder = ['image', 'imagefirst', 'imagesecond', 'imagethirder', 'imagefoure', 'imagefive'];
+          const occupiedSlots = imageSlotOrder.map(field => {
+            if (Object.prototype.hasOwnProperty.call(existingImages, field) && existingImages[field] === null) {
+              return false; // marked for removal in this save
+            }
+            return !!(selectedProduct as any)?.[field];
+          });
+
+          const targetIndices: number[] = [];
+          let slotPointer = 0;
+          for (let i = 0; i < editImageFiles.length; i++) {
+            while (slotPointer < occupiedSlots.length && occupiedSlots[slotPointer]) {
+              slotPointer++;
+            }
+            if (slotPointer >= occupiedSlots.length) {
+              toast({
+                title: "Some images not uploaded",
+                description: "This product already has the maximum of 6 images.",
+                variant: "destructive",
+              });
+              break;
+            }
+            targetIndices.push(slotPointer);
+            occupiedSlots[slotPointer] = true;
+            slotPointer++;
+          }
+
+          await uploadImagesOneByOne(selectedProduct.id, editImageFiles.slice(0, targetIndices.length), targetIndices);
         }
 
         setProducts(products.map(p => p.id === selectedProduct.id ? response.data : p));
@@ -8606,16 +8635,17 @@ case "products":
     }
   };
 
-const uploadImagesOneByOne = async (productId: string, files: File[]) => {
+const uploadImagesOneByOne = async (productId: string, files: File[], targetIndices?: number[]) => {
   console.log(`[IMAGE UPLOAD] Starting upload for product ${productId} with ${files.length} files`);
-  
+
   for (let i = 0; i < files.length; i++) {
     try {
-      console.log(`[IMAGE UPLOAD] Uploading image ${i + 1}/${files.length}: ${files[i].name}`);
-      
+      const imageIndex = targetIndices ? targetIndices[i] : i;
+      console.log(`[IMAGE UPLOAD] Uploading image ${i + 1}/${files.length} into slot ${imageIndex}: ${files[i].name}`);
+
       const formData = new FormData();
       formData.append('image', files[i]);
-      formData.append('imageIndex', String(i));
+      formData.append('imageIndex', String(imageIndex));
 
       const response = await fetch(`${getApiBaseURL()}/api/admin/products/${productId}/upload-images`, {
         method: 'POST',
