@@ -245,6 +245,10 @@ const About = () => {
       return image;
     }
 
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
+
     if (/^[A-Za-z0-9+/=]+$/.test(image)) {
       return `data:image/png;base64,${image}`;
     }

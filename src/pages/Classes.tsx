@@ -94,12 +94,17 @@ const Classes = () => {
       return image;
     }
 
-    // Case 2: Raw Base64 (no prefix yet)
+    // Case 2: Already a full URL
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
+
+    // Case 3: Raw Base64 (no prefix yet)
     if (/^[A-Za-z0-9+/=]+$/.test(image)) {
       return `data:image/png;base64,${image}`;
     }
 
-    // Case 3: Normal image path or URL
+    // Case 4: Normal image path
     return `/uploads/${image}`;
   };
 

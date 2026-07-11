@@ -42,7 +42,7 @@ import {
 } from "lucide-react";
 import { ZoomIn, ZoomOut } from "lucide-react";
 import { ChevronRight, ChevronDown } from "lucide-react";
-import { cn, getProductImageUrl } from "@/lib/utils";
+import { cn, getProductImageUrl, getImageUrl } from "@/lib/utils";
 import flowerSchoolLogo from "@/assets/flower-school-logo.png";
 import api from '@/lib/api';
 import { getApiBaseURL } from '@/lib/env';
@@ -586,6 +586,7 @@ const Admin = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isViewOrderModalOpen, setIsViewOrderModalOpen] = useState(false);
   const [isEditOrderModalOpen, setIsEditOrderModalOpen] = useState(false);
+  const [pendingOrderStatus, setPendingOrderStatus] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   
   // Edit filter section state variables
@@ -4021,6 +4022,7 @@ case "products":
                                         size="icon"
                                         onClick={() => {
                                           setSelectedOrder(order);
+                                          setPendingOrderStatus(order.status);
                                           setIsEditOrderModalOpen(true);
                                         }}
                                       >
@@ -4160,6 +4162,7 @@ case "products":
                                       size="icon"
                                       onClick={() => {
                                         setSelectedOrder(order);
+                                        setPendingOrderStatus(order.status);
                                         setIsEditOrderModalOpen(true);
                                       }}
                                     >
@@ -4389,51 +4392,8 @@ case "products":
                     <div className="space-y-2">
                       <Label>New Status</Label>
                       <Select
-                        defaultValue={selectedOrder.status}
-                        onValueChange={async (value) => {
-                          if (!selectedOrder) return;
-                          try {
-                            setIsLoading(true);
-                            // Update order status using the correct endpoint and ID field
-                            const response = await api.put(`/api/admin/orders/${selectedOrder.id}/status`, {
-                              status: value
-                            });
-
-                            if (response.status === 200) {
-                              // Update orders list with new status
-                              setOrders(orders.map(o =>
-                                o.id === selectedOrder.id
-                                  ? { ...o, status: value }
-                                  : o
-                              ));
-                              // Also update ordersForDate if present
-                              setOrdersForDate(prev =>
-                                prev.map(o =>
-                                  o.id === selectedOrder.id
-                                    ? { ...o, status: value }
-                                    : o
-                                )
-                              );
-
-                              setIsEditOrderModalOpen(false);
-
-                              toast({
-                                title: "Status Updated",
-                                description: `Order status changed to ${value}`,
-                                variant: "default",
-                              });
-                            }
-                          } catch (error) {
-                            console.error('Error updating status:', error);
-                            toast({
-                              title: "Error",
-                              description: "Failed to update order status",
-                              variant: "destructive",
-                            });
-                          } finally {
-                            setIsLoading(false);
-                          }
-                        }}
+                        value={pendingOrderStatus}
+                        onValueChange={(value) => setPendingOrderStatus(value)}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select new status" />
@@ -4457,6 +4417,52 @@ case "products":
                         disabled={isLoading}
                       >
                         Cancel
+                      </Button>
+                      <Button
+                        onClick={async () => {
+                          if (!selectedOrder || !pendingOrderStatus) return;
+                          try {
+                            setIsLoading(true);
+                            const response = await api.put(`/api/admin/orders/${selectedOrder.id}/status`, {
+                              status: pendingOrderStatus
+                            });
+
+                            if (response.status === 200) {
+                              setOrders(orders.map(o =>
+                                o.id === selectedOrder.id
+                                  ? { ...o, status: pendingOrderStatus }
+                                  : o
+                              ));
+                              setOrdersForDate(prev =>
+                                prev.map(o =>
+                                  o.id === selectedOrder.id
+                                    ? { ...o, status: pendingOrderStatus }
+                                    : o
+                                )
+                              );
+
+                              setIsEditOrderModalOpen(false);
+
+                              toast({
+                                title: "Status Updated",
+                                description: `Order status changed to ${pendingOrderStatus}`,
+                                variant: "default",
+                              });
+                            }
+                          } catch (error) {
+                            console.error('Error updating status:', error);
+                            toast({
+                              title: "Error",
+                              description: "Failed to update order status",
+                              variant: "destructive",
+                            });
+                          } finally {
+                            setIsLoading(false);
+                          }
+                        }}
+                        disabled={isLoading || !pendingOrderStatus || pendingOrderStatus === selectedOrder.status}
+                      >
+                        {isLoading ? "Saving..." : "Save"}
                       </Button>
                     </DialogFooter>
                   </div>
@@ -4824,7 +4830,7 @@ case "products":
                           <div className="aspect-video overflow-hidden relative rounded-t-lg">
                             {cls.image ? (
                               <img
-                                src={`data:image/png;base64,${cls.image}`}
+                                src={getImageUrl(cls.image)}
                                 alt={cls.title}
                                 className="w-full h-full object-cover"
                               />
@@ -5291,7 +5297,7 @@ case "products":
                             <div className="relative">
                               <div className="aspect-video w-full max-w-xs overflow-hidden rounded-lg border">
                                 <img
-                                  src={`data:image/png;base64,${editClassImageFile || selectedClass.image}`}
+                                  src={editClassImageFile ? `data:image/png;base64,${editClassImageFile}` : getImageUrl(selectedClass.image)}
                                   alt="Class preview"
                                   className="w-full h-full object-cover"
                                 />

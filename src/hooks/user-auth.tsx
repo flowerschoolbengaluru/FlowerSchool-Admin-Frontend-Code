@@ -177,7 +177,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           const resp = await api.get('/api/auth/user');
           if (resp && resp.data) {
-            setUser(resp.data as UserData);
+            // Bail out with the same reference when the data hasn't actually
+            // changed, so effects keyed on `user` (e.g. Admin product list)
+            // don't re-run just because the tab regained focus.
+            setUser(prev => {
+              const next = resp.data as UserData;
+              return JSON.stringify(prev) === JSON.stringify(next) ? prev : next;
+            });
             setIsAuthenticated(true);
           } else {
             // If server doesn't return a user, keep the existing client user
