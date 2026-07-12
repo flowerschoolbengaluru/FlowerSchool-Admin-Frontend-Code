@@ -96,6 +96,7 @@ interface Order {
   updatedat?: string;
   delivery_option?: string;
   distance?: number;
+  deliverydate?: string;
 }
 
 interface OrderItem {
@@ -4257,6 +4258,14 @@ case "products":
                               <div>
                               <dt className="text-sm text-muted-foreground">Delivery Option</dt>
                               <dd className="text-sm">{selectedOrder.delivery_option}</dd>
+                            </div>
+                              <div>
+                              <dt className="text-sm text-muted-foreground">Delivery Date</dt>
+                              <dd className="text-sm">
+                                {selectedOrder.deliverydate
+                                  ? new Date(selectedOrder.deliverydate).toLocaleDateString()
+                                  : 'Not specified'}
+                              </dd>
                             </div>
                               <div>
                               <dt className="text-sm text-muted-foreground">Distance</dt>
