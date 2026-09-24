@@ -245,7 +245,7 @@ const Classes = () => {
               category: normalizedCategory,
               capacity: cls.capacity || 20,
               enrolled: cls.enrolled || 0,
-              rating: cls.rating || 4.5,
+              // rating: cls.rating || 4.5,
             };
           });
         };
@@ -521,12 +521,12 @@ const Classes = () => {
                           <CardTitle className="text-base sm:text-lg font-semibold text-gray-900 leading-tight flex-1 min-w-0">
                             <span className="line-clamp-2">{cls.title}</span>
                           </CardTitle>
-                          <div className="flex items-center gap-1 flex-shrink-0">
+                          {/* <div className="flex items-center gap-1 flex-shrink-0">
                             <Star className="h-3 w-3 sm:h-4 sm:w-4 text-yellow-400 fill-yellow-400" />
                             <span className="text-xs sm:text-sm font-medium text-gray-700">
                               {cls.rating?.toFixed(1) || "4.5"}
                             </span>
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* Description */}

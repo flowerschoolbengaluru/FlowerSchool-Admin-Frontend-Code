@@ -658,12 +658,12 @@ const About = () => {
                               <h3 className="text-base md:text-lg font-bold text-gray-900 flex-1">
                                 {course.title}
                               </h3>
-                              <div className="flex items-center gap-1 flex-shrink-0 ml-2">
+                              {/* <div className="flex items-center gap-1 flex-shrink-0 ml-2">
                                 <Star className="h-3 w-3 md:h-4 md:w-4 text-yellow-400 fill-yellow-400" />
                                 <span className="text-xs md:text-sm font-medium text-gray-700">
                                   {course.rating?.toFixed(1) || "4.5"}
                                 </span>
-                              </div>
+                              </div> */}
                             </div>
 
                             <div className="space-y-2 md:space-y-3 mb-3 md:mb-4 flex-grow">
