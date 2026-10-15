@@ -331,6 +331,7 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
 
     return (
         <>
+      
             <Dialog open={isOpen} onOpenChange={handleClose}>
                 <DialogContent className="max-w-[95vw] mx-2 sm:max-w-[500px] md:max-w-[600px] max-h-[90vh] sm:max-h-[95vh] overflow-y-auto rounded-lg sm:rounded-xl">
                     <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
@@ -570,5 +571,6 @@ export function BookingModal({ event, isOpen, onClose }: BookingModalProps) {
                 </DialogContent>
             </Dialog>
         </>
+       
     );
 }

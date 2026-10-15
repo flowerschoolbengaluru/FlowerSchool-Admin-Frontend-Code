@@ -69,8 +69,10 @@ const Footer = () => {
             </div>
 
             <p className="text-gray-600 mb-6 leading-relaxed">
-              Creating beautiful moments with the art of flowers. From professional floristry courses
-              to creative workshops, we bring the beauty of nature into your life.
+              Creating beautiful moments with the art
+              of flowers. From professional floristry
+              courses to creative workshops where
+              careers are built.
             </p>
 
             <div className="flex space-x-4">
@@ -163,9 +165,7 @@ const Footer = () => {
               <a href="/privacy" className="text-gray-600 hover:text-pink-600 transition-colors">
                 Privacy Policy
               </a>
-              <a href="/terms" className="text-gray-600 hover:text-pink-600 transition-colors">
-                Terms of Service
-              </a>
+             
               <div className="flex items-center text-gray-600">
                 Made with <Heart className="h-4 w-4 mx-1 text-pink-600" /> for flower lovers
               </div>
