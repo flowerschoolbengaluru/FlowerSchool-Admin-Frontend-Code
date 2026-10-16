@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Users, Star, BookOpen, ImageIcon, ArrowRight, GraduationCap, Award, Target, Heart, ChevronDown, ChevronUp } from "lucide-react";
 import api, { endpoints } from "@/lib/api";
 import { BookingModal } from "@/components/BookingModal";
-import schoolClassroomImage from "@/assets/school-classroom.jpg";
+import schoolClassroomImage from "@/assets/schoolClassroomImage.jpg";
 import schoolGraduationImage from "@/assets/school-graduation.jpg";
 
 interface Feature {
