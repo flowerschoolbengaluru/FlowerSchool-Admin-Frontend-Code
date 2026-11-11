@@ -371,9 +371,7 @@ const Classes = () => {
                       className="w-full h-48 sm:h-64 md:h-80 lg:h-96 object-cover transform group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-700 ease-out"
                     />
 
-                    {/* Floating elements */}
-                    <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-3 h-3 sm:w-4 sm:h-4 bg-rose-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
-                    <div className="absolute top-4 right-4 sm:top-8 sm:right-8 w-2 h-2 sm:w-3 sm:h-3 bg-pink-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-ping" />
+      
                   </div>
                 </div>
 
@@ -389,8 +387,7 @@ const Classes = () => {
                     />
 
                     {/* Floating elements */}
-                    <div className="absolute bottom-2 right-2 sm:bottom-4 sm:right-4 w-3 h-3 sm:w-4 sm:h-4 bg-purple-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse" />
-                    <div className="absolute bottom-4 left-4 sm:bottom-8 sm:left-8 w-2 h-2 sm:w-3 sm:h-3 bg-pink-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 animate-ping" />
+
                   </div>
                 </div>
               </div>
